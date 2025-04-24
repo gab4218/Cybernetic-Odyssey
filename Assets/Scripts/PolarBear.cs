@@ -1,0 +1,93 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+
+public class PolarBear : EnemyBase
+{
+    private Vector2 randomPosition;
+    private Ray downRay;
+    private Animator anim;
+
+
+    [SerializeField] private float slamRange;
+    [SerializeField] private int slamDamage;
+    [SerializeField] private BoxCollider slamCollider;
+    [SerializeField] private float slamKnockback = 2.0f;
+    
+    protected override void Start()
+    {
+        base.Start();
+        anim = GetComponentInChildren<Animator>();
+        slamCollider.enabled = false;
+        randomPosition = new Vector2
+                            (
+                                Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
+                                Random.Range(randomMovementDimensions[0].y, randomMovementDimensions[1].y)
+                            );
+        findDirection(randomPosition);
+    }
+
+    private void Update()
+    {
+        detectPlayer();
+        HPDisplay.text = $"Bear HP: {currentHP}/{maxHP}";
+        if (state != IDLE)
+        {
+            findDirection();
+            if (Vector3.Distance(transform.position, playerTranform.position) < slamRange) 
+            {
+                state = ATTACKING;
+                anim.Play("BearSlam");
+            }
+        }
+        else if(hasReachedDestination(randomPosition))
+        {
+            randomPosition = new Vector2
+                            (
+                                Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
+                                Random.Range(randomMovementDimensions[0].y, randomMovementDimensions[1].y)
+                            );
+        }
+        else
+        {
+            findDirection(randomPosition);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        PlayerActions pAct = other.GetComponentInParent<PlayerActions>();
+        Rigidbody pRB = other.GetComponentInParent<Rigidbody>();
+        if (slamCollider.enabled && pAct != null)
+        {
+            pAct.takeDamage(slamDamage);
+            if (pRB != null)
+            {
+                pRB.drag = 0;
+                pRB.AddForce((dir + Vector3.up).normalized * slamKnockback * pAct.getKnockbackMult(), ForceMode.Impulse);
+            }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (state == IDLE || state == SEEKING)
+        {
+            move();
+        }
+    }
+
+    public void slamAttack()
+    {
+        slamCollider.enabled = true;
+    }
+
+
+    public void slamReset()
+    {
+        slamCollider.enabled = false;
+        state = IDLE;
+    }
+
+}

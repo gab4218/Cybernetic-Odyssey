@@ -1,7 +1,9 @@
  using System.Collections;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Timeline;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -25,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float groundRayLen = 0.2f;
     [SerializeField] private float slideImpulse = 2f;
     [SerializeField] private float slideTime = 2f;
+    [SerializeField] private float grapplingForce = 3000f;
     [SerializeField] private LayerMask groundRayLayerMask = 30;
     
 
@@ -42,11 +45,11 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
 
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = true, walljumping = false;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = true, walljumping = false, isGrappling = false;
 
     private Rigidbody rb;
 
-    private Vector3 posOffset;
+    private Vector3 posOffset, grapplePosition;
 
     
 
@@ -80,62 +83,80 @@ public class PlayerMovement : MonoBehaviour
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 0.01f);
         }
         //Get player input
-        xDir = Input.GetAxisRaw("Horizontal");
-        zDir = Input.GetAxisRaw("Vertical");
 
-        if (!isSliding)
+        if (isGrappling)
         {
-            dir = transform.right * xDir + transform.forward * zDir;
-        }
-        
-        //Create ground-detecting ray
-        groundRay = new Ray(-transform.up, transform.position);
-        //Change drag according to whether the player is on the ground or in the air
-        if (groundDetect())
-        {
-            rb.drag = groundDrag;
+            dir = grapplePosition - transform.position;
+            if (Vector3.Distance(transform.position, grapplePosition) < 2)
+            {
+                isGrappling = false;
+            }
         }
         else
         {
-            rb.drag = airDrag;
-        }
+            xDir = Input.GetAxisRaw("Horizontal");
+            zDir = Input.GetAxisRaw("Vertical");
 
-        //Check if there's any modification to the player's movement state and correct speed
-        checkSprint();
-
-        checkCrouch();
+            if (!isSliding)
+            {
+                dir = transform.right * xDir + transform.forward * zDir;
+            }
         
-        if (Input.GetKeyDown(jumpKey) && groundDetect())
-        {
-            Jump();
+            //Create ground-detecting ray
+            groundRay = new Ray(-transform.up, transform.position);
+            //Change drag according to whether the player is on the ground or in the air
+            if (groundDetect())
+            {
+                rb.drag = groundDrag;
+            }
+            else
+            {
+                rb.drag = airDrag;
+            }
+
+            //Check if there's any modification to the player's movement state and correct speed
+            checkSprint();
+
+            checkCrouch();
+        
+            if (Input.GetKeyDown(jumpKey) && groundDetect())
+            {
+                Jump();
+            }
+            if (Input.GetKeyDown(jumpKey) && WallDetect() && currentStamina >= 0.5f) WallJump();
+
+
+            checkSpeed();
+
+
+
+            //This handles stamina
+            if (isSprinting)
+            {
+                currentStamina -= Time.deltaTime;
+
+            }
+            else if(resting && currentStamina < maxStamina)
+            {
+                currentStamina = Mathf.Min(currentStamina + Time.deltaTime * 2, maxStamina);
+            }
+            staminaImg.sizeDelta = new Vector2(currentStamina * 80, staminaImg.sizeDelta.y);
+
         }
-        if (Input.GetKeyDown(jumpKey) && WallDetect() && currentStamina >= 0.5f) WallJump();
 
-
-        checkSpeed();
-
-
-
-        //This handles stamina
-        if (isSprinting)
-        {
-            currentStamina -= Time.deltaTime;
-
-        }
-        else if(resting && currentStamina < maxStamina)
-        {
-            currentStamina = Mathf.Min(currentStamina + Time.deltaTime * 2, maxStamina);
-        }
-        staminaImg.sizeDelta = new Vector2(currentStamina * 80, staminaImg.sizeDelta.y);
     }
 
     private void FixedUpdate()
     {
         //If player is providing movement input, move
-        if (dir.sqrMagnitude != 0)
+        if (dir.sqrMagnitude != 0 && !isGrappling)
         {
             Movement(dir);
             
+        }
+        else if(isGrappling)
+        {
+            rb.AddForce(dir.normalized * grapplingForce * Time.fixedDeltaTime, ForceMode.Force);
         }
     }
 
@@ -272,6 +293,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+  
     private void Jump()
     {
         //Halt all vertical movement for consistency and apply an impulse force upwards
@@ -292,6 +314,14 @@ public class PlayerMovement : MonoBehaviour
         canWalljump = newWalljump;
     }
 
+    public void GrappleTo(Vector3 grapplePos)
+    {
+        isGrappling = true;
+        grapplePosition = grapplePos;
+        
+    }
+
+   
     private IEnumerator slideTimer()
     {
         float currentTime = 0;

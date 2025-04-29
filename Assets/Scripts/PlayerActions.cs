@@ -14,16 +14,21 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] TMP_Text HPDisplay;
     [SerializeField] TMP_Text dmgTypeDisplay;
     [SerializeField] Image crosshair;
+    [SerializeField] Image grappleIMG;
     [Header("Inputs")]
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
     [SerializeField] KeyCode inventoryKey = KeyCode.I;
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
+    [SerializeField] KeyCode grappleKey = KeyCode.F;
     [Header("Parameters")]
     [SerializeField] float interactDistance;
     [SerializeField] int maxHP = 100;
     [SerializeField] int dmgPerPellet = 1;
     [SerializeField] float readyWeaponTime = 0.5f;
+    [SerializeField] float grappleDistance = 15f;
+    [SerializeField] float grappleDelay = 5.0f;
+
     
     bool canGetHit = true;
     int damageType = 0;
@@ -33,6 +38,8 @@ public class PlayerActions : MonoBehaviour
     private Ray facingRay;
     private Inventory inventory;
     private PlayerMovement playerMovement;
+    private bool canGrapple = true;
+
 
     private void Start()
     {
@@ -49,6 +56,7 @@ public class PlayerActions : MonoBehaviour
 
     private void Update()
     {
+
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward);
         HPDisplay.text = $"{currentHP}/{maxHP}";
         if (Input.GetKeyDown(Key1))
@@ -67,6 +75,16 @@ public class PlayerActions : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        if (Input.GetKeyDown(grappleKey) && canGrapple)
+        {
+            ShootGrapple();
+        }
+
+        if (transform.position.y < -20)
+        {
+            OOBDie();
         }
 
         dmgTypeDisplay.text = $"Damage type: {damageType.ToString()}";
@@ -174,6 +192,10 @@ public class PlayerActions : MonoBehaviour
             case 2:
                 playerMovement.ChangeWalljump(true);
                 break;
+            case 3:
+                canGrapple = true;
+                grappleIMG.color = new Color(70, 50, 231);
+                break;
 
             default:
                 break;
@@ -190,10 +212,47 @@ public class PlayerActions : MonoBehaviour
             case 2:
                 playerMovement.ChangeWalljump(false);
                 break;
-
+            case 3:
+                canGrapple = false;
+                grappleIMG.color = Color.red;
+                break;
             default:
                 break;
         }
+    }
+
+    private void OOBDie()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void ShootGrapple()
+    {
+        canGrapple = false;
+        grappleIMG.color = Color.red;
+        StartCoroutine(GrappleReload());
+        if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance))
+        {
+            if(hit.collider.gameObject != null)
+            {
+                playerMovement.GrappleTo(hit.point);
+            }
+        }
+    }
+
+    private IEnumerator GrappleReload()
+    {
+        
+        float timer = 0f;
+        while (timer < grappleDelay)
+        {
+            timer += Time.deltaTime;
+            
+            yield return null;
+        }
+        canGrapple = true;
+        grappleIMG.color = new Color(70f, 50f, 231f);
+        yield break;
     }
 
 }

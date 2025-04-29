@@ -15,6 +15,7 @@ public class PolarBear_Anim : MonoBehaviour
     {
         anim.Play("BearIdle");
         pb.slamReset();
+        pb.clawReset();
     }
 
     public void slam()
@@ -22,5 +23,8 @@ public class PolarBear_Anim : MonoBehaviour
         pb.slamAttack();
     }
     
-
+    public void claw()
+    {
+        pb.clawAttack();
+    }
 }

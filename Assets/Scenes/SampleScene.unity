@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 116180324}
   - component: {fileID: 116180325}
   - component: {fileID: 116180326}
+  - component: {fileID: 116180327}
   m_Layer: 0
   m_Name: PolarBear
   m_TagString: Untagged
@@ -552,7 +553,7 @@ MonoBehaviour:
   maxHP: 50
   speed: 4
   detectionDistance: 15
-  blindDistance: 20
+  escapeDistance: 0
   damageType: 1
   stunTime: 0
   randomMovementDimensions:
@@ -566,6 +567,10 @@ MonoBehaviour:
   slamDamage: 30
   slamCollider: {fileID: 116180326}
   slamKnockback: 10
+  clawDamage: 10
+  clawRange: 5
+  clawCollider: {fileID: 116180327}
+  clawKnockback: 7
 --- !u!54 &116180325
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -614,6 +619,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 25, y: 3, z: 25}
   m_Center: {x: 0, y: 1.5, z: 0}
+--- !u!65 &116180327
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116180322}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 1610645559
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 9.209377, y: 5.2207556, z: 6.587345}
+  m_Center: {x: 0, y: 1.6275377, z: -3.0664158}
 --- !u!1 &116643221
 GameObject:
   m_ObjectHideFlags: 0
@@ -5642,7 +5668,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1360607863}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 4.36, z: 0}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0

@@ -12,7 +12,7 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
     [SerializeField] protected float detectionDistance;
-    [SerializeField] protected float blindDistance;
+    [SerializeField] protected float escapeDistance;
     [SerializeField] protected int damageType;
     [SerializeField] protected float stunTime;
     [SerializeField] protected Vector3[] randomMovementDimensions;
@@ -31,8 +31,8 @@ public class EnemyBase : MonoBehaviour
     {
         rb = GetComponentInChildren<Rigidbody>();
         currentHP = maxHP;
+        playerTranform = FindObjectOfType<PlayerMovement>().transform;
         player = FindObjectOfType<PlayerActions>();
-        playerTranform = player.gameObject.transform;
         state = IDLE;
     }
 
@@ -42,7 +42,7 @@ public class EnemyBase : MonoBehaviour
         {
             state = SEEKING;
         }
-        else if (state != IDLE && state != ATTACKING && Vector3.Distance(transform.position, playerTranform.position) >= blindDistance)
+        else if (state != IDLE && state != ATTACKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
         {
             state = IDLE;
         }

@@ -31,8 +31,8 @@ public class EnemyBase : MonoBehaviour
     {
         rb = GetComponentInChildren<Rigidbody>();
         currentHP = maxHP;
-        playerTranform = FindObjectOfType<PlayerMovement>().transform;
         player = FindObjectOfType<PlayerActions>();
+        playerTranform = player.gameObject.transform;
         state = IDLE;
     }
 

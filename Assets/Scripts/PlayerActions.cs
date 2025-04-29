@@ -18,12 +18,12 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
     [SerializeField] KeyCode inventoryKey = KeyCode.I;
+    [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [Header("Parameters")]
     [SerializeField] float interactDistance;
     [SerializeField] int maxHP = 100;
     [SerializeField] int dmgPerPellet = 1;
     [SerializeField] float readyWeaponTime = 0.5f;
-    [SerializeField] int dmgTypeCount = 4;
     
     bool canGetHit = true;
     int damageType = 0;
@@ -32,11 +32,14 @@ public class PlayerActions : MonoBehaviour
     bool canShoot = true;
     private Ray facingRay;
     private Inventory inventory;
+    private PlayerMovement playerMovement;
+
     private void Start()
     {
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
         inventory = GetComponent<Inventory>();
+        playerMovement = GetComponent<PlayerMovement>();
         foreach (int i in inventory.getEnabledUpgrades())
         {
             enableUpgrade(i);
@@ -48,13 +51,22 @@ public class PlayerActions : MonoBehaviour
     {
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward);
         HPDisplay.text = $"{currentHP}/{maxHP}";
-        if (Input.mouseScrollDelta.y > 0)
+        if (Input.GetKeyDown(Key1))
         {
-            damageType = (damageType + 1) % dmgTypeCount;
+            damageType = 0;
         }
-        else if(Input.mouseScrollDelta.y < 0)
+        if(Input.GetKeyDown(Key2))
         {
-            damageType = (damageType > 0? damageType - 1 : dmgTypeCount-1)% dmgTypeCount;
+            damageType = 1;
+        }
+        if (Input.GetKeyDown(Key3))
+        {
+            damageType = 2;
+        }
+        //DELETE LATER
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         dmgTypeDisplay.text = $"Damage type: {damageType.ToString()}";
@@ -65,6 +77,7 @@ public class PlayerActions : MonoBehaviour
 
             if(Physics.Raycast(facingRay, out RaycastHit hit))
             {
+                
                 canShoot = false;
                 Invoke("readyWeapon", readyWeaponTime);
                 if(hit.collider != null)
@@ -158,7 +171,9 @@ public class PlayerActions : MonoBehaviour
             case 1:
                 knockbackMult = 0.5f;
                 break;
-            
+            case 2:
+                playerMovement.ChangeWalljump(true);
+                break;
 
             default:
                 break;
@@ -172,7 +187,9 @@ public class PlayerActions : MonoBehaviour
             case 1:
                 knockbackMult = 1;
                 break;
-
+            case 2:
+                playerMovement.ChangeWalljump(false);
+                break;
 
             default:
                 break;

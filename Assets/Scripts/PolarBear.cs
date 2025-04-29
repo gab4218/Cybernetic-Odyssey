@@ -6,7 +6,6 @@ using UnityEngine;
 public class PolarBear : EnemyBase
 {
     private Vector2 randomPosition;
-    private Ray downRay;
     private Animator anim;
 
 

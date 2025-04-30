@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float slideTime = 2f;
     [SerializeField] private float grapplingForce = 3000f;
     [SerializeField] private LayerMask groundRayLayerMask = 30;
+
     
 
     [Header("UI")]
@@ -45,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
 
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = true, walljumping = false, isGrappling = false;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false;
 
     private Rigidbody rb;
 

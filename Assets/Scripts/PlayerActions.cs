@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class PlayerActions : MonoBehaviour
 {
     
@@ -15,6 +16,9 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] TMP_Text dmgTypeDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
+    [SerializeField] Transform bulletSpawn;
+    [SerializeField] TrailRenderer bulletPrefab;
+    [SerializeField] Gradient[] bulletColors;
     [Header("Inputs")]
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
@@ -24,12 +28,16 @@ public class PlayerActions : MonoBehaviour
     [Header("Parameters")]
     [SerializeField] float interactDistance;
     [SerializeField] int maxHP = 100;
-    [SerializeField] int dmgPerPellet = 1;
-    [SerializeField] float readyWeaponTime = 0.5f;
+    [SerializeField] int dmgPerPellet = 10;
+    [SerializeField] float readyWeaponTime = 0.25f;
     [SerializeField] float grappleDistance = 15f;
     [SerializeField] float grappleDelay = 5.0f;
+    [SerializeField] float healingTime = 5.0f;
+    [SerializeField] int healingRate = 1;
+    [SerializeField] private float fallOffStart = 10f;
+    [SerializeField] private float fallOffDistace = 50f;
 
-    
+
     bool canGetHit = true;
     int damageType = 0;
     public int currentHP;
@@ -38,8 +46,8 @@ public class PlayerActions : MonoBehaviour
     private Ray facingRay;
     private Inventory inventory;
     private PlayerMovement playerMovement;
-    private bool canGrapple = true;
-
+    private bool canGrapple = false;
+    private bool canHeal = false;
 
     private void Start()
     {
@@ -93,22 +101,7 @@ public class PlayerActions : MonoBehaviour
         {
             crosshair.color = Color.red;
 
-            if(Physics.Raycast(facingRay, out RaycastHit hit))
-            {
-                
-                canShoot = false;
-                Invoke("readyWeapon", readyWeaponTime);
-                if(hit.collider != null)
-                {
-                    interactionDisplay.text = $"Shot missed at x = {hit.point.x}, y = {hit.point.y}, z = {hit.point.z}";
-                    EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
-                    if (enemy != null)
-                    {
-                        interactionDisplay.text = $"Shot hit an enemy at x = {hit.point.x}, y = {hit.point.y}, z = {hit.point.z}";
-                        enemy.takeDamage(dmgPerPellet, damageType);
-                    }
-                }
-            }
+            shoot();
         }
 
 
@@ -151,6 +144,42 @@ public class PlayerActions : MonoBehaviour
 
     }
 
+    private void shoot()
+    {
+        if (Physics.Raycast(facingRay, out RaycastHit hit))
+        {
+            float dist = Vector3.Distance(transform.position, hit.point);
+            float dmgDistanceMult = Mathf.Max(0, (fallOffDistace - dist)/fallOffDistace);
+            
+            TrailRenderer trail = Instantiate(bulletPrefab, bulletSpawn.position, Quaternion.identity);
+            trail.colorGradient = bulletColors[damageType];
+            StartCoroutine(SpawnTrail(trail, hit));
+            canShoot = false;
+            Invoke("readyWeapon", readyWeaponTime);
+            EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
+            if (enemy != null)
+            {
+                enemy.takeDamage(dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * dmgDistanceMult) : dmgPerPellet, damageType);
+            }
+        }
+    }
+
+    IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit)
+    {
+        float time = 0;
+        Vector3 startPos = Trail.transform.position;
+        while (time < 1)
+        {
+            Trail.transform.position = Vector3.Lerp(startPos, Hit.point, time);
+            time += Time.deltaTime/Trail.time;
+            yield return null;
+        }
+        Trail.transform.position = Hit.point;
+
+        Destroy(Trail.gameObject, Trail.time);
+
+    }
+
     private void readyWeapon()
     {
         canShoot = true;
@@ -165,6 +194,9 @@ public class PlayerActions : MonoBehaviour
             currentHP -= dmg;
             canGetHit = false;
             Invoke("resetDamage", 0.5f);
+            canHeal = false;
+            StopCoroutine(CheckHeal());
+            StopCoroutine(Heal());
             if (currentHP <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -174,6 +206,7 @@ public class PlayerActions : MonoBehaviour
 
     private void resetDamage()
     {
+        StartCoroutine(CheckHeal());
         canGetHit = true;
     }
 
@@ -190,11 +223,11 @@ public class PlayerActions : MonoBehaviour
                 knockbackMult = 0.5f;
                 break;
             case 2:
-                playerMovement.ChangeWalljump(true);
-                break;
-            case 3:
                 canGrapple = true;
                 grappleIMG.color = new Color(70, 50, 231);
+                break;
+            case 3:
+                playerMovement.ChangeWalljump(true);
                 break;
 
             default:
@@ -210,11 +243,11 @@ public class PlayerActions : MonoBehaviour
                 knockbackMult = 1;
                 break;
             case 2:
-                playerMovement.ChangeWalljump(false);
-                break;
-            case 3:
                 canGrapple = false;
                 grappleIMG.color = Color.red;
+                break;
+            case 3:
+                playerMovement.ChangeWalljump(false);
                 break;
             default:
                 break;
@@ -240,6 +273,30 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
+    private IEnumerator CheckHeal()
+    {
+        float timer = 0f;
+        while (timer < healingTime)
+        {
+            timer += Time.deltaTime;
+
+            yield return null;
+        }
+        canHeal = true;
+        StartCoroutine(Heal());
+        yield break;
+    }
+
+    private IEnumerator Heal()
+    {
+        while (canHeal && currentHP < maxHP)
+        {
+            currentHP += currentHP > (maxHP-healingRate)? (maxHP-currentHP) : healingRate;
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield break;
+    }
+
     private IEnumerator GrappleReload()
     {
         
@@ -254,5 +311,7 @@ public class PlayerActions : MonoBehaviour
         grappleIMG.color = new Color(70f, 50f, 231f);
         yield break;
     }
+
+    
 
 }

@@ -11,7 +11,6 @@ public class PlayerActions : MonoBehaviour
     
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
-    [SerializeField] TMP_Text interactionDisplay;
     [SerializeField] TMP_Text HPDisplay;
     [SerializeField] TMP_Text dmgTypeDisplay;
     [SerializeField] Image crosshair;

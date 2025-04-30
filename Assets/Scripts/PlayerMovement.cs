@@ -1,9 +1,7 @@
  using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Timeline;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -81,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
         */
         foreach(var cam in cams)
         {
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 0.01f);
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
         }
         //Get player input
 

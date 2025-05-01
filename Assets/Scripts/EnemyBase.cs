@@ -12,13 +12,8 @@ public class EnemyBase : MonoBehaviour
     protected const int STUNNED = 3;
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
-<<<<<<< HEAD
-    [SerializeField] protected float detectionDistance;
-    [SerializeField] protected float escapeDistance;
-=======
     [SerializeField] protected float detectionDistance = 15f;
     [SerializeField] protected float escapeDistance = 20f;
->>>>>>> main
     [SerializeField] protected int damageType;
     [SerializeField] protected Vector3[] randomMovementDimensions;
     [SerializeField] protected TMP_Text HPDisplay;
@@ -47,11 +42,7 @@ public class EnemyBase : MonoBehaviour
         {
             state = SEEKING;
         }
-<<<<<<< HEAD
-        else if (state != IDLE && state != ATTACKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
-=======
         else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
->>>>>>> main
         {
             state = IDLE;
         }

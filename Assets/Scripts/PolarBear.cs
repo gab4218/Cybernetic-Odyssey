@@ -5,13 +5,8 @@ using UnityEngine;
 
 public class PolarBear : EnemyBase
 {
-<<<<<<< HEAD
-    private Vector2 randomPosition;
-    private Animator anim;
-=======
     private const int CLAWING = 4;
     private const int RUSHING = 5;
->>>>>>> main
 
     private Vector2 randomPosition;
     private Animator anim;
@@ -28,20 +23,12 @@ public class PolarBear : EnemyBase
     [SerializeField] private float clawRange;
     [SerializeField] private BoxCollider clawCollider;
     [SerializeField] private float clawKnockback;
-<<<<<<< HEAD
-    private const int CLAWING = 3;
-=======
     [SerializeField] private float minRushDistance = 15f;
     [SerializeField] private int rushDamage = 70;
     [SerializeField] private float rushKnockback = 20f;
     [SerializeField] private float rushSpeed = 10f;
     
     [SerializeField] private BoxCollider rushCollider;
-    
-    
-
-    
->>>>>>> main
 
     protected override void Start()
     {
@@ -64,12 +51,8 @@ public class PolarBear : EnemyBase
         if (state == SEEKING)
         {
             findDirection();
-<<<<<<< HEAD
-            if (Vector3.Distance(transform.position, playerTranform.position) < slamRange) //put timer or sumn
-=======
             
             if (Vector3.Distance(transform.position, playerTranform.position) < slamRange && canSlam)
->>>>>>> main
             {
                 state = ATTACKING;
                 anim.Play("BearSlam");
@@ -155,19 +138,6 @@ public class PolarBear : EnemyBase
                 }
             }
         }
-<<<<<<< HEAD
-        if (clawCollider.enabled && pAct != null)
-        {
-            pAct.takeDamage(clawDamage);
-            if (pRB != null)
-            {
-                pRB.drag = 0;
-                pRB.AddForce((dir - transform.right).normalized * clawKnockback * pAct.getKnockbackMult(), ForceMode.Impulse);
-            }
-        }
-=======
-
->>>>>>> main
     }
 
     private void FixedUpdate()
@@ -193,15 +163,11 @@ public class PolarBear : EnemyBase
         state = IDLE;
         Invoke("slamReload", 10f);
     }
-
-<<<<<<< HEAD
-=======
     private void slamReload()
     {
         canSlam = true;
     }
 
->>>>>>> main
     public void clawAttack()
     {
         clawCollider.enabled = true;
@@ -211,8 +177,6 @@ public class PolarBear : EnemyBase
     {
         clawCollider.enabled = false;
         state = IDLE;
-<<<<<<< HEAD
-=======
         Invoke("clawReload", 1f);
     }
 
@@ -247,6 +211,5 @@ public class PolarBear : EnemyBase
         rushDirection = Vector3.Lerp(rushDirection, dir, 0.02f);
         transform.forward = Vector3.Lerp(transform.forward, -rushDirection, 0.1f);
         rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed;
->>>>>>> main
     }
 }

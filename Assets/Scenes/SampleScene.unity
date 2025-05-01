@@ -5305,7 +5305,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -12455,6 +12455,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 989451173}
     - target: {fileID: 3282890684703991109, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: grapplePoint
+      value: 
+      objectReference: {fileID: 2051812347873674627}
+    - target: {fileID: 3282890684703991109, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: grappleLinePF
+      value: 
+      objectReference: {fileID: 475410914824258222, guid: 5ffc0f8668ccee04683b583321f25344, type: 3}
+    - target: {fileID: 3282890684703991109, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: cams.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -12771,6 +12779,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+--- !u!4 &2051812347873674627 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6593229390381334881, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+  m_PrefabInstance: {fileID: 2051812347873674626}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -34,6 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1722146866201766478}
+  - {fileID: 6593229390381334881}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3282890684703991109
@@ -63,10 +64,16 @@ MonoBehaviour:
   groundRayLen: 0.2
   slideImpulse: 2
   slideTime: 0.5
+  grapplingForce: 3000
   groundRayLayerMask:
     serializedVersion: 2
     m_Bits: 1073741824
   staminaImg: {fileID: 0}
+  cams: []
+  FOV_Sprint: 0
+  FOV_Crouch: 0
+  grappleLinePF: {fileID: 0}
+  grapplePoint: {fileID: 0}
 --- !u!54 &2977787141678710446
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -108,15 +115,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 0}
   inventoryPlaceholder: {fileID: 0}
-  interactionDisplay: {fileID: 0}
+  HPDisplay: {fileID: 0}
+  dmgTypeDisplay: {fileID: 0}
+  crosshair: {fileID: 0}
+  grappleIMG: {fileID: 0}
+  bulletSpawn: {fileID: 0}
+  bulletPrefab: {fileID: 0}
+  bulletColors: []
   shootKey: 323
   interactKey: 101
   inventoryKey: 105
+  Key1: 49
+  Key2: 50
+  Key3: 51
+  grappleKey: 102
   interactDistance: 3
   maxHP: 100
   dmgPerPellet: 1
   readyWeaponTime: 0.5
-  dmgTypeCount: 4
+  grappleDistance: 15
+  grappleDelay: 5
+  healingTime: 5
+  healingRate: 1
+  fallOffStart: 10
+  fallOffDistace: 50
   currentHP: 0
 --- !u!114 &1058994343694560215
 MonoBehaviour:
@@ -131,8 +153,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfUpgradeSlots: 4
-  slotGO: []
-  upgradeQuantity: 6
+  matDisplay: []
+  availableUpgrades: 
+--- !u!1 &2521345936547561286
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6593229390381334881}
+  m_Layer: 3
+  m_Name: GraplpePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6593229390381334881
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521345936547561286}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.473, y: 0.511, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5382944002613277788}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7155548651124554841
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,7 +215,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 0.75, y: 1, z: 0.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4678779277676471293}

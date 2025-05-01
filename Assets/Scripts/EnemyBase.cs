@@ -9,12 +9,17 @@ public class EnemyBase : MonoBehaviour
     protected const int IDLE = 0;
     protected const int SEEKING = 1;
     protected const int ATTACKING = 2;
+    protected const int STUNNED = 3;
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
+<<<<<<< HEAD
     [SerializeField] protected float detectionDistance;
     [SerializeField] protected float escapeDistance;
+=======
+    [SerializeField] protected float detectionDistance = 15f;
+    [SerializeField] protected float escapeDistance = 20f;
+>>>>>>> main
     [SerializeField] protected int damageType;
-    [SerializeField] protected float stunTime;
     [SerializeField] protected Vector3[] randomMovementDimensions;
     [SerializeField] protected TMP_Text HPDisplay;
     [SerializeField] protected float positionThreshold = 0.5f;
@@ -38,11 +43,15 @@ public class EnemyBase : MonoBehaviour
 
     protected virtual void detectPlayer()
     {
-        if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state != ATTACKING)
+        if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE)
         {
             state = SEEKING;
         }
+<<<<<<< HEAD
         else if (state != IDLE && state != ATTACKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
+=======
+        else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
+>>>>>>> main
         {
             state = IDLE;
         }
@@ -92,7 +101,7 @@ public class EnemyBase : MonoBehaviour
 
     public virtual void takeDamage(int dmg, int dmgColor)
     {
-        currentHP -= dmg * dmgColor == damageType? 3 : 1;
+        currentHP -= dmg * (dmgColor == damageType? 3 : 1);
         if (currentHP <= 0)
         {
             Destroy(gameObject);

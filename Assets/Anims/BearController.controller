@@ -1,13 +1,21 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+<<<<<<< HEAD
 --- !u!1102 &-1400444537961871863
+=======
+--- !u!1102 &-4376807093544423178
+>>>>>>> main
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
   m_Name: BearFlip
+=======
+  m_Name: BearClaw
+>>>>>>> main
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -20,7 +28,11 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
+<<<<<<< HEAD
   m_Motion: {fileID: 7400000, guid: 22d411b21ecd0e84ea49795031b0a867, type: 2}
+=======
+  m_Motion: {fileID: 7400000, guid: 57eaf1b7886de7749bc1f684ae73a185, type: 2}
+>>>>>>> main
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -42,11 +54,16 @@ AnimatorStateMachine:
     m_State: {fileID: 5153271005422327651}
     m_Position: {x: 280, y: 140, z: 0}
   - serializedVersion: 1
+<<<<<<< HEAD
     m_State: {fileID: 8034604640749509729}
     m_Position: {x: 315, y: 205, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1400444537961871863}
     m_Position: {x: 350, y: 270, z: 0}
+=======
+    m_State: {fileID: -4376807093544423178}
+    m_Position: {x: 280, y: 210, z: 0}
+>>>>>>> main
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []

@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     //[SerializeField] private float airSpeed = 20f;
     [SerializeField] private float maxSpeed = 5f;
     [SerializeField] private float groundDrag = 5f;
-    [SerializeField] private float airDrag  = 1f;
+    [SerializeField] private float airDrag  = 0.5f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float accelerationForce = 2000f;
     [SerializeField] private float sprintMult = 1.5f;
@@ -25,24 +25,30 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float groundRayLen = 0.2f;
     [SerializeField] private float slideImpulse = 2f;
     [SerializeField] private float slideTime = 2f;
+    [SerializeField] private float grapplingForce = 3000f;
     [SerializeField] private LayerMask groundRayLayerMask = 30;
+
     
 
     [Header("UI")]
     [SerializeField] private RectTransform staminaImg;
+    [SerializeField] private Camera[] cams;
+    [SerializeField] private float FOV_Sprint, FOV_Crouch;
+
+    private float targetFOV;
 
 
-    private float originalSpeed, xDir, zDir, accelMult, currentStamina;
+    private float originalSpeed, xDir, zDir, accelMult, currentStamina, defaultFOV, targetSpeed, fac = 0;
 
-    private Ray groundRay;
+    private Ray groundRay, wallRay;
 
     private Vector3 dir = Vector3.zero;
 
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false;
 
     private Rigidbody rb;
 
-    private Vector3 posOffset;
+    private Vector3 posOffset, grapplePosition;
 
     
 
@@ -50,9 +56,9 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         //Preparations and storing original maxSpeed
-
+        defaultFOV = Camera.main.fieldOfView;
         currentStamina = maxStamina;
-
+        targetFOV = defaultFOV;
         rb = GetComponent<Rigidbody>();
         
         originalSpeed = maxSpeed;
@@ -64,67 +70,92 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0) return;
         /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
         */
-
-        //Get player input
-        xDir = Input.GetAxisRaw("Horizontal");
-        zDir = Input.GetAxisRaw("Vertical");
-
-        if (!isSliding)
+        foreach(var cam in cams)
         {
-            dir = transform.right * xDir + transform.forward * zDir;
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
         }
-        
-        //Create ground-detecting ray
-        groundRay = new Ray(-transform.up, transform.position);
-        //Change drag according to whether the player is on the ground or in the air
-        if (groundDetect())
+        //Get player input
+
+        if (isGrappling)
         {
-            rb.drag = groundDrag;
+            dir = grapplePosition - transform.position;
+            if (Vector3.Distance(transform.position, grapplePosition) < 2)
+            {
+                isGrappling = false;
+            }
         }
         else
         {
-            rb.drag = airDrag;
-        }
+            xDir = Input.GetAxisRaw("Horizontal");
+            zDir = Input.GetAxisRaw("Vertical");
 
-        //Check if there's any modification to the player's movement state and correct speed
-        checkSprint();
-
-        checkCrouch();
+            if (!isSliding)
+            {
+                dir = transform.right * xDir + transform.forward * zDir;
+            }
         
-        if (Input.GetKeyDown(jumpKey) && groundDetect())
-        {
-            Jump();
+            //Create ground-detecting ray
+            groundRay = new Ray(-transform.up, transform.position);
+            //Change drag according to whether the player is on the ground or in the air
+            if (groundDetect())
+            {
+                rb.drag = groundDrag;
+            }
+            else
+            {
+                rb.drag = airDrag;
+            }
+
+            //Check if there's any modification to the player's movement state and correct speed
+            checkSprint();
+
+            checkCrouch();
+        
+            if (Input.GetKeyDown(jumpKey) && groundDetect())
+            {
+                Jump();
+            }
+            if (Input.GetKeyDown(jumpKey) && WallDetect() && currentStamina >= 0.5f) WallJump();
+
+
+            checkSpeed();
+
+
+
+            //This handles stamina
+            if (isSprinting)
+            {
+                currentStamina -= Time.deltaTime;
+
+            }
+            else if(resting && currentStamina < maxStamina)
+            {
+                currentStamina = Mathf.Min(currentStamina + Time.deltaTime * 2, maxStamina);
+            }
+            staminaImg.sizeDelta = new Vector2(currentStamina * 80, staminaImg.sizeDelta.y);
+
         }
 
-
-        checkSpeed();
-
-        //This handles stamina
-        if (isSprinting)
-        {
-            currentStamina -= Time.deltaTime;
-
-        }
-        else if(resting && currentStamina < maxStamina)
-        {
-            currentStamina = Mathf.Min(currentStamina + Time.deltaTime * 2, maxStamina);
-        }
-        staminaImg.sizeDelta = new Vector2(currentStamina * 80, staminaImg.sizeDelta.y);
     }
 
     private void FixedUpdate()
     {
         //If player is providing movement input, move
-        if (dir.sqrMagnitude != 0)
+        if (dir.sqrMagnitude != 0 && !isGrappling)
         {
             Movement(dir);
             
+        }
+        else if(isGrappling)
+        {
+            rb.AddForce(dir.normalized * grapplingForce * Time.fixedDeltaTime, ForceMode.Force);
         }
     }
 
@@ -134,7 +165,29 @@ public class PlayerMovement : MonoBehaviour
         //If groundRay hits the ground, return true, otherwise return false
         posOffset = new Vector3(transform.position.x,transform.position.y + groundRayLen / 3.33f, transform.position.z);
         groundRay = new Ray(posOffset, -transform.up);
-        return Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
+        bool grounded = Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
+        if (grounded && !isSprinting && walljumping)
+        {
+            walljumping = false;
+            StartCoroutine(RechargeStamina());
+        }
+        return grounded;
+    }
+
+    private bool WallDetect()
+    {
+        
+        wallRay = new Ray(transform.position + Vector3.up, dir.normalized);
+
+
+        if (!groundDetect() && canWalljump)
+        {
+            return Physics.Raycast(wallRay, groundRayLen*3);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private void Movement(Vector3 dir)
@@ -153,7 +206,7 @@ public class PlayerMovement : MonoBehaviour
         
         
         //Check if horizontal velocity exceeds speed limit
-        if (flatVelocity.magnitude > maxSpeed)
+        if (flatVelocity.sqrMagnitude > maxSpeed * maxSpeed)
         {
             //Correct velocity to limit
             flatVelocity = flatVelocity.normalized * maxSpeed;
@@ -167,6 +220,9 @@ public class PlayerMovement : MonoBehaviour
         {
             //If player crouches, stop sprinting and start crouching
 
+            StopCoroutine(SmoothSpeed());
+            fac = 0;
+            
             if (isSprinting && !isSliding)
             {
                 isSliding = true;
@@ -174,6 +230,7 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(dir * slideImpulse, ForceMode.Impulse);
                 rb.drag = 0;
                 maxSpeed *= 3;
+                targetSpeed = maxSpeed;
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
                 StartCoroutine(slideTimer());
@@ -183,17 +240,24 @@ public class PlayerMovement : MonoBehaviour
                 isSprinting = false;
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
-                maxSpeed = originalSpeed * crouchMult;
+                targetSpeed = originalSpeed * crouchMult;
+                StartCoroutine(restartSmoothSpeed());
+                targetFOV = FOV_Crouch;
             }
 
         }
         else if ((Input.GetKeyUp(crouchKey) && isCrouching) || !forceStopSlide)
         {
             //If player stops crouching, go back to default state
+
             StopCoroutine(slideTimer());
-            maxSpeed = originalSpeed;
+            fac = 0;
+            StopCoroutine(SmoothSpeed());
+            targetSpeed = originalSpeed;
+            StartCoroutine(restartSmoothSpeed());
             isCrouching = false;
             isSliding = false;
+            targetFOV = defaultFOV;
             forceStopSlide = true;
             transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * 2, transform.localScale.z);
         }
@@ -208,26 +272,55 @@ public class PlayerMovement : MonoBehaviour
             accelMult = sprintMult;
             isSprinting = true;
             resting = false;
-            StopCoroutine(rechargeStamina());
+            StopCoroutine(SmoothSpeed());
+            fac = 0;
+            targetSpeed = sprintMult * originalSpeed;
+            StopCoroutine(RechargeStamina());
+            targetFOV = FOV_Sprint;
         }
         else if ((Input.GetKeyUp(sprintKey) || zDir < 1 || currentStamina <= 0) && isSprinting)
         {
             //If player stops sprinting, go back to default state
-            maxSpeed = originalSpeed;
+            StopCoroutine(SmoothSpeed());
+            fac = 0;
+            targetSpeed = originalSpeed;
+            StartCoroutine(restartSmoothSpeed());
             isSprinting = false;
             accelMult = 1;
-            StartCoroutine(rechargeStamina());
+            StartCoroutine(RechargeStamina());
+            targetFOV = defaultFOV;
         }
     }
 
+  
     private void Jump()
     {
         //Halt all vertical movement for consistency and apply an impulse force upwards
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
+    private void WallJump()
+    {
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        rb.AddForce((transform.up - 2 * dir).normalized * jumpForce * 3, ForceMode.Impulse);
+        currentStamina -= 0.5f;
+        resting = false;
+        walljumping = true;
+    }
 
+    public void ChangeWalljump(bool newWalljump)
+    {
+        canWalljump = newWalljump;
+    }
 
+    public void GrappleTo(Vector3 grapplePos)
+    {
+        isGrappling = true;
+        grapplePosition = grapplePos;
+        
+    }
+
+   
     private IEnumerator slideTimer()
     {
         float currentTime = 0;
@@ -239,18 +332,21 @@ public class PlayerMovement : MonoBehaviour
         }
         if (isSliding)
         {
-            maxSpeed = originalSpeed;
+            StopCoroutine(SmoothSpeed());
+            targetSpeed = originalSpeed;
+            fac = 0;
+            StartCoroutine(restartSmoothSpeed());
             forceStopSlide = false;
         }
         yield break;
     }
 
-    private IEnumerator rechargeStamina()
+    private IEnumerator RechargeStamina()
     {
 
         yield return new WaitForSeconds(staminaTimer);
 
-        if (!isSprinting)
+        if (!isSprinting && !walljumping)
         {
             resting = true;
         }
@@ -258,6 +354,27 @@ public class PlayerMovement : MonoBehaviour
         {
             resting = false;
         }
+        yield break;
+    }
+
+    private IEnumerator SmoothSpeed()
+    {
+        fac = 0;
+        while (fac < 2)
+        {
+            fac += Time.deltaTime;
+            maxSpeed = Mathf.Lerp(maxSpeed, targetSpeed, Mathf.Min(fac/2, 1));
+            
+            yield return null;
+        }
+        maxSpeed = targetSpeed;
+        yield break;
+        
+    }
+    private IEnumerator restartSmoothSpeed()
+    {
+        yield return null;
+        StartCoroutine(SmoothSpeed());
         yield break;
     }
 

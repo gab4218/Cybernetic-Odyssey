@@ -35,10 +35,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Camera[] cams;
     [SerializeField] private float FOV_Sprint, FOV_Crouch;
 
+    [SerializeField] private LineRenderer grappleLinePF;
+    [SerializeField] private Transform grapplePoint;
+
     private float targetFOV;
 
 
     private float originalSpeed, xDir, zDir, accelMult, currentStamina, defaultFOV, targetSpeed, fac = 0;
+
+    private LineRenderer grappleLine;
 
     private Ray groundRay, wallRay;
 
@@ -86,9 +91,11 @@ public class PlayerMovement : MonoBehaviour
         if (isGrappling)
         {
             dir = grapplePosition - transform.position;
+            grappleLine.SetPosition(0, grapplePoint.position);
             if (Vector3.Distance(transform.position, grapplePosition) < 2)
             {
                 isGrappling = false;
+                Destroy(grappleLine.gameObject);
             }
         }
         else
@@ -317,7 +324,8 @@ public class PlayerMovement : MonoBehaviour
     {
         isGrappling = true;
         grapplePosition = grapplePos;
-        
+        grappleLine = Instantiate(grappleLinePF, transform.position, Quaternion.identity);
+        grappleLine.SetPositions(new Vector3[] { grapplePoint.position, grapplePosition });
     }
 
    
@@ -343,8 +351,12 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator RechargeStamina()
     {
-
-        yield return new WaitForSeconds(staminaTimer);
+        float timer = 0;
+        while (timer < staminaTimer)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
 
         if (!isSprinting && !walljumping)
         {

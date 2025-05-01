@@ -156,7 +156,7 @@ public class PlayerActions : MonoBehaviour
             canShoot = false;
             Invoke("readyWeapon", readyWeaponTime);
             EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
-            if (enemy != null)
+            if (enemy != null && !hit.collider.isTrigger)
             {
                 enemy.takeDamage(dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * dmgDistanceMult) : dmgPerPellet, damageType);
             }

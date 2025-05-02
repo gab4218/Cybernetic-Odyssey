@@ -12,7 +12,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Physics")]
-    //[SerializeField] private float airSpeed = 20f;
     [SerializeField] private float maxSpeed = 5f;
     [SerializeField] private float groundDrag = 5f;
     [SerializeField] private float airDrag  = 0.5f;
@@ -76,12 +75,6 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0) return;
-        /*
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
-        */
         foreach(var cam in cams)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
@@ -92,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
         {
             dir = grapplePosition - transform.position;
             grappleLine.SetPosition(0, grapplePoint.position);
-            if (Vector3.Distance(transform.position, grapplePosition) < 2)
+            if (Vector3.Distance(transform.position, grapplePosition) < 3)
             {
                 isGrappling = false;
                 Destroy(grappleLine.gameObject);

@@ -85,13 +85,18 @@ public class EnemyBase : MonoBehaviour
     {
         if (dir.sqrMagnitude > 0)
         {
-            rb.velocity = dir * speed;
+            rb.velocity = dir * speed + rb.velocity.y * Vector3.up;
             transform.forward = Vector3.Lerp(transform.forward, -dir, 0.1f);
         }
     }
 
     public virtual void takeDamage(int dmg, int dmgColor)
     {
+        if (HPDisplay != null)
+        {
+            HPDisplay.text = $"Bear HP: {currentHP}/{maxHP}";
+
+        }
         currentHP -= dmg * (dmgColor == damageType? 3 : 1);
         if (currentHP <= 0)
         {
@@ -99,4 +104,14 @@ public class EnemyBase : MonoBehaviour
         }
     }
 
+    protected void Stun(float stunTime)
+    {
+        state = STUNNED;
+        Invoke("Destun", stunTime);
+    }
+
+    private void Destun()
+    {
+        state = IDLE;
+    }
 }

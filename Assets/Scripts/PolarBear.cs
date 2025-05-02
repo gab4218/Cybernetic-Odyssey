@@ -7,28 +7,39 @@ public class PolarBear : EnemyBase
 {
     private const int CLAWING = 4;
     private const int RUSHING = 5;
+    private const int BALL = 6;
 
     private Vector2 randomPosition;
     private Animator anim;
     private bool canClaw = true;
     private bool canSlam = true;
     private bool canRush = true;
+    private bool canBall = true;
     private Vector3 rushDirection;
 
     [SerializeField] private float slamRange;
     [SerializeField] private int slamDamage;
-    [SerializeField] private BoxCollider slamCollider;
     [SerializeField] private float slamKnockback = 2.0f;
+    [SerializeField] private BoxCollider slamCollider;
     [SerializeField] private int clawDamage;
     [SerializeField] private float clawRange;
-    [SerializeField] private BoxCollider clawCollider;
     [SerializeField] private float clawKnockback;
+    [SerializeField] private BoxCollider clawCollider;
     [SerializeField] private float minRushDistance = 15f;
     [SerializeField] private int rushDamage = 70;
     [SerializeField] private float rushKnockback = 20f;
     [SerializeField] private float rushSpeed = 10f;
-    
+    [SerializeField] private float rushStunTime = 1f;
     [SerializeField] private BoxCollider rushCollider;
+    [SerializeField] private float ballImpulse = 10f;
+    [SerializeField] private float ballDelayMin = 1f;
+    [SerializeField] private float ballDelayMax = 3f;
+    [SerializeField] private BoxCollider ballTriggerCollider;
+    [SerializeField] private MeshFilter bearMeshFilter;
+    [SerializeField] private Mesh bearMesh, ballMesh;
+    [SerializeField] private SphereCollider ballCollider;
+
+    private BoxCollider[] bearColliders;
     
     
 
@@ -40,18 +51,20 @@ public class PolarBear : EnemyBase
         anim = GetComponentInChildren<Animator>();
         slamCollider.enabled = false;
         clawCollider.enabled = false;
+        bearColliders = GetComponentsInChildren<BoxCollider>();
         randomPosition = new Vector2
                             (
                                 Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
                                 Random.Range(randomMovementDimensions[0].y, randomMovementDimensions[1].y)
                             );
         findDirection(randomPosition);
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
     private void Update()
     {
         detectPlayer();
-        HPDisplay.text = $"Bear HP: {currentHP}/{maxHP}";
+        
         if (state == SEEKING)
         {
             findDirection();
@@ -69,7 +82,7 @@ public class PolarBear : EnemyBase
                 anim.Play("BearClaw");
                 canClaw = false;
             }
-
+            
             if (Vector3.Distance(transform.position, playerTranform.position) > minRushDistance && canRush)
             {
                 RushAttack();
@@ -93,8 +106,13 @@ public class PolarBear : EnemyBase
                 findDirection(randomPosition);
             }
         }
-        else if(state == RUSHING)
+        if(state == RUSHING)
         {
+            
+            if (Vector3.Distance(transform.position, playerTranform.position) > minRushDistance + 2 && !canRush)
+            {
+                RushReset();
+            }
             
         }
         
@@ -135,6 +153,13 @@ public class PolarBear : EnemyBase
                     pRB.AddForce((dir + 3 * Vector3.up).normalized * rushKnockback * pAct.getKnockbackMult(), ForceMode.Impulse);
                     RushReset();
                 }
+            }
+        }
+        else
+        {
+            if (rushCollider.enabled)
+            {
+                RushReset();
             }
         }
 
@@ -197,7 +222,7 @@ public class PolarBear : EnemyBase
     public void RushReset()
     {
         rushCollider.enabled = false;
-        state = IDLE;
+        Stun(rushStunTime);
         Invoke("RushReload", 15f);
     }
 
@@ -206,11 +231,52 @@ public class PolarBear : EnemyBase
         canRush = true;
     }
 
+    public void StartBall()
+    {
+        if (canBall)
+        {
+            canBall = false;
+            Invoke("DoBall", Random.Range(ballDelayMin, ballDelayMax));
+        }
+    }
+    
+    private void DoBall()
+    {
+        bearMeshFilter.mesh = ballMesh;
+        state = BALL;
+        foreach (BoxCollider bc in bearColliders)
+        {
+            bc.enabled = false;
+        }
+        rb.constraints = RigidbodyConstraints.None;
+        ballCollider.enabled = true;
+        rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse);
+        Invoke("EndBall", 1f);
+    }
+    
+    private void EndBall()
+    {
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.rotation = Quaternion.identity;
+        transform.rotation = Quaternion.identity;
+        bearMeshFilter.mesh = bearMesh;
+        state = SEEKING;
+        canBall = true;
+        foreach (BoxCollider bc in bearColliders)
+        {
+            if (!bc.isTrigger)
+            {
+                bc.enabled = true;
+            }
+        }
+        ballTriggerCollider.enabled = true;
+        ballCollider.enabled = false;
+    }
     private void moveRush()
     {
         findDirection();
-        rushDirection = Vector3.Lerp(rushDirection, dir, 0.02f);
-        transform.forward = Vector3.Lerp(transform.forward, -rushDirection, 0.1f);
+        rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f);
+        transform.forward = rushDirection;
         rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed;
     }
 }

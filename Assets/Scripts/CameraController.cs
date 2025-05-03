@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] float cameraSensitivityY = 1;
     [SerializeField] TMP_Text sensDisplay;
 
-    float xRotation, yRotation;
+    float xRotation, yRotation, mouseX, mouseY;
 
 
 
@@ -26,8 +26,8 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         //Get mouse input
-        float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * cameraSensitivityX;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * cameraSensitivityY;
+        mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * cameraSensitivityX;
+        mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * cameraSensitivityY;
 
 
         //Temporary sensitivity changer

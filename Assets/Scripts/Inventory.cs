@@ -15,7 +15,8 @@ public class Inventory : MonoBehaviour
     int[] secondarySlots;
     int[] materialInventory = new int[6];
     public List<int> availableUpgrades = new List<int>();
-
+    int oldUpgrade;
+    bool cancheck = true;
     private void Awake()
     {
         secondarySlots = new int[numberOfUpgradeSlots];
@@ -24,6 +25,7 @@ public class Inventory : MonoBehaviour
     private void Update()
     {
         displayMats();
+        CheckForDuplicates();
     }
     public void removeFromInventory(int type, int quantity)
     {
@@ -70,6 +72,31 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < matDisplay.Length; i++)
         {
             matDisplay[i].text = materialInventory[i].ToString();
+        }
+    }
+
+    public void CheckForDuplicates()
+    {
+        oldUpgrade = new int();
+        
+        foreach (int i in availableUpgrades)
+        {
+            if (i == oldUpgrade)
+            {
+                availableUpgrades.Remove(i);
+                cancheck = false;
+                break;
+            }
+            else
+            {
+                oldUpgrade = i;
+            }
+        }
+        if (!cancheck)
+        {
+            cancheck = true;
+            CheckForDuplicates();
+
         }
     }
 

@@ -13,8 +13,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private int id;
     private bool isRunning = true;
     [SerializeField] TMPro.TMP_Dropdown[] otherDropdowns;
-
-    
+    TMPro.TMP_Dropdown.OptionData DDTina;
+    List<TMPro.TMP_Dropdown.OptionData> newOptions;
+    public bool isChangedByPerson = true;
     void Start()
     {
         inventory = FindObjectOfType<Inventory>();
@@ -28,7 +29,7 @@ public class InventoryManager : MonoBehaviour
         if (Time.timeScale == 0 && isRunning)
         {
             isRunning = false;
-            List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>();
+            newOptions = new List<TMPro.TMP_Dropdown.OptionData>();
 
             newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0]));
             for (int i = 0; i < inventory.availableUpgrades.Count; i++)
@@ -57,44 +58,68 @@ public class InventoryManager : MonoBehaviour
 
     public void selectUpgrade()
     {
-        if (upgradeDropdown.value > 0)
+        if (isChangedByPerson)
         {
-            inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
-        }
-        if (oldUpgrade > 0)
-        {
-            inventory.disableUpgrade(oldUpgrade, id);
-        }
-        //Debug.Log(inventory.availableUpgrades.Count);
-
-        foreach (TMPro.TMP_Dropdown DD in otherDropdowns)
-        {
-            var DDIM = DD.GetComponent<InventoryManager>();
-            List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>();
-            newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0]));
 
 
-            //Debug.Log(DDIM.oldUpgrade);
-            if (inventory.availableUpgrades.Count > 0)
+            if (upgradeDropdown.value > 0)
             {
-                for (int i = 0; i < inventory.availableUpgrades.Count; i++)
+                inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
+            }
+            if (oldUpgrade > 0)
+            {
+                inventory.disableUpgrade(oldUpgrade, id);
+            }
+
+            inventory.CheckForDuplicates();
+
+            foreach (TMPro.TMP_Dropdown DD in otherDropdowns)
+            {
+                InventoryManager DDIM = DD.GetComponent<InventoryManager>();
+                newOptions.Clear();
+                newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Adds empty to list
+
+                DDTina = new TMPro.TMP_Dropdown.OptionData(possibleOptions[DDIM.oldUpgrade]);
+
+                if (inventory.availableUpgrades.Count > 0)
                 {
-                    if ((inventory.availableUpgrades[i] > DDIM.oldUpgrade || i == inventory.availableUpgrades.Count) && DDIM.oldUpgrade > 0)
+                    for (int i = 0; i < inventory.availableUpgrades.Count; i++)
                     {
-                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[DDIM.oldUpgrade]));
+
+                        if ((inventory.availableUpgrades[i] > DDIM.oldUpgrade || (i == inventory.availableUpgrades.Count - 1) && (inventory.availableUpgrades[i] > DDIM.oldUpgrade)) && DDIM.oldUpgrade > 0)
+                        {
+                            newOptions.Add(DDTina);
+                        }
+                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]]));
+                        if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < DDIM.oldUpgrade)
+                        {
+                            newOptions.Add(DDTina);
+                        }
                     }
-                    newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]]));
                 }
-            }
-            else
-            {
-                newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[DDIM.oldUpgrade]));
-            }
+                else
+
+                {
+                    if (DDIM.oldUpgrade > 0)
+                    {
+                        newOptions.Add(DDTina);
+
+                    }
+                }
 
 
-            DD.options = newOptions;
+                DD.options = newOptions;
+                DDIM.isChangedByPerson = false;
+                DD.value = DD.options.IndexOf(DDTina);
+            }
+            oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text);
         }
-        oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text);
+        else
+        {
+            isChangedByPerson = true;
+        }
+        
     }
+    
     
 }

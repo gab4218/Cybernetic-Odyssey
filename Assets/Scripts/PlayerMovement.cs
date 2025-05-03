@@ -47,8 +47,8 @@ public class PlayerMovement : MonoBehaviour
     private Ray groundRay, wallRay;
 
     private Vector3 dir = Vector3.zero;
-
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false;
+    Vector3 flatVelocity;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true;
 
     private Rigidbody rb;
 
@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
             //Create ground-detecting ray
             groundRay = new Ray(-transform.up, transform.position);
             //Change drag according to whether the player is on the ground or in the air
-            if (groundDetect())
+            if (grounded)
             {
                 rb.drag = groundDrag;
             }
@@ -118,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
 
             checkCrouch();
         
-            if (Input.GetKeyDown(jumpKey) && groundDetect())
+            if (Input.GetKeyDown(jumpKey) && grounded)
             {
                 Jump();
             }
@@ -160,18 +160,18 @@ public class PlayerMovement : MonoBehaviour
     }
 
   
-    private bool groundDetect()
+    private void groundDetect()
     {
         //If groundRay hits the ground, return true, otherwise return false
         posOffset = new Vector3(transform.position.x,transform.position.y + groundRayLen / 3.33f, transform.position.z);
         groundRay = new Ray(posOffset, -transform.up);
-        bool grounded = Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
+        grounded = Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
         if (grounded && !isSprinting && walljumping)
         {
             walljumping = false;
             StartCoroutine(RechargeStamina());
         }
-        return grounded;
+        
     }
 
     private bool WallDetect()
@@ -180,7 +180,7 @@ public class PlayerMovement : MonoBehaviour
         wallRay = new Ray(transform.position + Vector3.up, dir.normalized);
 
 
-        if (!groundDetect() && canWalljump)
+        if (!grounded && canWalljump)
         {
             return Physics.Raycast(wallRay, groundRayLen*3);
         }
@@ -202,7 +202,7 @@ public class PlayerMovement : MonoBehaviour
     private void checkSpeed()
     {
         //Isolate horizontal components of velocity
-        Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         
         
         //Check if horizontal velocity exceeds speed limit
@@ -216,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void checkCrouch()
     {
-        if (Input.GetKeyDown(crouchKey) && !isCrouching && groundDetect())
+        if (Input.GetKeyDown(crouchKey) && !isCrouching && grounded)
         {
             //If player crouches, stop sprinting and start crouching
 

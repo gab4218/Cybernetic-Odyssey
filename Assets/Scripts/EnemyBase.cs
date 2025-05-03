@@ -24,7 +24,7 @@ public class EnemyBase : MonoBehaviour
     protected Vector3 dir;
     public int state;
     protected Rigidbody rb;
-
+    
 
 
     protected virtual void Start()
@@ -57,8 +57,8 @@ public class EnemyBase : MonoBehaviour
 
     protected void findDirection(Vector2 newSpot)
     {
-        Vector3 newSpot3 = new Vector3(newSpot.x, transform.position.y, newSpot.y);
-        dir = newSpot3 - transform.position;
+        
+        dir = new Vector3(newSpot.x, transform.position.y, newSpot.y) - transform.position;
         dir.Normalize();
     }
 
@@ -70,8 +70,8 @@ public class EnemyBase : MonoBehaviour
 
     protected bool hasReachedDestination(Vector2 targetPos)
     {
-        Vector3 targetPos3 = new Vector3(targetPos.x, transform.position.y, targetPos.y);
-        return Vector3.Distance(transform.position, targetPos3) <= positionThreshold;
+        
+        return Vector3.Distance(transform.position, new Vector3(targetPos.x, transform.position.y, targetPos.y)) <= positionThreshold;
         
     }
 

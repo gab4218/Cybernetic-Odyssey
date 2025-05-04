@@ -1,45 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
+
+    //Variables modificables o publicas
     [SerializeField] int numberOfUpgradeSlots = 4;
     [SerializeField] TMP_Text[] matDisplay;
+    public List<int> availableUpgrades = new List<int>();
 
+
+    //Variables de crafteo e inventario
     ItemCost[] craftingCosts;
     Button[] craftingButtons;
     PlayerActions playerActions;
     int[] secondarySlots;
-    int[] materialInventory = new int[6];
-    public List<int> availableUpgrades = new List<int>();
-    int oldUpgrade;
-    bool cancheck = true;
+    int[] materialInventory = new int[3];
+    
+    
+
     
 
     private void Awake()
     {
+        //Preparaciones
         secondarySlots = new int[numberOfUpgradeSlots];
         playerActions = FindObjectOfType<PlayerActions>();
     }
     private void Update()
     {
-        displayMats();
+        displayMats(); //Mostrar materiales y verificar integridad
         CheckForDuplicates();
     }
-    public void removeFromInventory(int type, int quantity)
+    public void removeFromInventory(int type, int quantity) //Borrar material del inventario
     {
         materialInventory[type] -= quantity;
     }
 
-    public void addToInventory(int type)
+    public void addToInventory(int type) //Agregar material al inventario
     {
         materialInventory[type]++;
     }
 
-    public void unlockUpgrade(ItemCost upgrade)
+    public void unlockUpgrade(ItemCost upgrade) //Desbloquear mejora y remover costo
     {
         for (int i = 0; i < upgrade.cost.Length; i++)
         {
@@ -49,31 +56,31 @@ public class Inventory : MonoBehaviour
         availableUpgrades.Add(upgrade.upgradeType);
     }
 
-    public void enableUpgrade(int upgrade, int slot)
+    public void enableUpgrade(int upgrade, int slot) //Habilitar mejora
     {
         secondarySlots[slot] = upgrade;
         playerActions.enableUpgrade(upgrade);
         availableUpgrades.Remove(upgrade);
     }
 
-    public void disableUpgrade(int upgrade, int slot)
+    public void disableUpgrade(int upgrade, int slot) //Deshabilitar mejora
     {
         secondarySlots[slot] = 0;
         playerActions.disableUpgrade(upgrade);
         availableUpgrades.Add(upgrade);
     }
 
-    public int[] getEnabledUpgrades()
+    public int[] getEnabledUpgrades() //Devuelve mejoras habilitadas
     {
         return secondarySlots;
     }
 
-    public bool hasMaterials(int type, int quantity)
+    public bool hasMaterials(int type, int quantity) //Verificar que tenga los materiales requeridos para craftear
     {
         return materialInventory[type] >= quantity; 
     }
 
-    void displayMats()
+    void displayMats() //Mostrar materiales
     {
         for (int i = 0; i < matDisplay.Length; i++)
         {
@@ -81,29 +88,24 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void CheckForDuplicates()
+    public void CheckForDuplicates() //Chequear que no haya duplicas para evitar problemas
     {
-        oldUpgrade = new int();
-        
+
+        if (availableUpgrades.Count == 0) return;
+        int[] upgradeTypeCount = new int[availableUpgrades.Max()];
         foreach (int i in availableUpgrades)
         {
-            if (i == oldUpgrade)
-            {
-                availableUpgrades.Remove(i);
-                cancheck = false;
-                break;
-            }
-            else
-            {
-                oldUpgrade = i;
-            }
+            upgradeTypeCount[i-1]++;
         }
-        if (!cancheck)
-        {
-            cancheck = true;
-            CheckForDuplicates();
 
+        for (int i = 0; i < upgradeTypeCount.Length;i++)
+        {
+            if (upgradeTypeCount[i] > 1)
+            {
+                availableUpgrades.Remove(i+1);
+            }
         }
+
     }
 
 }

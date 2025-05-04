@@ -1560,7 +1560,7 @@ MonoBehaviour:
   oldUpgrade: 0
   possibleOptions:
   - Vacio
-  - Anti-knockback
+  - Slide
   - Gancho
   - Wall-Jump
   - Mejora de velocidad
@@ -2420,7 +2420,7 @@ MonoBehaviour:
   oldUpgrade: 0
   possibleOptions:
   - Vacio
-  - Anti-knockback
+  - Slide
   - Gancho
   - Wall-Jump
   - Mejora de velocidad
@@ -3923,7 +3923,7 @@ MonoBehaviour:
   oldUpgrade: 0
   possibleOptions:
   - Vacio
-  - Anti-knockback
+  - Slide
   - Gancho
   - Wall-Jump
   - Mejora de velocidad
@@ -7161,6 +7161,8 @@ MonoBehaviour:
   craftingMenu: {fileID: 414165753}
   craftingButtons:
   - {fileID: 1964473174}
+  - {fileID: 1129617075}
+  - {fileID: 337849158}
 --- !u!1001 &1169342739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11804,7 +11806,7 @@ MonoBehaviour:
   oldUpgrade: 0
   possibleOptions:
   - Vacio
-  - Anti-knockback
+  - Slide
   - Gancho
   - Wall-Jump
   - Mejora de velocidad
@@ -13749,7 +13751,7 @@ PrefabInstance:
       objectReference: {fileID: 51520396}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: availableUpgrades.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: availableUpgrades.Array.data[0]
@@ -13761,7 +13763,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: availableUpgrades.Array.data[2]
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1549553879654629858, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

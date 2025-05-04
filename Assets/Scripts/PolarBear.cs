@@ -5,10 +5,8 @@ using UnityEngine;
 
 public class PolarBear : EnemyBase
 {
-    //Comments were written in English because when I code, I like to think in English, as it's closer in nature to C# and (at least professionally) it's more common
-    //[Traduccion] Los comentarios fueron escritos en Ingles porque, cuando hago codigo, me gusta pensar en Ingles, ya que es fundamentalmente mas parecido a C# y (al menos profesionalmente) es mas comun
     
-    //Extra state Variables
+    //Variables de estado extra
     private const int CLAWING = 4;
     private const int RUSHING = 5;
     private const int BALL = 6;
@@ -17,26 +15,26 @@ public class PolarBear : EnemyBase
     private Vector2 randomPosition;
     private Animator anim;
 
-    //Attacking AI Variables
+    //Variables de ataque de la IA
     private bool canClaw = true;
     private bool canSlam = true;
     private bool canRush = true;
     private bool canBall = true;
     private Vector3 rushDirection;
 
-    //Slam attack Variables
+    //Variables del ataque de Slam
     [SerializeField] private float slamRange;
     [SerializeField] private int slamDamage;
     [SerializeField] private float slamKnockback = 2.0f;
     [SerializeField] private BoxCollider slamCollider;
 
-    //Claw attack Variables
+    //Variables del ataque de Claw
     [SerializeField] private int clawDamage;
     [SerializeField] private float clawRange;
     [SerializeField] private float clawKnockback;
     [SerializeField] private BoxCollider clawCollider;
 
-    //Rush attack Variables
+    //Variables del ataque de Rush
     [SerializeField] private float minRushDistance = 15f;
     [SerializeField] private int rushDamage = 70;
     [SerializeField] private float rushKnockback = 20f;
@@ -44,7 +42,7 @@ public class PolarBear : EnemyBase
     [SerializeField] private float rushStunTime = 1f;
     [SerializeField] private BoxCollider rushCollider;
 
-    //Ball evade/attack Variables
+    //Variables del ataque/evasion de Ball
     [SerializeField] private float ballImpulse = 10f;
     [SerializeField] private float ballDelayMin = 1f;
     [SerializeField] private float ballDelayMax = 3f;
@@ -61,7 +59,7 @@ public class PolarBear : EnemyBase
 
     protected override void Start()
     {
-        //Repeat EnemyBase start actions
+        //Repetir acciones de EnemyBase.Start
         base.Start();
         anim = GetComponentInChildren<Animator>();
         slamCollider.enabled = false;
@@ -74,16 +72,16 @@ public class PolarBear : EnemyBase
                             );
         findDirection(randomPosition);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-        //General preparation
+        //Preparaciones generales
     }
 
     private void Update()
     {
         detectPlayer(); 
         
-        if (state == SEEKING) //If chasing player
+        if (state == SEEKING) //Si se persigue al jugador, atacarlo cuando sea posible 
         {
-            findDirection(); //Find path to player
+            findDirection(); 
             
             if (Vector3.Distance(transform.position, playerTranform.position) < slamRange && canSlam) //Slam
             {
@@ -106,11 +104,10 @@ public class PolarBear : EnemyBase
 
 
         }
-        else if(state == IDLE) //If can't see player
+        else if(state == IDLE) //Si no sigue al jugador, moverse a una posicion random
         {
-            if (hasReachedDestination(randomPosition)) //If reached destination
+            if (hasReachedDestination(randomPosition)) 
             {
-                //Find random positions in range to roam arround
                 randomPosition = new Vector2
                                 (
                                     Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
@@ -119,13 +116,13 @@ public class PolarBear : EnemyBase
             }
             else 
             {
-                findDirection(randomPosition); //Find path to position
+                findDirection(randomPosition); 
             }
         }
-        if(state == RUSHING) //If doing a Rush attack
+        if(state == RUSHING) //Si hace un ataque de Rush, frenar si se aleja mucho del jugador
         {
             
-            if (Vector3.Distance(transform.position, playerTranform.position) > detectionDistance && !canRush) //Stop if too far from player
+            if (Vector3.Distance(transform.position, playerTranform.position) > detectionDistance && !canRush)
             {
                 RushReset();
             } 
@@ -139,10 +136,10 @@ public class PolarBear : EnemyBase
         PlayerActions pAct = other.GetComponentInParent<PlayerActions>();
         Rigidbody pRB = other.GetComponentInParent<Rigidbody>();
 
-        if (pAct != null) //If Trigger collision is with player
+        if (pAct != null) //Si la colision es con el jugador, volver a estado base y hacer el ataque correcto
         {
-            state = IDLE; //Return to base state
-            if (slamCollider.enabled) //If slamming, do Slam
+            state = IDLE; 
+            if (slamCollider.enabled) 
             {
                 pAct.takeDamage(slamDamage);
                 if (pRB != null)
@@ -151,7 +148,7 @@ public class PolarBear : EnemyBase
                     pRB.AddForce((dir + Vector3.up).normalized * slamKnockback, ForceMode.Impulse);
                 }
             }
-            if (clawCollider.enabled) //If clawing, do Claw
+            if (clawCollider.enabled) 
             {
                 pAct.takeDamage(clawDamage);
                 if (pRB != null)
@@ -160,7 +157,7 @@ public class PolarBear : EnemyBase
                     pRB.AddForce((dir + transform.right + Vector3.up).normalized * clawKnockback, ForceMode.Impulse);
                 }
             }
-            if (rushCollider.enabled) //If rushing, do Rush
+            if (rushCollider.enabled) 
             {
                 pAct.takeDamage(rushDamage);
                 if (pRB != null)
@@ -173,7 +170,7 @@ public class PolarBear : EnemyBase
         }
         else
         {
-            if (rushCollider.enabled) //If Trigger collision is with anything else and is rushing, stop Rush
+            if (rushCollider.enabled) //Si la colision fue con cualquier otra cosa y esta haciendo Rush, detener Rush
             {
                 RushReset();
             }
@@ -183,51 +180,53 @@ public class PolarBear : EnemyBase
 
     private void FixedUpdate()
     {
-        if (state == IDLE || state == SEEKING) //If not attacking in any way, move normally
+        if (state == IDLE || state == SEEKING) //Si no ataca de ningun modo, moverse normalmente
         {
-            move();
+            move(true);
         }
-        else if (state == RUSHING) //If rushing, move accordingly
+        else if (state == RUSHING) //Si hace Rush, moverse como Rush
         {
             moveRush();
         }
     }
 
-    public void slamAttack() //Used for in-animation function calling
+
+    //Las siguientes funciones son usadas para llamado detro de animaciones
+    public void slamAttack() 
     {
         slamCollider.enabled = true;
     }
 
-    public void slamReset() //Return to base from slam
+    public void slamReset()
     {
         slamCollider.enabled = false;
         state = IDLE;
         Invoke("slamReload", 10f);
     }
 
-    private void slamReload() //Used for Invoke
+    private void slamReload() //Para Invoke
     {
         canSlam = true;
     }
 
-    public void clawAttack() //Used for in-animation function calling
+    public void clawAttack() 
     {
         clawCollider.enabled = true;
     }
 
-    public void clawReset() //Return to base from claw
+    public void clawReset() 
     {
         clawCollider.enabled = false;
         state = IDLE;
         Invoke("clawReload", 1f);
     }
 
-    private void clawReload() //Used for Invoke
+    private void clawReload() //Para Invoke
     {
         canClaw = true;
     }
 
-    private void RushAttack() //Start rush attack
+    private void RushAttack() //Iniciar ataque de Rush
     {
         state = RUSHING;
         rushCollider.enabled = true;
@@ -235,19 +234,19 @@ public class PolarBear : EnemyBase
         canRush = false; 
     }
 
-    public void RushReset() //Return to base from rush
+    public void RushReset() //Volver a base de Rush
     {
         rushCollider.enabled = false;
         Stun(rushStunTime);
         Invoke("RushReload", 15f);
     }
 
-    private void RushReload() //Used for Invoke
+    private void RushReload() //Para Invoke
     {
         canRush = true;
     }
 
-    public void StartBall() //Start ball evasion/attack
+    public void StartBall() //Iniciar Ball
     {
         if (canBall)
         {
@@ -256,29 +255,29 @@ public class PolarBear : EnemyBase
         }
     }
     
-    private void DoBall() //Used for Invoke, turns bear into ball
+    private void DoBall() //Para Invoke, usado para volver Oso a Ball
     {
-        bearMeshFilter.mesh = ballMesh; //Change mesh to ball
+        bearMeshFilter.mesh = ballMesh; //Cambiar mesh a Ball
         state = BALL;
-        foreach (BoxCollider bc in bearColliders) //Disable all colliders
+        foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
         {
             bc.enabled = false;
         }
-        rb.constraints = RigidbodyConstraints.None; //Make it so ball can roll
+        rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true; 
-        rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Push ball back
+        rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
         Invoke("EndBall", 1f);
     }
     
-    private void EndBall() //Return to base bear from ball
+    private void EndBall() //Para Invoke, volver a base de Ball
     {
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.rotation = Quaternion.identity; 
-        transform.rotation = Quaternion.identity; //Make rotation original
-        bearMeshFilter.mesh = bearMesh; //Change mesh back to bear
+        transform.rotation = Quaternion.identity; //Hacer rotacion Default
+        bearMeshFilter.mesh = bearMesh; //Cambiar mesh a Oso
         state = SEEKING;
         canBall = true;
-        foreach (BoxCollider bc in bearColliders) //Enable all non-trigger colliders
+        foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
         {
             if (!bc.isTrigger)
             {
@@ -291,8 +290,8 @@ public class PolarBear : EnemyBase
     private void moveRush()
     {
         findDirection();
-        rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f); //Turn slowly
-        transform.forward = -rushDirection; //The bear mesh is backwards, so make it face opposite to move direction
-        rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed; //Move the bear
+        rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f); //Girar lentamente
+        transform.forward = -rushDirection; 
+        rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed; //Mover
     }
 }

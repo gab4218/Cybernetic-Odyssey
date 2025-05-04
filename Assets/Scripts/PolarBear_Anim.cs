@@ -4,18 +4,16 @@ using UnityEngine;
 
 public class PolarBear_Anim : MonoBehaviour
 {
-    //Comments were written in English because when I code, I like to think in English, as it's closer in nature to C# and (at least professionally) it's more common
-    //[Traduccion] Los comentarios fueron escritos en Ingles porque, cuando hago codigo, me gusta pensar en Ingles, ya que es fundamentalmente mas parecido a C# y (al menos profesionalmente) es mas comun
+    
+    //Todo este script es usado para llamado de funciones en animaciones, todas las funciones llaman funciones de PolarBear
 
-    //This entire script it used for in-animation function calling, everything here calls functions from the PolarBear script
-
-    //Required scripts and animator controller
+    //Scripts necesarios y AnimatorController
     private PolarBear pb;
     private Animator anim;
 
     private void Start()
     {
-        //Preparations
+        //Preparaciones
         pb = GetComponentInParent<PolarBear>();
         anim = GetComponent<Animator>();
     }

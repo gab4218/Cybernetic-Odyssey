@@ -6,28 +6,27 @@ using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
-    //Comments were written in English because when I code, I like to think in English, as it's closer in nature to C# and (at least professionally) it's more common
-    //[Traduccion] Los comentarios fueron escritos en Ingles porque, cuando hago codigo, me gusta pensar en Ingles, ya que es fundamentalmente mas parecido a C# y (al menos profesionalmente) es mas comun
+    
 
     
-    private Inventory inventory; //Player's Inventory script
-    public int oldUpgrade; //Selected upgrade
+    private Inventory inventory; //Script del inventario del jugador
+    public int oldUpgrade; //Mejora seleccionada
 
-    private TMPro.TMP_Dropdown upgradeDropdown; //Reference to own dropdown menu
+    private TMPro.TMP_Dropdown upgradeDropdown; //Referencia al Dropdown propio
 
-    [SerializeField] private List<string> possibleOptions; //List of possible options as text mapped to their integer values
-    [SerializeField] private int id; //Slot identifier, used for inventory
-    [SerializeField] TMPro.TMP_Dropdown[] otherDropdowns; //References to other dropdown menus
+    [SerializeField] private List<string> possibleOptions; //Lista de las posibles opciones de texto mapeadas a su valor numerico
+    [SerializeField] private int id; //ID de slot, usado para inventario
+    [SerializeField] TMPro.TMP_Dropdown[] otherDropdowns; //Referencias a los otros Dropdowns
 
-    public bool isRunning = true; //Bool so that InventoryManager update only runs once
+    public bool isRunning = true; //Bool para que el Update de InventoryManager solo corra cuando se abre el inventario
 
 
-    public TMPro.TMP_Dropdown.OptionData Tina; //Named this way because of something said in a call I was in, fixed my code, used to look for and maintain selected value when modifying option list
+    public TMPro.TMP_Dropdown.OptionData Tina; //Nombrado de esta forma por algo dicho en una llamada en la que estaba, arreglo mi codigo, usado para buscar y mantener la opcion seleccionada al modificar la lista de opciones
     
-    public bool isChangedByPerson = true; //Created to stop stack overflow from occurring when modifying selected value via code
+    public bool isChangedByPerson = true; //Creado para frenar error de Stack Overflow al cambiar de valor por codigo
     void Start()
     {
-        //Preparations
+        //Preparaciones
         inventory = FindObjectOfType<Inventory>();
         upgradeDropdown = GetComponent<TMPro.TMP_Dropdown>();
         oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text);
@@ -41,33 +40,33 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
-        if (Time.timeScale == 0 && isRunning) //If menu is opened, updates options
+        if (Time.timeScale == 0 && isRunning) //Si se abre el menu, actualizar opciones
         {
             isRunning = false;
-            List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>(); //Create empty list of new options
+            List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>(); //Crear lista vacia de nuevas opciones
 
-            newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Add empty
-
-
-            oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text); //Store value of selected upgrade
-
-            Tina = upgradeDropdown.options[upgradeDropdown.value]; //Store selected upgrade
+            newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Agregar vacio
 
 
-            if (inventory.availableUpgrades.Count > 0) //If there are available upgrades do the following:
+            oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text); //Guardar valor de mejora seleccionada
+
+            Tina = upgradeDropdown.options[upgradeDropdown.value]; //Guardar mejora seleccionada
+
+
+            if (inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente:
             {
-                for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Cycle through every available upgrade
+                for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
                 {
 
-                    if (inventory.availableUpgrades[i] > oldUpgrade && oldUpgrade > 0) //If selected upgrade isn't empty and available upgrade is greater than selected upgrade, add selected upgrade
+                    if (inventory.availableUpgrades[i] > oldUpgrade && oldUpgrade > 0) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
                     {
                         newOptions.Add(Tina);
                     }
 
-                    newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Add available upgrade
+                    newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Agregar mejora disponible
                     
                     
-                    if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < oldUpgrade) //If every single available upgrade has been checked and the selected upgrade has not yet been added, add selected upgrade
+                    if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < oldUpgrade) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
                     {
                         newOptions.Add(Tina);
                     }
@@ -76,71 +75,72 @@ public class InventoryManager : MonoBehaviour
             else
 
             {
-                if (oldUpgrade > 0) //If there are no available upgrades and the selected upgrade is not empty, add selected upgrade
+                if (oldUpgrade > 0) //Si no hay mejoras disponibles y la mejora seleccionada no es vacio, agregar mejora seleccionada
                 {
                     newOptions.Add(Tina); 
                     
                 }
             }
-            upgradeDropdown.options = newOptions; //Update options
+            upgradeDropdown.options = newOptions; //Actualizar opciones
 
-            if (upgradeDropdown.value != upgradeDropdown.options.IndexOf(Tina)) //If the selected option's index changed, set index to the new one and stop stack overflow error from occurring
+            if (upgradeDropdown.value != upgradeDropdown.options.IndexOf(Tina)) //Si el indice de la opcion seleccionada fue modificado, cambiar opcion seleccionada al nuevo indice y frenar error de Stack Overflow
             {
-                isChangedByPerson = false; //Indicate that the next change will be made by code to prevent stack overflow
+                isChangedByPerson = false; //Indicar que el proximo cambio sera realizado por codigo para detener error de Stack Overflow
                 upgradeDropdown.value = upgradeDropdown.options.IndexOf(Tina);
             }
         }
     }
 
 
-    public TMPro.TMP_Dropdown.OptionData returnSelected() //Return selected value
+    public TMPro.TMP_Dropdown.OptionData returnSelected() //Devolver valor seleccionado
     {
         return upgradeDropdown.options[upgradeDropdown.value];
     }
 
 
-    public void selectUpgrade() //Happens every time option is changed
+    public void selectUpgrade() //Ocurre cada vez que una opcion es cambiada
     {
-        if (isChangedByPerson) //Check if change is made by a human
+        if (isChangedByPerson) //Chequear que el cambio fue hecho por una persona
         {
 
 
-            if (upgradeDropdown.value > 0) //If an upgrade is selected, enable it
+            if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
             {
                 inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
             }
-            if (oldUpgrade > 0) //If an upgrade is deselected, disable it
+            if (oldUpgrade > 0) //Si una mejora es deseleccionada, desactivarla
             {
                 inventory.disableUpgrade(oldUpgrade, id);
             }
 
 
-            //Store new selected values
+            //Guardar nuevos valores seleccionados
             oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text);
             Tina = upgradeDropdown.options[upgradeDropdown.value]; 
 
             inventory.CheckForDuplicates(); //Failsafe
 
-            foreach (TMPro.TMP_Dropdown DD in otherDropdowns) //Cycle through all other dropdowns
+            foreach (TMPro.TMP_Dropdown DD in otherDropdowns) //Pasar por todos los otros Dropdowns
             {
-                List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>(); //Create empty list of new options
+                List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>(); //Crear lista de nuevas opciones
                 InventoryManager DDIM = DD.GetComponent<InventoryManager>();
-                newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Add empty to list
+                newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Agregar vacio a lista
 
                 
 
-                if (inventory.availableUpgrades.Count > 0) //If there are available upgrades, do the following
+                if (inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente
                 {
-                    for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Cycle through every available upgrade
+                    //Lo mismo que en Update pero para los otros Dropdowns
+                    for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
                     {
 
-                        if (inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0) //If selected upgrade isn't empty and available upgrade is greater than selected upgrade, add selected upgrade
+                        if (inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
                         {
                             newOptions.Add(DDIM.Tina); 
                         }
-                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Add available upgrade
+                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Agregar mejora disponible
 
-                        if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < DDIM.oldUpgrade) //If every single available upgrade has been checked and the selected upgrade has not yet been added, add selected upgrade
+                        if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < DDIM.oldUpgrade && !newOptions.Contains(DDIM.Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
                         {
                             newOptions.Add(DDIM.Tina);
                         }
@@ -149,7 +149,7 @@ public class InventoryManager : MonoBehaviour
                 else
 
                 {
-                    if (DDIM.oldUpgrade > 0) //If there are no available upgrades and the selected upgrade is not empty, add selected upgrade
+                    if (DDIM.oldUpgrade > 0) //Si no hay mejoras disponibles y la mejora seleccionada no es vacio, agregar mejora seleccionada
                     {
                         newOptions.Add(DDIM.Tina);
                         
@@ -157,16 +157,16 @@ public class InventoryManager : MonoBehaviour
                 }
 
 
-                DD.options = newOptions; //Update options
-                if (DD.value != DD.options.IndexOf(DDIM.Tina)) //If the selected option's index changed, set index to the new one and stop stack overflow error from occurring
+                DD.options = newOptions; //Actualizar opciones
+                if (DD.value != DD.options.IndexOf(DDIM.Tina)) //Si el indice de la opcion seleccionada fue modificado, cambiar opcion seleccionada al nuevo indice y frenar error de Stack Overflow
                 {
-                    DDIM.isChangedByPerson = false; //Indicate that the next change will be made by code to prevent stack overflow
+                    DDIM.isChangedByPerson = false; //Indicar que el proximo cambio sera realizado por codigo para detener error de Stack Overflow
                     DD.value = DD.options.IndexOf(DDIM.Tina);
                 }
                 
             }
         }
-        else //Indicate that the next change will be made by a human
+        else //Indicar que el proximo cambio sera realizado por una persona
         {
             isChangedByPerson = true;
         }

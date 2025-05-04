@@ -48,7 +48,7 @@ public class ExplodingBall : EnemyBase
     {
         if (state == SEEKING && canMove == true)
         {
-            move(); //se mueve
+            move(false); //se mueve
         }
         if (state == ATTACKING)
         {

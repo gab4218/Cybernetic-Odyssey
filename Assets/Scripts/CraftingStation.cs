@@ -12,7 +12,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
     [SerializeField] private Button[] craftingButtons;
     private ItemCost[] costs;
 
-    public void onInteract()
+    public void onInteract() //Al interactuar, 
     {
         Time.timeScale = 0;
         isCrafting = true;
@@ -28,14 +28,18 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 {
                     hasColors[j] = true;
                 }
+                else
+                {
+                    hasColors[j] = false;
+                }
             }
             if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true)
             {
-                craftingButtons[i].enabled = true;
+                craftingButtons[i].interactable = true;
             }
             else
             {
-                craftingButtons[i].enabled = false;
+                craftingButtons[i].interactable = false;
             }
         }
     }
@@ -63,7 +67,19 @@ public class CraftingStation : MonoBehaviour, IInteractable
         {
             for (int i = 0; i < craftingButtons.Length; i++)
             {
-                if (inventory.hasMaterials(costs[i].cost[1], costs[i].cost[0]) && !costs[i].hasBeenCrafted)
+                bool[] hasColors = new bool[] { false, false, false };
+                for (int j = 0; j < costs[i].cost.Length; j++)
+                {
+                    if (inventory.hasMaterials(j, costs[i].cost[j]))
+                    {
+                        hasColors[j] = true;
+                    }
+                    else
+                    {
+                        hasColors[j] = false;
+                    }
+                }
+                if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true)
                 {
                     craftingButtons[i].interactable = true;
                 }

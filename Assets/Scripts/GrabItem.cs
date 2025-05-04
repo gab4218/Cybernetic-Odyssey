@@ -11,7 +11,7 @@ public class GrabItem : MonoBehaviour, IInteractable
     {
         inventory = FindObjectOfType<Inventory>();
     }
-    public void onInteract()
+    public void onInteract() //Agregar al inventario el material correcto
     {
         inventory.addToInventory(materialType);
         Destroy(gameObject);

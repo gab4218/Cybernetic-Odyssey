@@ -82,9 +82,10 @@ public class ExplodingBall : EnemyBase
 
             if (delayCurrent <= 0)
             {
+                findDirection();
                 playerA.takeDamage(explosionDamage); //player toma damage
                 playerRB.drag = 0;
-                playerRB.AddForce((dir + Vector3.up).normalized * explosionKnockback * playerA.getKnockbackMult(), ForceMode.Impulse); //toma knockback
+                playerRB.AddForce((dir + Vector3.up).normalized * explosionKnockback, ForceMode.Impulse); //toma knockback
                 Destroy(gameObject);
             }
         }

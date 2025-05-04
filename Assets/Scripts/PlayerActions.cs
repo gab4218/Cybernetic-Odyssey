@@ -40,18 +40,18 @@ public class PlayerActions : MonoBehaviour
     bool canGetHit = true;
     int damageType = 0;
     public int currentHP;
-    private float knockbackMult = 1f;
     bool canShoot = true;
     private Ray facingRay;
     private Inventory inventory;
     private PlayerMovement playerMovement;
     private bool canGrapple = false;
     private bool canHeal = false;
-
+    private Animator anim;
     private void Start()
     {
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
+        anim = GetComponentInChildren<Animator>();
         inventory = GetComponent<Inventory>();
         playerMovement = GetComponent<PlayerMovement>();
         foreach (int i in inventory.getEnabledUpgrades())
@@ -112,6 +112,7 @@ public class PlayerActions : MonoBehaviour
                 if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
                 {
                     interactable.onInteract();
+                    anim.SetTrigger("Interact");
                 }
             }
         }
@@ -209,17 +210,14 @@ public class PlayerActions : MonoBehaviour
         canGetHit = true;
     }
 
-    public float getKnockbackMult()
-    {
-        return knockbackMult;
-    }
+    
 
     public void enableUpgrade(int upgrade)
     {
         switch (upgrade)
         {
             case 1:
-                knockbackMult = 0.5f;
+                playerMovement.allowedToSlide = true;
                 break;
             case 2:
                 canGrapple = true;
@@ -239,7 +237,7 @@ public class PlayerActions : MonoBehaviour
         switch (upgrade)
         {
             case 1:
-                knockbackMult = 1;
+                playerMovement.allowedToSlide = false;
                 break;
             case 2:
                 canGrapple = false;

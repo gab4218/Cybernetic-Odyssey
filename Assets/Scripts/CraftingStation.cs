@@ -21,13 +21,21 @@ public class CraftingStation : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.None;
         for (int i = 0; i < craftingButtons.Length; i++)
         {
-            if (inventory.hasMaterials(costs[i].cost[1], costs[i].cost[0]))
+            bool[] hasColors = new bool[] { false, false, false };
+            for (int j = 0; j < costs[i].cost.Length; j++)
             {
-                craftingButtons[i].interactable = true;
+                if (inventory.hasMaterials(j, costs[i].cost[j]))
+                {
+                    hasColors[j] = true;
+                }
+            }
+            if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true)
+            {
+                craftingButtons[i].enabled = true;
             }
             else
             {
-                craftingButtons[i].interactable = false;
+                craftingButtons[i].enabled = false;
             }
         }
     }
@@ -55,7 +63,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
         {
             for (int i = 0; i < craftingButtons.Length; i++)
             {
-                if (inventory.hasMaterials(costs[i].cost[1], costs[i].cost[0]))
+                if (inventory.hasMaterials(costs[i].cost[1], costs[i].cost[0]) && !costs[i].hasBeenCrafted)
                 {
                     craftingButtons[i].interactable = true;
                 }

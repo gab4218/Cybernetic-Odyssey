@@ -17,6 +17,8 @@ public class Inventory : MonoBehaviour
     public List<int> availableUpgrades = new List<int>();
     int oldUpgrade;
     bool cancheck = true;
+    
+
     private void Awake()
     {
         secondarySlots = new int[numberOfUpgradeSlots];
@@ -39,7 +41,11 @@ public class Inventory : MonoBehaviour
 
     public void unlockUpgrade(ItemCost upgrade)
     {
-        removeFromInventory(upgrade.cost[1], upgrade.cost[0]);
+        for (int i = 0; i < upgrade.cost.Length; i++)
+        {
+            removeFromInventory(i, upgrade.cost[i]);
+        }
+        upgrade.hasBeenCrafted = true;
         availableUpgrades.Add(upgrade.upgradeType);
     }
 

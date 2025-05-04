@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+
+    
+    private Animator anim;
     [Header("Inputs")]
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
@@ -39,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float targetFOV;
 
-
+    public bool allowedToSlide = false;
     private float originalSpeed, xDir, zDir, accelMult, currentStamina, defaultFOV, targetSpeed, fac = 0;
 
     private LineRenderer grappleLine;
@@ -64,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
         currentStamina = maxStamina;
         targetFOV = defaultFOV;
         rb = GetComponent<Rigidbody>();
-        
+        anim = GetComponentInChildren<Animator>();
         originalSpeed = maxSpeed;
 
         accelMult = 1;
@@ -80,7 +84,8 @@ public class PlayerMovement : MonoBehaviour
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
         }
         //Get player input
-
+        groundDetect();
+        
         if (isGrappling)
         {
             dir = grapplePosition - transform.position;
@@ -95,6 +100,8 @@ public class PlayerMovement : MonoBehaviour
         {
             xDir = Input.GetAxisRaw("Horizontal");
             zDir = Input.GetAxisRaw("Vertical");
+            anim.SetFloat("xDir", Input.GetAxis("Horizontal"));
+            anim.SetFloat("zDir", Input.GetAxis("Vertical"));
 
             if (!isSliding)
             {
@@ -126,8 +133,9 @@ public class PlayerMovement : MonoBehaviour
 
 
             checkSpeed();
-
-
+            anim.SetBool("Sprinting", isSprinting);
+            anim.SetBool("Sliding", isSliding);
+            anim.SetBool("Crouching", isCrouching);
 
             //This handles stamina
             if (isSprinting)
@@ -166,6 +174,8 @@ public class PlayerMovement : MonoBehaviour
         posOffset = new Vector3(transform.position.x,transform.position.y + groundRayLen / 3.33f, transform.position.z);
         groundRay = new Ray(posOffset, -transform.up);
         grounded = Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
+        anim.SetBool("Grounded", grounded);
+        
         if (grounded && !isSprinting && walljumping)
         {
             walljumping = false;
@@ -177,7 +187,7 @@ public class PlayerMovement : MonoBehaviour
     private bool WallDetect()
     {
         
-        wallRay = new Ray(transform.position + Vector3.up, dir.normalized);
+        wallRay = new Ray(transform.position + Vector3.up, dir);
 
 
         if (!grounded && canWalljump)
@@ -193,7 +203,7 @@ public class PlayerMovement : MonoBehaviour
     private void Movement(Vector3 dir)
     {
         
-        rb.AddForce(dir.normalized * accelerationForce * Time.fixedDeltaTime * accelMult, ForceMode.Force);
+        rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult, ForceMode.Force);
         
     }
 
@@ -223,7 +233,7 @@ public class PlayerMovement : MonoBehaviour
             StopCoroutine(SmoothSpeed());
             fac = 0;
             
-            if (isSprinting && !isSliding)
+            if (isSprinting && !isSliding && allowedToSlide)
             {
                 isSliding = true;
                 isSprinting = false;
@@ -298,6 +308,7 @@ public class PlayerMovement : MonoBehaviour
         //Halt all vertical movement for consistency and apply an impulse force upwards
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        anim.SetTrigger("Jump");
     }
     private void WallJump()
     {
@@ -306,6 +317,7 @@ public class PlayerMovement : MonoBehaviour
         currentStamina -= 0.5f;
         resting = false;
         walljumping = true;
+        anim.SetTrigger("Jump");
     }
 
     public void ChangeWalljump(bool newWalljump)

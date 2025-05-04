@@ -8,7 +8,8 @@ using UnityEngine.UI;
 
 public class PlayerActions : MonoBehaviour
 {
-    
+
+    //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
     [SerializeField] TMP_Text HPDisplay;
@@ -18,13 +19,15 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
     [SerializeField] Gradient[] bulletColors;
-    [Header("Inputs")]
+
+    [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
     [SerializeField] KeyCode inventoryKey = KeyCode.I;
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
-    [Header("Parameters")]
+
+    [Header("Parameters")] //Parametros posiblemente modificados en el editor
     [SerializeField] float interactDistance;
     [SerializeField] int maxHP = 100;
     [SerializeField] int dmgPerPellet = 10;
@@ -36,37 +39,42 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] private float fallOffStart = 10f;
     [SerializeField] private float fallOffDistace = 50f;
 
-
+    //Otras variables
+    public int currentHP;
     bool canGetHit = true;
     int damageType = 0;
-    public int currentHP;
-    private float knockbackMult = 1f;
     bool canShoot = true;
     private Ray facingRay;
     private Inventory inventory;
     private PlayerMovement playerMovement;
     private bool canGrapple = false;
     private bool canHeal = false;
+    private Animator anim;
 
     private void Start()
     {
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
+        anim = GetComponentInChildren<Animator>();
         inventory = GetComponent<Inventory>();
         playerMovement = GetComponent<PlayerMovement>();
-        foreach (int i in inventory.getEnabledUpgrades())
+        foreach (int i in inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
         {
             enableUpgrade(i);
         }
+        //Preparaciones
+
     }
 
 
     private void Update()
     {
 
-        facingRay = new Ray(cameraTransform.position, cameraTransform.forward);
-        HPDisplay.text = $"{currentHP}/{maxHP}";
-        if (Input.GetKeyDown(Key1))
+        facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
+
+        HPDisplay.text = $"{currentHP}/{maxHP}"; //Mostrar HP
+
+        if (Input.GetKeyDown(Key1)) //Tipo de damage
         {
             damageType = 0;
         }
@@ -78,25 +86,25 @@ public class PlayerActions : MonoBehaviour
         {
             damageType = 2;
         }
-        //DELETE LATER
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        
+        if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
-        if (Input.GetKeyDown(grappleKey) && canGrapple)
+        if (Input.GetKeyDown(grappleKey) && canGrapple) //Grapple
         {
             ShootGrapple();
         }
 
-        if (transform.position.y < -20)
+        if (transform.position.y < -20) //Morir si Out Of Bounds
         {
             OOBDie();
         }
 
-        dmgTypeDisplay.text = $"Damage type: {damageType.ToString()}";
+        dmgTypeDisplay.text = $"Damage type: {damageType.ToString()}"; //Mostrar tipo de damage
 
-        if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0)
+        if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0) //Disparar
         {
             crosshair.color = Color.red;
 
@@ -104,7 +112,7 @@ public class PlayerActions : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(interactKey) && Time.timeScale > 0)
+        if (Input.GetKeyDown(interactKey) && Time.timeScale > 0) //Interactuar
         {
 
             if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
@@ -112,11 +120,12 @@ public class PlayerActions : MonoBehaviour
                 if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
                 {
                     interactable.onInteract();
+                    anim.SetTrigger("Interact");
                 }
             }
         }
 
-        if (Input.GetKeyDown(inventoryKey))
+        if (Input.GetKeyDown(inventoryKey)) //Inventario
         {
             if (inventoryPlaceholder.activeSelf)
             {
@@ -133,7 +142,7 @@ public class PlayerActions : MonoBehaviour
                 Time.timeScale = 0.0f;
             }
         }
-        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf)
+        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf) //Salir de inventario
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -145,7 +154,7 @@ public class PlayerActions : MonoBehaviour
 
     private void shoot()
     {
-        if (Physics.Raycast(facingRay, out RaycastHit hit))
+        if (Physics.Raycast(facingRay, out RaycastHit hit)) //Si dispara a algun lugar valido, hacer feedback visual y calcular multiplicador por distancia
         {
             float dist = Vector3.Distance(transform.position, hit.point);
             float dmgDistanceMult = Mathf.Max(0, (fallOffDistace - dist)/fallOffDistace);
@@ -156,14 +165,14 @@ public class PlayerActions : MonoBehaviour
             canShoot = false;
             Invoke("readyWeapon", readyWeaponTime);
             EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
-            if (enemy != null && !hit.collider.isTrigger)
+            if (enemy != null && !hit.collider.isTrigger) //Si dispara a un enemigo, hacer damage
             {
                 enemy.takeDamage(dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * dmgDistanceMult) : dmgPerPellet, damageType);
             }
         }
     }
 
-    IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit)
+    IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit) //Feedback visual de disparo
     {
         float time = 0;
         Vector3 startPos = Trail.transform.position;
@@ -179,14 +188,14 @@ public class PlayerActions : MonoBehaviour
 
     }
 
-    private void readyWeapon()
+    private void readyWeapon() //Para invoke
     {
         canShoot = true;
         crosshair.color = Color.white;
     }
 
 
-    public void takeDamage(int dmg)
+    public void takeDamage(int dmg) //Recibir damage
     {
         if (canGetHit)
         {
@@ -203,23 +212,20 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    private void resetDamage()
+    private void resetDamage() //Para Invoke
     {
         StartCoroutine(CheckHeal());
         canGetHit = true;
     }
 
-    public float getKnockbackMult()
-    {
-        return knockbackMult;
-    }
+    
 
-    public void enableUpgrade(int upgrade)
+    public void enableUpgrade(int upgrade) //Activar efecto de mejora
     {
         switch (upgrade)
         {
             case 1:
-                knockbackMult = 0.5f;
+                playerMovement.allowedToSlide = true;
                 break;
             case 2:
                 canGrapple = true;
@@ -234,12 +240,12 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    public void disableUpgrade(int upgrade)
+    public void disableUpgrade(int upgrade) //Deshabilitar efecto de mejora
     {
         switch (upgrade)
         {
             case 1:
-                knockbackMult = 1;
+                playerMovement.allowedToSlide = false;
                 break;
             case 2:
                 canGrapple = false;
@@ -253,12 +259,12 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    private void OOBDie()
+    private void OOBDie() //Morir si OOB
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    private void ShootGrapple()
+    private void ShootGrapple() //Disparar Grapple
     {
         canGrapple = false;
         grappleIMG.color = Color.red;
@@ -272,7 +278,7 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    private IEnumerator CheckHeal()
+    private IEnumerator CheckHeal() //Revisar si se puede curar
     {
         float timer = 0f;
         while (timer < healingTime)
@@ -286,7 +292,7 @@ public class PlayerActions : MonoBehaviour
         yield break;
     }
 
-    private IEnumerator Heal()
+    private IEnumerator Heal() //Curar
     {
         while (canHeal && currentHP < maxHP)
         {
@@ -296,7 +302,7 @@ public class PlayerActions : MonoBehaviour
         yield break;
     }
 
-    private IEnumerator GrappleReload()
+    private IEnumerator GrappleReload() //Recargar grapple
     {
         
         float timer = 0f;

@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class PolarBear_Anim : MonoBehaviour
 {
+    
+    //Todo este script es usado para llamado de funciones en animaciones, todas las funciones llaman funciones de PolarBear
+
+    //Scripts necesarios y AnimatorController
     private PolarBear pb;
     private Animator anim;
+
     private void Start()
     {
+        //Preparaciones
         pb = GetComponentInParent<PolarBear>();
         anim = GetComponent<Animator>();
     }
-    public void returnToIdle()
+    public void returnToIdle() 
     {
         anim.Play("BearIdle");
         pb.slamReset();

@@ -4,5 +4,6 @@ using UnityEngine;
 
 public interface IInteractable
 {
+    //Interfaz para objetos interactuables
     void onInteract();
 }

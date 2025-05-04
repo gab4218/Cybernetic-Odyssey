@@ -4,31 +4,42 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class EnemyBase : MonoBehaviour
+public abstract class EnemyBase : MonoBehaviour
 {
+ 
+
+    //Variables de estado
     protected const int IDLE = 0;
     protected const int SEEKING = 1;
     protected const int ATTACKING = 2;
     protected const int STUNNED = 3;
+    public int state;
+
+    //Variables basicas modificables en el editor que un enemigo podria tener
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
     [SerializeField] protected float detectionDistance = 15f;
     [SerializeField] protected float escapeDistance = 20f;
     [SerializeField] protected int damageType;
     [SerializeField] protected Vector3[] randomMovementDimensions;
-    [SerializeField] protected TMP_Text HPDisplay;
     [SerializeField] protected float positionThreshold = 0.5f;
+
+    [SerializeField] protected TMP_Text HPDisplay; //Para debug
+
+    //Otras variables comunes de enemigo
+    public int currentHP;
+    protected Rigidbody rb;
+    
+    //Variables para deteccion de jugador
     protected Transform playerTranform;
     protected PlayerActions player;
-    public int currentHP;
     protected Vector3 dir;
-    public int state;
-    protected Rigidbody rb;
-
+    
 
 
     protected virtual void Start()
     {
+        //Preparaciones
         rb = GetComponentInChildren<Rigidbody>();
         currentHP = maxHP;
         playerTranform = FindObjectOfType<PlayerMovement>().transform;
@@ -36,81 +47,83 @@ public class EnemyBase : MonoBehaviour
         state = IDLE;
     }
 
-    protected virtual void detectPlayer()
+    protected virtual void detectPlayer() //Detectar jugador
     {
-        if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE)
+        if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
         {
-            state = SEEKING;
+            state = SEEKING; 
         }
-        else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance)
+        else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance) //Si el jugador esta fuera del radio de escape y estado = buscar, cambiar a idle
         {
             state = IDLE;
         }
     }
 
-    protected void findDirection()
+    //Las siguientes funciones fueron nombradas iguales porque me gustan las funciones con multiples overrides
+
+    protected void findDirection() //Si la llamada de la funcion no toma argumentos, mirar a la proyeccion de la posicion del jugador en el plano xz
     {
         dir = playerTranform.position - transform.position;
         dir.y = 0;
         dir.Normalize();
     }
 
-    protected void findDirection(Vector2 newSpot)
+    protected void findDirection(Vector2 newSpot) //Si la llamada de la funcion toma un Vector2, mirar a la proyeccion de la posicion pasada en el plano xz
     {
-        Vector3 newSpot3 = new Vector3(newSpot.x, transform.position.y, newSpot.y);
-        dir = newSpot3 - transform.position;
+        
+        dir = new Vector3(newSpot.x, transform.position.y, newSpot.y) - transform.position;
         dir.Normalize();
     }
 
-    protected void findDirection(Vector3 newSpot)
+    protected void findDirection(Vector3 newSpot) //Si la llamada de la funcion toma un Vector3, mirar a la posicion pasada
     {
         dir = newSpot - transform.position;
         dir.Normalize();
     }
 
-    protected bool hasReachedDestination(Vector2 targetPos)
+    protected bool hasReachedDestination(Vector2 targetPos) //Si la llamada de la funcion toma un Vector2, chequear si la posicion esta dentro de una tolerancia de la proyeccion en el plano xz del vector
     {
-        Vector3 targetPos3 = new Vector3(targetPos.x, transform.position.y, targetPos.y);
-        return Vector3.Distance(transform.position, targetPos3) <= positionThreshold;
+        
+        return Vector3.Distance(transform.position, new Vector3(targetPos.x, transform.position.y, targetPos.y)) <= positionThreshold;
         
     }
 
-    protected bool hasReachedDestination(Vector3 targetPos)
+    protected bool hasReachedDestination(Vector3 targetPos) //Si la llamada de la funcion toma un Vector3, chequear si la posicion esta dentro de una tolerancia del vector
     {
        return Vector3.Distance(transform.position, targetPos) <= positionThreshold;
 
     }
 
-    protected virtual void move()
+    protected virtual void move(bool inverted) //Mover en la direccion encontrada
     {
         if (dir.sqrMagnitude > 0)
         {
-            rb.velocity = dir * speed + rb.velocity.y * Vector3.up;
-            transform.forward = Vector3.Lerp(transform.forward, -dir, 0.1f);
+            rb.velocity = (inverted? -dir : dir) * speed + rb.velocity.y * Vector3.up;
+            transform.forward = Vector3.Lerp(transform.forward, dir, 0.1f);
         }
     }
 
-    public virtual void takeDamage(int dmg, int dmgColor)
+    public virtual void takeDamage(int dmg, int dmgColor) 
     {
-        if (HPDisplay != null)
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
             HPDisplay.text = $"Bear HP: {currentHP}/{maxHP}";
 
         }
-        currentHP -= dmg * (dmgColor == damageType? 3 : 1);
-        if (currentHP <= 0)
+        currentHP -= dmg * (dmgColor == damageType? 3 : 1); //Restar HP acorde al tipo de damage recibido
+        if (currentHP <= 0) //Si muerto, destruir
         {
             Destroy(gameObject);
         }
     }
 
-    protected void Stun(float stunTime)
+    protected void Stun(float stunTime) //Stunnear por un periodo de tiempo
     {
         state = STUNNED;
         Invoke("Destun", stunTime);
     }
 
-    private void Destun()
+    private void Destun() //Usado para Invoke
     {
         state = IDLE;
     }

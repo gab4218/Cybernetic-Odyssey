@@ -35,7 +35,6 @@ public class ExplodingBall : EnemyBase
             {
                 state = ATTACKING;
                 Debug.Log("esta attacking");
-                //anim.Play("Explode"); //animacion de explotar
             }
         }
         if (collision == false && canMove == true && timerOff == true)

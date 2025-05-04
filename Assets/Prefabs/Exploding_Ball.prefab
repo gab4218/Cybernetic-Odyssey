@@ -197,8 +197,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 20
   speed: 5.5
-  detectionDistance: 30
-  escapeDistance: 40
+  detectionDistance: 15
+  escapeDistance: 25
   damageType: 2
   randomMovementDimensions: []
   HPDisplay: {fileID: 0}

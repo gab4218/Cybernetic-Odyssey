@@ -92,6 +92,11 @@ public class PlayerActions : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
+        if (Input.GetKeyDown(grappleKey) && playerMovement.GetGrappleState())
+        {
+            playerMovement.StopGrapple();
+        }
+
         if (Input.GetKeyDown(grappleKey) && canGrapple) //Grapple
         {
             ShootGrapple();

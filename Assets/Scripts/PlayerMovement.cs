@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
     Vector3 flatVelocity;
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false;
 
     private Rigidbody rb;
 
@@ -79,20 +79,21 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0) return;
-        foreach(var cam in cams)
+        foreach (var cam in cams)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
         }
-       
+
         groundDetect();
-        
+
         if (isGrappling) //Si esta grappling, moverse al punto de grapple e ignorar input
         {
             dir = grapplePosition - transform.position;
             grappleLine.SetPosition(0, grapplePoint.position);
-            if (Vector3.Distance(transform.position, grapplePosition) < 3)
+            if (Vector3.Distance(transform.position, grapplePosition) < 3 || forceStopGrapple)
             {
                 isGrappling = false;
+                forceStopGrapple = false;
                 Destroy(grappleLine.gameObject);
             }
         }
@@ -329,7 +330,15 @@ public class PlayerMovement : MonoBehaviour
         grappleLine = Instantiate(grappleLinePF, transform.position, Quaternion.identity);
         grappleLine.SetPositions(new Vector3[] { grapplePoint.position, grapplePosition });
     }
+    public bool GetGrappleState()
+    {
+        return isGrappling;
+    }
 
+    public void StopGrapple()
+    {
+        forceStopGrapple = true;
+    }
    
     private IEnumerator slideTimer() //Limitador de tiempo de Slide
     {

@@ -17,16 +17,7 @@ public class PlataformaTemporal : MonoBehaviour
         if (other.GetComponentInParent<PlayerActions>())
         {
             
-            _animator.SetBool("activado", false);
-        }
-    }
-    private void OnTriggerExit(Collider other)
-    {
-
-        if (other.GetComponentInParent<PlayerActions>())
-        {
-
-            _animator.SetBool("activado", true);
+            _animator.SetTrigger("activado");
         }
     }
 }

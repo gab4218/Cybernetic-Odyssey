@@ -72,6 +72,11 @@ public class PolarBear : EnemyBase
                             );
         findDirection(randomPosition);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        HPDisplay = GameObject.FindWithTag("BearHP").GetComponent<TMPro.TMP_Text>();
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+        {
+            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+        }
         //Preparaciones generales
     }
 
@@ -122,7 +127,7 @@ public class PolarBear : EnemyBase
         if(state == RUSHING) //Si hace un ataque de Rush, frenar si se aleja mucho del jugador
         {
             
-            if (Vector3.Distance(transform.position, playerTranform.position) > detectionDistance && !canRush)
+            if (Vector3.Distance(transform.position, playerTranform.position) > escapeDistance)
             {
                 RushReset();
             } 

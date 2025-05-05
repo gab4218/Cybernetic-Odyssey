@@ -46,6 +46,7 @@ public abstract class EnemyBase : MonoBehaviour
         player = FindObjectOfType<PlayerActions>();
         playerTranform = player.transform;
         state = IDLE;
+        
     }
 
     private void OnDestroy()
@@ -110,12 +111,11 @@ public abstract class EnemyBase : MonoBehaviour
 
     public virtual void takeDamage(int dmg, int dmgColor) 
     {
+        currentHP -= dmg * (dmgColor == damageType? 3 : 1); //Restar HP acorde al tipo de damage recibido
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
-            HPDisplay.text = $"Bear HP: {currentHP}/{maxHP}";
-
+            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP,0)}/{maxHP}";
         }
-        currentHP -= dmg * (dmgColor == damageType? 3 : 1); //Restar HP acorde al tipo de damage recibido
         if (currentHP <= 0) //Si muerto, destruir
         {
             Destroy(gameObject);

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Exoplody
   - Bear
+  - BearHP
   layers:
   - Default
   - TransparentFX

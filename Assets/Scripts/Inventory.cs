@@ -22,7 +22,7 @@ public class Inventory : MonoBehaviour
     int[] materialInventory = new int[3];
     
     
-
+    
     
 
     private void Awake()

@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Time.timeScale == 0) return;
+        if (Time.timeScale == 0) return; //Si esta pausado
         foreach (var cam in cams)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);

@@ -43,8 +43,8 @@ public abstract class EnemyBase : MonoBehaviour
         //Preparaciones
         rb = GetComponentInChildren<Rigidbody>();
         currentHP = maxHP;
-        playerTranform = FindObjectOfType<PlayerMovement>().transform;
         player = FindObjectOfType<PlayerActions>();
+        playerTranform = player.transform;
         state = IDLE;
     }
 

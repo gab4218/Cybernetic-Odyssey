@@ -66,7 +66,7 @@ public class InventoryManager : MonoBehaviour
                     newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Agregar mejora disponible
                     
                     
-                    if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < oldUpgrade) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
+                    if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < oldUpgrade && !newOptions.Contains(Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
                     {
                         newOptions.Add(Tina);
                     }

@@ -23,7 +23,7 @@ public class PlayerActions : MonoBehaviour
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
-    [SerializeField] KeyCode inventoryKey = KeyCode.I;
+    [SerializeField] KeyCode inventoryKey = KeyCode.Tab;
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
 
@@ -41,6 +41,7 @@ public class PlayerActions : MonoBehaviour
 
     //Otras variables
     public int currentHP;
+    public Vector3 lastPosition;
     bool canGetHit = true;
     int damageType = 0;
     bool canShoot = true;
@@ -92,6 +93,11 @@ public class PlayerActions : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
+        if (Input.GetKeyDown(grappleKey) && playerMovement.GetGrappleState())
+        {
+            playerMovement.StopGrapple();
+        }
+
         if (Input.GetKeyDown(grappleKey) && canGrapple) //Grapple
         {
             ShootGrapple();
@@ -127,14 +133,14 @@ public class PlayerActions : MonoBehaviour
 
         if (Input.GetKeyDown(inventoryKey)) //Inventario
         {
-            if (inventoryPlaceholder.activeSelf)
+            if (inventoryPlaceholder.activeSelf && Time.timeScale == 0)
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 inventoryPlaceholder.SetActive(false);
                 Time.timeScale = 1.0f;
             }
-            else
+            else if (Time.timeScale > 0) 
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;

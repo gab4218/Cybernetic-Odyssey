@@ -98,8 +98,8 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (dir.sqrMagnitude > 0)
         {
-            rb.velocity = (inverted? -dir : dir) * speed + rb.velocity.y * Vector3.up;
-            transform.forward = Vector3.Lerp(transform.forward, dir, 0.1f);
+            rb.velocity = dir * speed + rb.velocity.y * Vector3.up;
+            transform.forward = Vector3.Lerp(transform.forward, (inverted ? -dir : dir), 0.1f);
         }
     }
 

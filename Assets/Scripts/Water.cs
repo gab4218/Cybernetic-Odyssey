@@ -13,6 +13,6 @@ public class Water : MonoBehaviour
             pa.GetComponent<Rigidbody>().velocity = Vector3.zero;
             pa.gameObject.transform.position = pa.lastPosition;
         }
-        else if (other.GetComponentInParent<EnemyBase>()) Destroy(other.gameObject); 
+        else if (other.GetComponentInParent<EnemyBase>() != null) Destroy(other.gameObject); 
     }
 }

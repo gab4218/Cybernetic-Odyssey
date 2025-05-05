@@ -111,7 +111,7 @@ public class PolarBear : EnemyBase
                 randomPosition = new Vector2
                                 (
                                     Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
-                                    Random.Range(randomMovementDimensions[0].y, randomMovementDimensions[1].y)
+                                    Random.Range(randomMovementDimensions[0].z, randomMovementDimensions[1].z)
                                 );
             }
             else 

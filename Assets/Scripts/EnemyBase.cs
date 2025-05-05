@@ -28,6 +28,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     //Otras variables comunes de enemigo
     public int currentHP;
+    public EnemySpawner enemySpawner;
     protected Rigidbody rb;
     
     //Variables para deteccion de jugador
@@ -47,6 +48,10 @@ public abstract class EnemyBase : MonoBehaviour
         state = IDLE;
     }
 
+    private void OnDestroy()
+    {
+        enemySpawner.enemyCount--;
+    }
     protected virtual void detectPlayer() //Detectar jugador
     {
         if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar

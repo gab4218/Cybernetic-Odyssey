@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -9,23 +10,25 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] int maxEnemyCount;
     [SerializeField] int spawnDelay;
 
-    int enemyCount;
-    List<GameObject> enemyList = new List<GameObject>();
+    public int enemyCount = 0;
+    
     void Start()
     {
-        enemyList.AddRange(GameObject.FindGameObjectsWithTag(enemy.tag));
-        enemyCount = enemyList.Count;
+        foreach (var enemy in GameObject.FindGameObjectsWithTag(enemy.tag))
+        {
+            enemyCount++;
+            enemy.GetComponent<EnemyBase>().enemySpawner = this;
+        }
+        
     }
 
     
     void Update()
     {
-        enemyList.RemoveAll(null);
-        Debug.Log(enemyList.Count);
         if (enemyCount < maxEnemyCount)
         {
             Invoke("SpawnEnemy", spawnDelay);
-
+            enemyCount++;
         }
     }
 
@@ -33,6 +36,8 @@ public class EnemySpawner : MonoBehaviour
     private void SpawnEnemy()
     {
         Vector3 spawnPoint = new Vector3(Random.Range(spawnArea[0].x, spawnArea[1].x), Random.Range(spawnArea[0].y, spawnArea[1].y), Random.Range(spawnArea[0].z, spawnArea[1].z));
+        GameObject go = Instantiate(enemy, spawnPoint, Quaternion.identity);
+        go.GetComponent<EnemyBase>().enemySpawner = this;
     }
 
 }

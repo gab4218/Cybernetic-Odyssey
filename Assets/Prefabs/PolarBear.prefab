@@ -82,7 +82,7 @@ GameObject:
   - component: {fileID: 5290198108620238391}
   m_Layer: 6
   m_Name: PolarBear
-  m_TagString: Untagged
+  m_TagString: Bear
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70b3a5a82f6957448c264d0529f0464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   maxHP: 300
   speed: 4
   detectionDistance: 20
@@ -124,10 +125,9 @@ MonoBehaviour:
   randomMovementDimensions:
   - {x: -55, y: 0, z: 0}
   - {x: 0, y: 10, z: 55}
-  HPDisplay: {fileID: 0}
   positionThreshold: 1
+  HPDisplay: {fileID: 0}
   currentHP: 0
-  state: 0
   slamRange: 8
   slamDamage: 30
   slamKnockback: 10

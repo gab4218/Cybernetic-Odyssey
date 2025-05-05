@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 1806866940470901178}
   m_Layer: 6
   m_Name: Exploding_Ball
-  m_TagString: Untagged
+  m_TagString: Exoplody
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

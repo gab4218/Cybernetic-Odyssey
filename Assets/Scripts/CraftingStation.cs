@@ -33,7 +33,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
                     hasColors[j] = false;
                 }
             }
-            if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true)
+            if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true && !costs[i].hasBeenCrafted)
             {
                 craftingButtons[i].interactable = true;
             }
@@ -79,7 +79,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
                         hasColors[j] = false;
                     }
                 }
-                if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true)
+                if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true && !costs[i].hasBeenCrafted)
                 {
                     craftingButtons[i].interactable = true;
                 }

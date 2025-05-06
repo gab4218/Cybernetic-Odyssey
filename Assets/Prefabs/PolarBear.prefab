@@ -230,7 +230,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 2147483656
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 1610645623

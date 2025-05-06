@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float slideTime = 2f;
     [SerializeField] private float grapplingForce = 3000f;
     [SerializeField] private LayerMask groundRayLayerMask = 30;
+    [SerializeField] private float maxSlopeAngle = 45f;
 
     
 
@@ -52,11 +53,15 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
     Vector3 flatVelocity;
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false;
+    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
 
     private Rigidbody rb;
 
     private Vector3 posOffset, grapplePosition;
+
+    private RaycastHit slopeHit;
+
+
 
     
 
@@ -126,7 +131,12 @@ public class PlayerMovement : MonoBehaviour
             checkSprint();
 
             checkCrouch();
-        
+
+            SlopeDetect();
+
+            rb.useGravity = !onSlope;
+
+
             if (Input.GetKeyDown(jumpKey) && grounded) //Salto
             {
                 Jump();
@@ -186,6 +196,27 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    private void SlopeDetect()
+    {
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 0.3f, groundRayLayerMask))
+        {
+
+            slopeHit = hit;
+            float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            onSlope = angle != 0 && angle < maxSlopeAngle;
+        }
+        else
+        {
+            onSlope = false;
+
+        }
+    }
+
+    private Vector3 SlopeMoveDir()
+    {
+        return Vector3.ProjectOnPlane(dir, slopeHit.normal).normalized;
+    }
+
     private bool WallDetect() //Detectar paredes para walljump
     {
         
@@ -204,25 +235,49 @@ public class PlayerMovement : MonoBehaviour
 
     private void Movement(Vector3 dir) //Mover
     {
-        
-        rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult, ForceMode.Force);
-        
+
+        if (onSlope)
+        {
+            
+            rb.AddForce(SlopeMoveDir() * accelerationForce * Time.fixedDeltaTime * accelMult, ForceMode.Force);
+            if (rb.velocity.y > 0)
+            {
+                rb.AddForce(Vector3.down * 10f, ForceMode.Force);
+            }
+        }
+        else
+        {
+            rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult, ForceMode.Force);
+        }
+
     }
 
 
 
     private void checkSpeed()
     {
-        //Aislar componentes x & z de la velocidad
-        flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-        
-        
-        //Chequear si la velocidad horizontal excede un limite y corregir
-        if (flatVelocity.sqrMagnitude > maxSpeed * maxSpeed)
+        if (onSlope && !jumping)
         {
-            flatVelocity = flatVelocity.normalized * maxSpeed;
-            rb.velocity = new Vector3(flatVelocity.x, rb.velocity.y, flatVelocity.z);
+            if (rb.velocity.sqrMagnitude > maxSpeed * maxSpeed)
+            {
+                rb.velocity = rb.velocity.normalized * maxSpeed;
+            }
         }
+        else
+        {
+            //Aislar componentes x & z de la velocidad
+            flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        
+        
+            //Chequear si la velocidad horizontal excede un limite y corregir
+            if (flatVelocity.sqrMagnitude > maxSpeed * maxSpeed)
+            {
+                flatVelocity = flatVelocity.normalized * maxSpeed;
+                rb.velocity = new Vector3(flatVelocity.x, rb.velocity.y, flatVelocity.z);
+            }
+            
+        }
+        
     }
 
     private void checkCrouch()
@@ -303,10 +358,18 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         //Frenar todo movimiento vertical y aplicar fuerza de salto para que sea consistente
+        jumping = true;
+        Invoke("StopJumping", 0.5f);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         anim.SetTrigger("Jump");
     }
+
+    private void StopJumping()
+    {
+        jumping = false;
+    }
+
     private void WallJump()
     {
         //Igual que salto pero en direccion opuesta a la pared

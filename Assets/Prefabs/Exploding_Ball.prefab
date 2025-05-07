@@ -200,11 +200,11 @@ MonoBehaviour:
   speed: 5.5
   detectionDistance: 15
   escapeDistance: 25
-  damageType: 2
   randomMovementDimensions: []
   positionThreshold: 0.5
   HPDisplay: {fileID: 0}
   currentHP: 20
+  enemySpawner: {fileID: 0}
   explosionKnockback: 30
   explosionDelay: 1.5
   explosionDamage: 20

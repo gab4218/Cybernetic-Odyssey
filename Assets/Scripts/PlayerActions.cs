@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,32 +19,44 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Image grappleIMG;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
-    [SerializeField] Gradient[] bulletColors;
+    [SerializeField] Gradient bulletColors;
+    [SerializeField] MeshFilter gunMeshFilter;
+    [SerializeField] Mesh pistolMesh, shotgunMesh;
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
     [SerializeField] KeyCode inventoryKey = KeyCode.Tab;
-    [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
+    [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
 
     [Header("Parameters")] //Parametros posiblemente modificados en el editor
     [SerializeField] float interactDistance;
+    [SerializeField] float pistolCooldown = 0.33f;
+    [SerializeField] float pistolFallOffStart = 10f;
+    [SerializeField] float pistolFallOffMax = 40f;
+    [SerializeField] float shotgunCooldown = 0.75f;
+    [SerializeField] float shotgunFallOffStart = 2f;
+    [SerializeField] float shotgunFallOffMax = 15f;
+    [SerializeField] float shotgunPelletCount = 5f;
+    [SerializeField] float shotgunPelletSpreadMax = 20f;
     [SerializeField] int maxHP = 100;
     [SerializeField] int dmgPerPellet = 10;
-    [SerializeField] float readyWeaponTime = 0.25f;
     [SerializeField] float grappleDistance = 15f;
     [SerializeField] float grappleDelay = 5.0f;
     [SerializeField] float healingTime = 5.0f;
     [SerializeField] int healingRate = 1;
-    [SerializeField] private float fallOffStart = 10f;
-    [SerializeField] private float fallOffDistace = 50f;
+    [SerializeField] float weakPointMult = 2;
+    [SerializeField] float strongPointMult = 0.5f;
 
     //Otras variables
+    private float fallOffStart = 10f;
+    private float fallOffDistace = 40f;
+    float readyWeaponTime = 0.33f;
     public int currentHP;
     public Vector3 lastPosition;
     bool canGetHit = true;
-    int damageType = 0;
+    int selectedWeapon = 0;
     bool canShoot = true;
     private Ray facingRay;
     private Inventory inventory;
@@ -51,6 +64,8 @@ public class PlayerActions : MonoBehaviour
     private bool canGrapple = false;
     private bool canHeal = false;
     private Animator anim;
+    private bool hasShotgun = false;
+
 
     private void Start()
     {
@@ -77,15 +92,19 @@ public class PlayerActions : MonoBehaviour
 
         if (Input.GetKeyDown(Key1)) //Tipo de damage
         {
-            damageType = 0;
+            selectedWeapon = 0;
+            fallOffDistace = pistolFallOffMax;
+            fallOffStart = pistolFallOffStart;
+            readyWeaponTime = pistolCooldown;
+            gunMeshFilter.mesh = pistolMesh;
         }
-        if(Input.GetKeyDown(Key2))
+        if(Input.GetKeyDown(Key2) && hasShotgun)
         {
-            damageType = 1;
-        }
-        if (Input.GetKeyDown(Key3))
-        {
-            damageType = 2;
+            selectedWeapon = 1;
+            fallOffDistace = shotgunFallOffMax;
+            fallOffStart = shotgunFallOffStart;
+            readyWeaponTime = shotgunCooldown;
+            gunMeshFilter.mesh = shotgunMesh;
         }
         
         if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
@@ -108,13 +127,24 @@ public class PlayerActions : MonoBehaviour
             OOBDie();
         }
 
-        dmgTypeDisplay.text = $"Damage type: {damageType.ToString()}"; //Mostrar tipo de damage
+        dmgTypeDisplay.text = $"Damage type: {selectedWeapon.ToString()}"; //Mostrar tipo de damage
 
         if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0) //Disparar
         {
-            crosshair.color = Color.red;
+            switch (selectedWeapon)
+            {
+                case 0:
+                    shoot(facingRay);
+                    break;
+                case 1:
+                    shootShotgun();
+                    break;
+                default:
+                    shoot(facingRay);
+                    break;
 
-            shoot();
+            }
+
         }
 
 
@@ -158,25 +188,52 @@ public class PlayerActions : MonoBehaviour
 
     }
 
-    private void shoot()
+    private void shoot(Ray aimRay)
     {
-        if (Physics.Raycast(facingRay, out RaycastHit hit)) //Si dispara a algun lugar valido, hacer feedback visual y calcular multiplicador por distancia
+        if (Physics.Raycast(aimRay, out RaycastHit hit)) //Si dispara a algun lugar valido, hacer feedback visual y calcular multiplicador por distancia
         {
             float dist = Vector3.Distance(transform.position, hit.point);
-            float dmgDistanceMult = Mathf.Max(0, (fallOffDistace - dist)/fallOffDistace);
+            
             
             TrailRenderer trail = Instantiate(bulletPrefab, bulletSpawn.position, Quaternion.identity);
-            trail.colorGradient = bulletColors[damageType];
+            trail.colorGradient = bulletColors;
             StartCoroutine(SpawnTrail(trail, hit));
             canShoot = false;
             Invoke("readyWeapon", readyWeaponTime);
             EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
-            if (enemy != null && !hit.collider.isTrigger) //Si dispara a un enemigo, hacer damage
+
+
+            
+            if (enemy != null && !hit.collider.isTrigger && dist < fallOffDistace) //Si dispara a un enemigo, hacer damage
             {
-                enemy.takeDamage(dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * dmgDistanceMult) : dmgPerPellet, damageType);
+                if (!enemy.ignoreColliders.Contains(hit.collider))
+                {
+                    float mult = 1;
+                    if (enemy.weakColliders.Contains(hit.collider))
+                    {
+                        mult = weakPointMult;
+                    }
+                    else if (enemy.strongColliders.Contains(hit.collider))
+                    {
+                        mult = strongPointMult;
+                    }
+                    
+                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult));
+                }
             }
         }
     }
+
+    private void shootShotgun()
+    {
+        Vector3 pelletDir;
+        for (int i = 0; i < shotgunPelletCount; i++)
+        {
+            pelletDir = Quaternion.Euler(Random.Range(-shotgunPelletSpreadMax, shotgunPelletSpreadMax), Random.Range(-shotgunPelletSpreadMax, shotgunPelletSpreadMax), Random.Range(-shotgunPelletSpreadMax, shotgunPelletSpreadMax)) * facingRay.direction;
+            shoot(new Ray(cameraTransform.position, pelletDir));
+        }
+    }
+
 
     IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit) //Feedback visual de disparo
     {
@@ -240,7 +297,9 @@ public class PlayerActions : MonoBehaviour
             case 3:
                 playerMovement.ChangeWalljump(true);
                 break;
-
+            case 4:
+                hasShotgun = true;
+                break;
             default:
                 break;
         }
@@ -259,6 +318,9 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 3:
                 playerMovement.ChangeWalljump(false);
+                break;
+            case 4:
+                hasShotgun = false;
                 break;
             default:
                 break;

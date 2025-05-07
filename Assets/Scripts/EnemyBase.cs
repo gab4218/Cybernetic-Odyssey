@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,14 +21,19 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected float speed;
     [SerializeField] protected float detectionDistance = 15f;
     [SerializeField] protected float escapeDistance = 20f;
-    [SerializeField] protected int damageType;
     [SerializeField] protected Vector3[] randomMovementDimensions;
     [SerializeField] protected float positionThreshold = 0.5f;
+    [SerializeField] protected GameObject strongCollidersGO;
+    [SerializeField] protected GameObject weakCollidersGO;
+    [SerializeField] protected GameObject ignoreCollidersGO;
 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 
     //Otras variables comunes de enemigo
     public int currentHP;
+    public Collider[] ignoreColliders;
+    public Collider[] weakColliders;
+    public Collider[] strongColliders;
     public EnemySpawner enemySpawner;
     protected Rigidbody rb;
     
@@ -46,7 +52,21 @@ public abstract class EnemyBase : MonoBehaviour
         player = FindObjectOfType<PlayerActions>();
         playerTranform = player.transform;
         state = IDLE;
-        
+
+        if (ignoreCollidersGO != null)
+        {
+            ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();
+        }
+
+        if (strongCollidersGO != null)
+        {
+            strongColliders = strongCollidersGO.GetComponents<Collider>();
+        }
+
+        if (weakCollidersGO != null)
+        {
+            weakColliders = weakCollidersGO.GetComponents<Collider>();
+        }
     }
 
     private void OnDestroy()
@@ -109,9 +129,9 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
-    public virtual void takeDamage(int dmg, int dmgColor) 
+    public virtual void takeDamage(int dmg) 
     {
-        currentHP -= dmg * (dmgColor == damageType? 3 : 1); //Restar HP acorde al tipo de damage recibido
+        currentHP -= dmg; //Restar HP acorde al tipo de damage recibido
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP,0)}/{maxHP}";

@@ -440,9 +440,9 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   inventoryPlaceholder: {fileID: 0}
   HPDisplay: {fileID: 0}
-  dmgTypeDisplay: {fileID: 0}
   crosshair: {fileID: 0}
   grappleIMG: {fileID: 0}
+  overloadIMG: {fileID: 0}
   bulletSpawn: {fileID: 0}
   bulletPrefab: {fileID: 4142949402675267902, guid: df53ad881397eec48b656481d69116fa, type: 3}
   bulletColors:
@@ -565,6 +565,7 @@ MonoBehaviour:
   gunMeshFilter: {fileID: 0}
   pistolMesh: {fileID: 313342534689051398, guid: d967e07b45b54ca4db35301924083b96, type: 3}
   shotgunMesh: {fileID: 5314951041115539915, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
+  overloadingColors: []
   shootKey: 323
   interactKey: 101
   inventoryKey: 9
@@ -574,6 +575,7 @@ MonoBehaviour:
   iceKey: 122
   fireKey: 120
   acidKey: 99
+  healKey: 113
   interactDistance: 3
   pistolCooldown: 0.33
   pistolFallOffStart: 10
@@ -595,6 +597,9 @@ MonoBehaviour:
   overloadCooldown: 20
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
+  partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
+  partMin: {fileID: 704876869660727204, guid: cb3fd86f1074f6e44a47b0281f0acc2f, type: 3}
+  partMid: {fileID: 2307703672736081187, guid: ebb1b875768588b4d921799cbf3a71ae, type: 3}
 --- !u!54 &2977787141678710446
 Rigidbody:
   m_ObjectHideFlags: 0

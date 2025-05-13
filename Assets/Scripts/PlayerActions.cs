@@ -74,7 +74,9 @@ public class PlayerActions : MonoBehaviour
     private bool canOverload = true;
     private List<bool> canHealMats = new List<bool>{ false, false, false };
     private bool haltHeal = false;
-
+    public ParticleSystem partMax;
+    public ParticleSystem partMin;
+    public ParticleSystem partMid;
 
     public enum damageType
     {
@@ -282,6 +284,22 @@ public class PlayerActions : MonoBehaviour
                     }
                     
                     enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult), dmgType);
+                    
+                    if (mult == 1)
+                    {
+                        ParticleSystem partSys = Instantiate (partMid, hit.point, Quaternion.LookRotation(hit.normal));
+                        partSys.Play();
+                    }
+                    else if (mult == weakPointMult)
+                    {
+                        ParticleSystem partSys = Instantiate(partMax, hit.point, Quaternion.LookRotation(hit.normal));
+                        partSys.Play();
+                    }
+                    else if (mult == strongPointMult)
+                    {
+                        ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
+                        partSys.Play();
+                    }
                 }
             }
         }

@@ -8180,8 +8180,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerTransform: {fileID: 1918893585}
   POVTransform: {fileID: 239637464}
-  cameraSensitivityX: 150
-  cameraSensitivityY: 150
+  cameraSensitivityX: 1000
+  cameraSensitivityY: 1000
   sensDisplay: {fileID: 872947794}
 --- !u!4 &1207463209
 Transform:
@@ -16047,6 +16047,18 @@ PrefabInstance:
       value: 0.5710185
       objectReference: {fileID: 0}
     - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: partMax
+      value: 
+      objectReference: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
+    - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: partMid
+      value: 
+      objectReference: {fileID: 2307703672736081187, guid: ebb1b875768588b4d921799cbf3a71ae, type: 3}
+    - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: partMin
+      value: 
+      objectReference: {fileID: 704876869660727204, guid: cb3fd86f1074f6e44a47b0281f0acc2f, type: 3}
+    - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: HPDisplay
       value: 
       objectReference: {fileID: 1866192792}
@@ -17217,6 +17229,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3854720099750436180, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253619908627776750, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253619908627776750, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253619908627776750, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253619908627776750, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253619908627776750, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}
+      propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5290198108620238391, guid: 2b06e8d391ef11a4d9fcc27c9afbc535, type: 3}

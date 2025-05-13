@@ -14,14 +14,15 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
     [SerializeField] TMP_Text HPDisplay;
-    [SerializeField] TMP_Text dmgTypeDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
+    [SerializeField] Image overloadIMG;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
-    [SerializeField] Gradient bulletColors;
+    [SerializeField] Gradient[] bulletColors;
     [SerializeField] MeshFilter gunMeshFilter;
     [SerializeField] Mesh pistolMesh, shotgunMesh;
+    [SerializeField] Color[] overloadingColors;
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
@@ -29,6 +30,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] KeyCode inventoryKey = KeyCode.Tab;
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
+    [SerializeField] KeyCode iceKey = KeyCode.Z, fireKey = KeyCode.X, acidKey = KeyCode.C;
+    [SerializeField] KeyCode healKey = KeyCode.Q;
 
     [Header("Parameters")] //Parametros posiblemente modificados en el editor
     [SerializeField] float interactDistance;
@@ -48,7 +51,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] int healingRate = 1;
     [SerializeField] float weakPointMult = 2;
     [SerializeField] float strongPointMult = 0.5f;
-
+    [SerializeField] float overloadTime = 10f;
+    [SerializeField] float overloadCooldown = 20f;
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -65,8 +69,22 @@ public class PlayerActions : MonoBehaviour
     private bool canHeal = false;
     private Animator anim;
     private bool hasShotgun = false;
+    private bool isAllowedToOverload = false;
+    private bool isAllowedToHeal = false;
+    private bool canOverload = true;
+    private List<bool> canHealMats = new List<bool>{ false, false, false };
+    private bool haltHeal = false;
 
 
+    public enum damageType
+    {
+        None,
+        Ice,
+        Fire,
+        Acid
+    }
+
+    damageType dmgType = damageType.None;
     private void Start()
     {
         inventoryPlaceholder.SetActive(false);
@@ -78,7 +96,9 @@ public class PlayerActions : MonoBehaviour
         {
             enableUpgrade(i);
         }
+        overloadIMG.gameObject.SetActive(false);
         //Preparaciones
+
 
     }
 
@@ -106,7 +126,52 @@ public class PlayerActions : MonoBehaviour
             readyWeaponTime = shotgunCooldown;
             gunMeshFilter.mesh = shotgunMesh;
         }
-        
+
+        if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                canHealMats[i] = inventory.hasMaterials(i, 1);
+            }
+            if (canHealMats.Contains(true))
+            {
+                inventory.removeFromInventory(canHealMats.IndexOf(true), 1);
+                currentHP = Mathf.Min(currentHP + 50, maxHP);
+            }
+        }
+
+        if (isAllowedToOverload && canOverload)
+        {
+            if (Input.GetKeyDown(iceKey) && inventory.hasMaterials(0, 2))
+            {
+                dmgType = damageType.Ice;
+                inventory.removeFromInventory(0, 2);
+                canOverload = false;
+                overloadIMG.gameObject.SetActive(true);
+                overloadIMG.color = overloadingColors[0];
+                StartCoroutine(WaitOverload());
+            }
+            if (Input.GetKeyDown(fireKey) && inventory.hasMaterials(1, 2))
+            {
+                dmgType = damageType.Fire;
+                inventory.removeFromInventory(1, 2);
+                canOverload = false;
+                overloadIMG.gameObject.SetActive(true);
+                overloadIMG.color = overloadingColors[1];
+                StartCoroutine(WaitOverload());
+            }
+            if (Input.GetKeyDown(acidKey) && inventory.hasMaterials(2, 2))
+            {
+                dmgType = damageType.Acid;
+                inventory.removeFromInventory(2, 2);
+                canOverload = false;
+                overloadIMG.gameObject.SetActive(true);
+                overloadIMG.color = overloadingColors[2];
+                StartCoroutine(WaitOverload());
+            }
+
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -127,8 +192,6 @@ public class PlayerActions : MonoBehaviour
             OOBDie();
         }
 
-        dmgTypeDisplay.text = $"Damage type: {selectedWeapon.ToString()}"; //Mostrar tipo de damage
-
         if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0) //Disparar
         {
             switch (selectedWeapon)
@@ -147,12 +210,12 @@ public class PlayerActions : MonoBehaviour
 
         }
 
-
-        if (Input.GetKeyDown(interactKey) && Time.timeScale > 0) //Interactuar
+        if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 
-            if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
+            if (Input.GetKeyDown(interactKey) && Time.timeScale > 0) //Interactuar
             {
+
                 if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
                 {
                     interactable.onInteract();
@@ -196,7 +259,7 @@ public class PlayerActions : MonoBehaviour
             
             
             TrailRenderer trail = Instantiate(bulletPrefab, bulletSpawn.position, Quaternion.identity);
-            trail.colorGradient = bulletColors;
+            trail.colorGradient = bulletColors[(int)dmgType];
             StartCoroutine(SpawnTrail(trail, hit));
             canShoot = false;
             Invoke("readyWeapon", readyWeaponTime);
@@ -218,7 +281,7 @@ public class PlayerActions : MonoBehaviour
                         mult = strongPointMult;
                     }
                     
-                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult));
+                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult), dmgType);
                 }
             }
         }
@@ -266,7 +329,7 @@ public class PlayerActions : MonoBehaviour
             canGetHit = false;
             Invoke("resetDamage", 0.5f);
             canHeal = false;
-            StopCoroutine(CheckHeal());
+            haltHeal = true;
             StopCoroutine(Heal());
             if (currentHP <= 0)
             {
@@ -277,8 +340,9 @@ public class PlayerActions : MonoBehaviour
 
     private void resetDamage() //Para Invoke
     {
-        StartCoroutine(CheckHeal());
+        haltHeal = false;
         canGetHit = true;
+        StartCoroutine(CheckHeal());
     }
 
     
@@ -299,6 +363,12 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 4:
                 hasShotgun = true;
+                break;
+            case 5:
+                isAllowedToOverload = true;
+                break;
+            case 6:
+                isAllowedToHeal = true;
                 break;
             default:
                 break;
@@ -321,6 +391,12 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 4:
                 hasShotgun = false;
+                break;
+            case 5:
+                isAllowedToOverload = false;
+                break;
+            case 6:
+                isAllowedToHeal = false;
                 break;
             default:
                 break;
@@ -352,12 +428,16 @@ public class PlayerActions : MonoBehaviour
         while (timer < healingTime)
         {
             timer += Time.deltaTime;
-
+            if (haltHeal)
+            {
+                haltHeal = false;
+                yield break;
+            }
             yield return null;
         }
         canHeal = true;
-        StartCoroutine(Heal());
-        yield break;
+        if (isAllowedToHeal) StartCoroutine(Heal());
+
     }
 
     private IEnumerator Heal() //Curar
@@ -367,7 +447,7 @@ public class PlayerActions : MonoBehaviour
             currentHP += currentHP > (maxHP-healingRate)? (maxHP-currentHP) : healingRate;
             yield return new WaitForSeconds(0.1f);
         }
-        yield break;
+        
     }
 
     private IEnumerator GrappleReload() //Recargar grapple
@@ -382,9 +462,27 @@ public class PlayerActions : MonoBehaviour
         }
         canGrapple = true;
         grappleIMG.color = new Color(70f, 50f, 231f);
-        yield break;
+
     }
 
+    private IEnumerator WaitOverload()
+    {
+        float t = 0f;
+        while (t < overloadCooldown)
+        {
+
+            if (t >= overloadTime && dmgType != damageType.None)
+            {
+                dmgType = damageType.None;
+                overloadIMG.gameObject.SetActive(false);
+            }
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        canOverload = true;
+        
+    }
     
 
 }

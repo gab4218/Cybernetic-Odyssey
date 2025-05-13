@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class GrabItem : MonoBehaviour, IInteractable
+public class GrabItem : MonoBehaviour
 {
     public int materialType;
     private Inventory inventory;
@@ -11,9 +11,12 @@ public class GrabItem : MonoBehaviour, IInteractable
     {
         inventory = FindObjectOfType<Inventory>();
     }
-    public void onInteract() //Agregar al inventario el material correcto
+    private void OnTriggerEnter(Collider other)
     {
-        inventory.addToInventory(materialType);
-        Destroy(gameObject);
+        if (other.GetComponentInParent<PlayerActions>())
+        {
+            inventory.addToInventory(materialType);
+            Destroy(gameObject);
+        }
     }
 }

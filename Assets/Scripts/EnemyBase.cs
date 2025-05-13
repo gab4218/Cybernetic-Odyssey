@@ -26,6 +26,7 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected GameObject strongCollidersGO;
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
+    
 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 
@@ -36,7 +37,13 @@ public abstract class EnemyBase : MonoBehaviour
     public Collider[] strongColliders;
     public EnemySpawner enemySpawner;
     protected Rigidbody rb;
-    
+    protected int fireDamage = 2;
+    protected float fireFrequency = 0.25f;
+    protected float fireTime = 5;
+    protected float slowMult = 0.75f;
+    protected float slowTime = 5f;
+    protected bool onFire = false;
+    protected bool slowed = false;
     //Variables para deteccion de jugador
     protected Transform playerTranform;
     protected PlayerActions player;
@@ -124,14 +131,25 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (dir.sqrMagnitude > 0)
         {
-            rb.velocity = dir * speed + rb.velocity.y * Vector3.up;
+            rb.velocity = dir * speed + rb.velocity.y * Vector3.up * (slowed? slowMult : 1);
             transform.forward = Vector3.Lerp(transform.forward, (inverted ? -dir : dir), 0.1f);
         }
     }
 
-    public virtual void takeDamage(int dmg) 
+    public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType) 
     {
-        currentHP -= dmg; //Restar HP acorde al tipo de damage recibido
+        currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
+        if (!onFire && dmgType == PlayerActions.damageType.Fire)
+        {
+            StartCoroutine(FireDamage());
+            onFire = true;
+        }
+        if (!slowed && dmgType == PlayerActions.damageType.Ice)
+        {
+            StartCoroutine(IceTimer());
+            slowed = true;
+        }
+
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP,0)}/{maxHP}";
@@ -151,5 +169,41 @@ public abstract class EnemyBase : MonoBehaviour
     private void Destun() //Usado para Invoke
     {
         state = IDLE;
+    }
+
+    private IEnumerator FireDamage()
+    {
+        float t = 0;
+        while (t < fireTime)
+        {
+            t += Time.deltaTime;
+            
+            if (t % fireFrequency < Time.deltaTime)
+            {
+                currentHP -= fireDamage;
+                if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+                {
+                    HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+                }
+                if (currentHP <= 0) //Si muerto, destruir
+                {
+                    Destroy(gameObject);
+                }
+            }
+            yield return null;
+        }
+        onFire = false;
+    }
+
+    private IEnumerator IceTimer()
+    {
+        float t = 0;
+        while (t < slowTime)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        slowed = false;
     }
 }

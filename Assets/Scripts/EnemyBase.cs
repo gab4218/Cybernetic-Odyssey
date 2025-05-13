@@ -4,7 +4,9 @@ using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public abstract class EnemyBase : MonoBehaviour
 {
  
@@ -38,6 +40,7 @@ public abstract class EnemyBase : MonoBehaviour
     public EnemySpawner enemySpawner;
     protected Rigidbody rb;
     protected int fireDamage = 2;
+    protected NavMeshAgent navMeshAgent;
     protected float fireFrequency = 0.25f;
     protected float fireTime = 5;
     protected float slowMult = 0.75f;
@@ -59,7 +62,7 @@ public abstract class EnemyBase : MonoBehaviour
         player = FindObjectOfType<PlayerActions>();
         playerTranform = player.transform;
         state = IDLE;
-
+        navMeshAgent = GetComponent<NavMeshAgent>();
         if (ignoreCollidersGO != null)
         {
             ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();
@@ -84,7 +87,7 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
         {
-            state = SEEKING; 
+            state = SEEKING;
         }
         else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance) //Si el jugador esta fuera del radio de escape y estado = buscar, cambiar a idle
         {
@@ -99,17 +102,20 @@ public abstract class EnemyBase : MonoBehaviour
         dir = playerTranform.position - transform.position;
         dir.y = 0;
         dir.Normalize();
+        navMeshAgent.destination = playerTranform.position;
     }
-
-    protected void findDirection(Vector2 newSpot) //Si la llamada de la funcion toma un Vector2, mirar a la proyeccion de la posicion pasada en el plano xz
+    
+    protected void setDestination(Vector2 newSpot) //Si la llamada de la funcion toma un Vector2, mirar a la proyeccion de la posicion pasada en el plano xz
     {
-        
-        dir = new Vector3(newSpot.x, transform.position.y, newSpot.y) - transform.position;
+        navMeshAgent.destination = new Vector3(newSpot.x, transform.position.y, newSpot.y);
+
+        dir = navMeshAgent.destination - transform.position;
         dir.Normalize();
     }
 
-    protected void findDirection(Vector3 newSpot) //Si la llamada de la funcion toma un Vector3, mirar a la posicion pasada
+    protected void setDestination(Vector3 newSpot) //Si la llamada de la funcion toma un Vector3, mirar a la posicion pasada
     {
+        navMeshAgent.destination = newSpot;
         dir = newSpot - transform.position;
         dir.Normalize();
     }
@@ -127,14 +133,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     }
 
-    protected virtual void move(bool inverted) //Mover en la direccion encontrada
-    {
-        if (dir.sqrMagnitude > 0)
-        {
-            rb.velocity = dir * speed + rb.velocity.y * Vector3.up * (slowed? slowMult : 1);
-            transform.forward = Vector3.Lerp(transform.forward, (inverted ? -dir : dir), 0.1f);
-        }
-    }
+
 
     public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType) 
     {
@@ -164,11 +163,13 @@ public abstract class EnemyBase : MonoBehaviour
     {
         state = STUNNED;
         Invoke("Destun", stunTime);
+        navMeshAgent.isStopped = true;
     }
 
     private void Destun() //Usado para Invoke
     {
         state = IDLE;
+        navMeshAgent.isStopped = false;
     }
 
     private IEnumerator FireDamage()

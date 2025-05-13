@@ -70,7 +70,7 @@ public class PolarBear : EnemyBase
                                 Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
                                 Random.Range(randomMovementDimensions[0].z, randomMovementDimensions[1].z)
                             );
-        findDirection(randomPosition);
+        setDestination(randomPosition);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         HPDisplay = GameObject.FindWithTag("BearHP").GetComponent<TMPro.TMP_Text>();
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
@@ -93,6 +93,7 @@ public class PolarBear : EnemyBase
                 state = ATTACKING;
                 anim.Play("BearSlam");
                 canSlam = false;
+                navMeshAgent.isStopped = true;
             }
            
             if (Vector3.Distance(transform.position, playerTranform.position) < clawRange && canClaw) //Claw
@@ -100,11 +101,13 @@ public class PolarBear : EnemyBase
                 state = CLAWING;
                 anim.Play("BearClaw");
                 canClaw = false;
+                navMeshAgent.isStopped = true;
             }
             
             if (Vector3.Distance(transform.position, playerTranform.position) > minRushDistance && canRush) //Rush
             {
                 RushAttack();
+                navMeshAgent.isStopped = true;
             }
 
 
@@ -121,7 +124,7 @@ public class PolarBear : EnemyBase
             }
             else 
             {
-                findDirection(randomPosition); 
+                setDestination(randomPosition); 
             }
         }
         if(state == RUSHING) //Si hace un ataque de Rush, frenar si se aleja mucho del jugador
@@ -185,11 +188,7 @@ public class PolarBear : EnemyBase
 
     private void FixedUpdate()
     {
-        if (state == IDLE || state == SEEKING) //Si no ataca de ningun modo, moverse normalmente
-        {
-            move(true);
-        }
-        else if (state == RUSHING) //Si hace Rush, moverse como Rush
+        if (state == RUSHING) //Si hace Rush, moverse como Rush
         {
             moveRush();
         }
@@ -206,6 +205,7 @@ public class PolarBear : EnemyBase
     {
         slamCollider.enabled = false;
         state = IDLE;
+        navMeshAgent.isStopped = false;
         Invoke("slamReload", 10f);
     }
 
@@ -224,6 +224,7 @@ public class PolarBear : EnemyBase
         clawCollider.enabled = false;
         state = IDLE;
         Invoke("clawReload", 1f);
+        navMeshAgent.isStopped = false;
     }
 
     private void clawReload() //Para Invoke
@@ -235,6 +236,7 @@ public class PolarBear : EnemyBase
     {
         state = RUSHING;
         rushCollider.enabled = true;
+        navMeshAgent.isStopped = true;
         rushDirection = dir;
         canRush = false; 
     }
@@ -255,6 +257,7 @@ public class PolarBear : EnemyBase
     {
         if (canBall)
         {
+            
             canBall = false;
             Invoke("DoBall", Random.Range(ballDelayMin, ballDelayMax));
         }
@@ -269,7 +272,8 @@ public class PolarBear : EnemyBase
             bc.enabled = false;
         }
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
-        ballCollider.enabled = true; 
+        ballCollider.enabled = true;
+        navMeshAgent.isStopped = true;
         rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
         Invoke("EndBall", 1f);
     }
@@ -282,6 +286,7 @@ public class PolarBear : EnemyBase
         bearMeshFilter.mesh = bearMesh; //Cambiar mesh a Oso
         state = SEEKING;
         canBall = true;
+        navMeshAgent.isStopped = false;
         foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
         {
             if (!bc.isTrigger)
@@ -296,7 +301,7 @@ public class PolarBear : EnemyBase
     {
         findDirection();
         rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f); //Girar lentamente
-        transform.forward = -rushDirection; 
+        transform.forward = rushDirection; 
         rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed; //Mover
     }
 }

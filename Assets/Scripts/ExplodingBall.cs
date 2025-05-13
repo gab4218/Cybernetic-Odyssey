@@ -39,17 +39,14 @@ public class ExplodingBall : EnemyBase
             }
         }
         if (collision == false && canMove == true && timerOff == true)
-            {
-                state = SEEKING;
-            }
+        {
+            state = SEEKING;
+        }
+        navMeshAgent.isStopped = !canMove;
     }
 
     private void FixedUpdate()
     {
-        if (state == SEEKING && canMove == true)
-        {
-            move(false); //se mueve
-        }
         if (state == ATTACKING)
         {
             canMove = false; //frena para epxlotar

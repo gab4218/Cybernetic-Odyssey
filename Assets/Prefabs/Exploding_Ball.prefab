@@ -110,6 +110,7 @@ GameObject:
   - component: {fileID: 1050689844528334874}
   - component: {fileID: 3170577809976354928}
   - component: {fileID: 1806866940470901178}
+  - component: {fileID: 4658071265328717839}
   m_Layer: 6
   m_Name: Exploding_Ball
   m_TagString: Exoplody
@@ -202,8 +203,14 @@ MonoBehaviour:
   escapeDistance: 25
   randomMovementDimensions: []
   positionThreshold: 0.5
+  strongCollidersGO: {fileID: 0}
+  weakCollidersGO: {fileID: 0}
+  ignoreCollidersGO: {fileID: 0}
   HPDisplay: {fileID: 0}
   currentHP: 20
+  ignoreColliders: []
+  weakColliders: []
+  strongColliders: []
   enemySpawner: {fileID: 0}
   explosionKnockback: 30
   explosionDelay: 1.5
@@ -230,6 +237,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!195 &4658071265328717839
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828282429843357794}
+  m_Enabled: 1
+  m_AgentTypeID: -1923039037
+  m_Radius: 1.25
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3246301510353130360
 GameObject:
   m_ObjectHideFlags: 0

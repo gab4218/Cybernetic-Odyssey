@@ -8243,8 +8243,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerTransform: {fileID: 1918893585}
   POVTransform: {fileID: 239637464}
-  cameraSensitivityX: 150
-  cameraSensitivityY: 150
+  cameraSensitivityX: 1000
+  cameraSensitivityY: 1000
   sensDisplay: {fileID: 872947794}
 --- !u!4 &1207463209
 Transform:

@@ -216,6 +216,7 @@ MonoBehaviour:
   explosionDelay: 1.5
   explosionDamage: 20
   explosionCollider: {fileID: 1050689844528334874}
+  partExp: {fileID: 2918498673123971216, guid: e179afd256017f047a0421fc22480350, type: 3}
 --- !u!95 &1806866940470901178
 Animator:
   serializedVersion: 5

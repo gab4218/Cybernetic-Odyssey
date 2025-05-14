@@ -13,6 +13,7 @@ public class ExplodingBall : EnemyBase
     private bool canMove; //si se puede mover
     private bool timerOff; //si el timer no corre
     private bool collision; //si esta en el collider
+    public ParticleSystem partExp;
 
     protected override void Start()
     {
@@ -83,6 +84,8 @@ public class ExplodingBall : EnemyBase
                 playerA.takeDamage(explosionDamage); //player toma damage
                 playerRB.drag = 0;
                 playerRB.AddForce((dir + Vector3.up).normalized * explosionKnockback, ForceMode.Impulse); //toma knockback
+                ParticleSystem partSys = Instantiate(partExp, transform.position, Quaternion.identity);
+                partSys.Play();
                 Destroy(gameObject);
             }
         }

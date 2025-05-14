@@ -92,6 +92,8 @@ public class PlayerActions : MonoBehaviour
     private Coroutine healCR;
     private ParticleSystem.EmissionModule flamethrowerFire;
 
+    private Color originalOverheatColor;
+
     private Coroutine overheatCR;
     public enum damageType
     {
@@ -104,6 +106,7 @@ public class PlayerActions : MonoBehaviour
     damageType dmgType = damageType.None;
     private void Start()
     {
+        originalOverheatColor = overheatIMG.color;
         overheatIMG.gameObject.SetActive(false);
         overloadIMG.gameObject.SetActive(false);
         grappleIMG.gameObject.SetActive(false);
@@ -303,6 +306,8 @@ public class PlayerActions : MonoBehaviour
                 flamethrowerCurrentTime = 0;
                 flamethrowerFire.enabled = false;
                 canFlamethrow = false;
+                overheatIMG.color = Color.red;
+
 
                 if (overheatCR != null)
                 {
@@ -413,6 +418,7 @@ public class PlayerActions : MonoBehaviour
             t += Time.deltaTime;
             yield return null;
         }
+        overheatIMG.color = originalOverheatColor;
         overheatIMG.fillAmount = 1;
         canFlamethrow = true;
         overheatCR = null;

@@ -302,6 +302,6 @@ public class PolarBear : EnemyBase
         findDirection();
         rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f); //Girar lentamente
         transform.forward = rushDirection; 
-        rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed; //Mover
+        rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed * (slowed? slowMult : 1); //Mover
     }
 }

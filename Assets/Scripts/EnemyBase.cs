@@ -172,6 +172,7 @@ public abstract class EnemyBase : MonoBehaviour
                 {
                     StopCoroutine(iceCoroutine);
                 }
+                navMeshAgent.speed = originalSpeed * slowMult;
                 iceCoroutine = StartCoroutine(IceTimer());
                 slowed = true;
 
@@ -282,6 +283,7 @@ public abstract class EnemyBase : MonoBehaviour
         }
         mr.material.SetColor("_Color", new Vector4(oldColor.r,oldColor.g,oldColor.b,1f));
         slowed = false;
+        navMeshAgent.speed = originalSpeed;
         yield break;
     }
 }

@@ -201,11 +201,14 @@ MonoBehaviour:
   speed: 5.5
   detectionDistance: 15
   escapeDistance: 25
-  randomMovementDimensions: []
+  calmTime: 15
   positionThreshold: 0.5
+  randomMovementDimensions: []
   strongCollidersGO: {fileID: 0}
   weakCollidersGO: {fileID: 0}
   ignoreCollidersGO: {fileID: 0}
+  fireRadius: 0.5
+  fireParticleSystem: {fileID: 7298929676011750005, guid: b94c03d9ac7b7cb4c9753fa359776f52, type: 3}
   HPDisplay: {fileID: 0}
   currentHP: 20
   ignoreColliders: []

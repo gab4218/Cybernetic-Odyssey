@@ -30,8 +30,11 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected GameObject strongCollidersGO;
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
-    
+    [SerializeField] protected float fireRadius = 2;
+    [SerializeField] protected ParticleSystem fireParticleSystem;
+    [SerializeField] protected bool canSlow = true;
 
+    ParticleSystem currentFirePS;
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 
     //Otras variables comunes de enemigo
@@ -48,10 +51,15 @@ public abstract class EnemyBase : MonoBehaviour
     protected float slowMult = 0.75f;
     protected float slowTime = 5f;
     protected bool slowed = false;
+    protected bool onFire = false;
     //Variables para deteccion de jugador
     protected Transform playerTranform;
     protected PlayerActions player;
     protected Vector3 dir;
+    protected Coroutine fireCoroutine;
+    protected Coroutine calmCoroutine;
+    protected Coroutine iceCoroutine;
+    protected float originalSpeed;
     
 
 
@@ -64,6 +72,7 @@ public abstract class EnemyBase : MonoBehaviour
         playerTranform = player.transform;
         state = IDLE;
         navMeshAgent = GetComponent<NavMeshAgent>();
+        originalSpeed = navMeshAgent.speed;
         if (ignoreCollidersGO != null)
         {
             ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();
@@ -141,13 +150,32 @@ public abstract class EnemyBase : MonoBehaviour
         currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
         if (dmgType == PlayerActions.damageType.Fire)
         {
-            StopCoroutine(FireDamage());
-            StartCoroutine(FireDamage());
+            if (currentFirePS == null)
+            {
+                currentFirePS = Instantiate(fireParticleSystem, transform.position, Quaternion.identity);
+                currentFirePS.gameObject.transform.SetParent(transform, true);
+
+                ParticleSystem.ShapeModule sphere = currentFirePS.shape;
+                sphere.radius = fireRadius;
+            }
+            if (fireCoroutine != null)
+            {
+                StopCoroutine(fireCoroutine);
+            }
+            fireCoroutine = StartCoroutine(FireDamage());
         }
         if (!slowed && dmgType == PlayerActions.damageType.Ice)
         {
-            StartCoroutine(IceTimer());
-            slowed = true;
+            if (canSlow)
+            {
+                if (iceCoroutine != null)
+                {
+                    StopCoroutine(iceCoroutine);
+                }
+                iceCoroutine = StartCoroutine(IceTimer());
+                slowed = true;
+
+            }
         }
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
@@ -159,12 +187,24 @@ public abstract class EnemyBase : MonoBehaviour
         }
         if (player.isCrouched && player.canGambleCrouch)
         {
-            if (Random.Range(0, 1) > 0.5f)
+            if (Random.Range(0, 1f) > 0.5f)
             {
                 isAngered = true;
-                StopCoroutine(CalmDown());
-                StartCoroutine(CalmDown());
+                if (calmCoroutine != null)
+                {
+                    StopCoroutine(calmCoroutine);
+                }
+                calmCoroutine = StartCoroutine(CalmDown());
             }
+        }
+        else
+        {
+            isAngered = true;
+            if (calmCoroutine != null)
+            {
+                StopCoroutine(calmCoroutine);
+            }
+            calmCoroutine = StartCoroutine(CalmDown());
         }
     }
 
@@ -186,7 +226,7 @@ public abstract class EnemyBase : MonoBehaviour
         {
             canCalm = true;
         }
-        
+        calmCoroutine = null;
     }
 
     protected void Stun(float stunTime) //Stunnear por un periodo de tiempo
@@ -223,17 +263,25 @@ public abstract class EnemyBase : MonoBehaviour
             }
             yield return null;
         }
+        Destroy(currentFirePS.gameObject);
+        currentFirePS = null;
+        fireCoroutine = null;
+
     }
 
     private IEnumerator IceTimer()
     {
+        MeshRenderer mr = GetComponentInChildren<MeshRenderer>();
+        Color oldColor = mr.material.color;
+        mr.material.SetColor("_Color", new Vector4(0.8f, 1f, 1f, 1f));
         float t = 0;
         while (t < slowTime)
         {
             t += Time.deltaTime;
             yield return null;
         }
-
+        mr.material.SetColor("_Color", new Vector4(oldColor.r,oldColor.g,oldColor.b,1f));
         slowed = false;
+        yield break;
     }
 }

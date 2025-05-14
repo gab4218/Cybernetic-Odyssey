@@ -9,6 +9,7 @@ public class ItemCost : MonoBehaviour
     public int[] cost;
     public int upgradeType;
     public bool hasBeenCrafted = false;
+    public int majorUpgradeType;
     private Inventory inventory;
     private void Start()
     {

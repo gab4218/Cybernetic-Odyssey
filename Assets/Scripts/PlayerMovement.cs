@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float targetFOV;
 
-    public bool allowedToSlide = false;
+    public bool isCrouching = false, allowedToSlide = false;
     private float originalSpeed, xDir, zDir, accelMult, currentStamina, defaultFOV, targetSpeed, fac = 0;
 
     private LineRenderer grappleLine;
@@ -53,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
     Vector3 flatVelocity;
-    private bool isCrouching = false, isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
+    private bool isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
 
     private Rigidbody rb;
 
@@ -196,6 +196,12 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    public void FailGrapple(Vector3 pos)
+    {
+        grapplePosition = pos;
+        grappleLine = Instantiate(grappleLinePF, transform.position, Quaternion.identity);
+        StartCoroutine(GrappleFail());
+    }
     private void SlopeDetect()
     {
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 0.3f, groundRayLayerMask))
@@ -307,7 +313,7 @@ public class PlayerMovement : MonoBehaviour
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
                 targetSpeed = originalSpeed * crouchMult;
-                StartCoroutine(restartSmoothSpeed());
+                StartCoroutine(RestartSmoothSpeed());
             }
 
         }
@@ -318,7 +324,7 @@ public class PlayerMovement : MonoBehaviour
             fac = 0;
             StopCoroutine(SmoothSpeed());
             targetSpeed = originalSpeed;
-            StartCoroutine(restartSmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             isCrouching = false;
             isSliding = false;
             targetFOV = defaultFOV;
@@ -346,7 +352,7 @@ public class PlayerMovement : MonoBehaviour
             StopCoroutine(SmoothSpeed());
             fac = 0;
             targetSpeed = originalSpeed;
-            StartCoroutine(restartSmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             isSprinting = false;
             accelMult = 1;
             StartCoroutine(RechargeStamina());
@@ -417,10 +423,10 @@ public class PlayerMovement : MonoBehaviour
             StopCoroutine(SmoothSpeed());
             targetSpeed = originalSpeed;
             fac = 0;
-            StartCoroutine(restartSmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             forceStopSlide = false;
         }
-        yield break;
+        
     }
 
     private IEnumerator RechargeStamina() //Recargar stamina
@@ -440,7 +446,7 @@ public class PlayerMovement : MonoBehaviour
         {
             resting = false;
         }
-        yield break;
+        
     }
 
     private IEnumerator SmoothSpeed() //Cambiar la velocidad de forma suave
@@ -454,14 +460,35 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         maxSpeed = targetSpeed;
-        yield break;
+        
         
     }
-    private IEnumerator restartSmoothSpeed() //Frenar cambio de velocidad
+    private IEnumerator RestartSmoothSpeed() //Frenar cambio de velocidad
     {
         yield return null;
         StartCoroutine(SmoothSpeed());
-        yield break;
+        
     }
 
+    private IEnumerator GrappleFail()
+    {
+        float blend = 0;
+        while (blend < 1)
+        {
+            grappleLine.SetPosition(0, grapplePoint.position);
+            grappleLine.SetPosition(1, Vector3.Lerp(grapplePoint.position, grapplePosition, blend));
+            blend += Time.deltaTime * 5;
+            yield return null;
+        }
+        grappleLine.SetPosition(1, grapplePosition);
+        blend = 1;
+        while (blend > 0)
+        {
+            grappleLine.SetPosition(0, grapplePoint.position);
+            grappleLine.SetPosition(1, Vector3.Lerp(grapplePoint.position, grapplePosition, blend));
+            blend -= Time.deltaTime * 7;
+            yield return null;
+        }
+        Destroy(grappleLine.gameObject);
+    }
 }

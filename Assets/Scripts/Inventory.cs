@@ -15,12 +15,11 @@ public class Inventory : MonoBehaviour
 
 
     //Variables de crafteo e inventario
-    ItemCost[] craftingCosts;
-    Button[] craftingButtons;
     PlayerActions playerActions;
     int[] secondarySlots;
     int[] materialInventory = new int[3];
-    
+    public bool hasShotgun = false;
+    public bool hasFlamethrower = false;
     
     
     
@@ -41,9 +40,9 @@ public class Inventory : MonoBehaviour
         materialInventory[type] -= quantity;
     }
 
-    public void addToInventory(int type) //Agregar material al inventario
+    public void addToInventory(int type, int quantity) //Agregar material al inventario
     {
-        materialInventory[type]++;
+        materialInventory[type] += quantity;
     }
 
     public void unlockUpgrade(ItemCost upgrade) //Desbloquear mejora y remover costo
@@ -53,7 +52,25 @@ public class Inventory : MonoBehaviour
             removeFromInventory(i, upgrade.cost[i]);
         }
         upgrade.hasBeenCrafted = true;
-        availableUpgrades.Add(upgrade.upgradeType);
+        if (upgrade.upgradeType != 0)
+        {
+            availableUpgrades.Add(upgrade.upgradeType);
+        }
+        else
+        {
+            switch (upgrade.majorUpgradeType)
+            {
+                case 0:
+                    hasShotgun = true;
+                    break;
+                case 1:
+                    hasFlamethrower = true;
+                    break;
+                default:
+                    break;
+            }
+            playerActions.unlockWeapon(upgrade.majorUpgradeType);
+        }
     }
 
     public void enableUpgrade(int upgrade, int slot) //Habilitar mejora

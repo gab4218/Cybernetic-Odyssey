@@ -17,14 +17,16 @@ public abstract class EnemyBase : MonoBehaviour
     protected const int ATTACKING = 2;
     protected const int STUNNED = 3;
     public int state;
-
+    protected bool isAngered = false;
+    protected bool canCalm = true;
     //Variables basicas modificables en el editor que un enemigo podria tener
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
     [SerializeField] protected float detectionDistance = 15f;
     [SerializeField] protected float escapeDistance = 20f;
-    [SerializeField] protected Vector3[] randomMovementDimensions;
+    [SerializeField] protected float calmTime = 15f;
     [SerializeField] protected float positionThreshold = 0.5f;
+    [SerializeField] protected Vector3[] randomMovementDimensions;
     [SerializeField] protected GameObject strongCollidersGO;
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
@@ -45,7 +47,6 @@ public abstract class EnemyBase : MonoBehaviour
     protected float fireTime = 5;
     protected float slowMult = 0.75f;
     protected float slowTime = 5f;
-    protected bool onFire = false;
     protected bool slowed = false;
     //Variables para deteccion de jugador
     protected Transform playerTranform;
@@ -85,11 +86,11 @@ public abstract class EnemyBase : MonoBehaviour
     }
     protected virtual void detectPlayer() //Detectar jugador
     {
-        if (Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
+        if ((Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance * (player.isCrouched? 0.5f : 1) || isAngered) && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
         {
             state = SEEKING;
         }
-        else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance) //Si el jugador esta fuera del radio de escape y estado = buscar, cambiar a idle
+        else if (state == SEEKING && Vector3.Distance(transform.position, playerTranform.position) >= escapeDistance && !isAngered) //Si el jugador esta fuera del radio de escape y estado = buscar, cambiar a idle
         {
             state = IDLE;
         }
@@ -138,17 +139,16 @@ public abstract class EnemyBase : MonoBehaviour
     public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType) 
     {
         currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
-        if (!onFire && dmgType == PlayerActions.damageType.Fire)
+        if (dmgType == PlayerActions.damageType.Fire)
         {
+            StopCoroutine(FireDamage());
             StartCoroutine(FireDamage());
-            onFire = true;
         }
         if (!slowed && dmgType == PlayerActions.damageType.Ice)
         {
             StartCoroutine(IceTimer());
             slowed = true;
         }
-
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP,0)}/{maxHP}";
@@ -157,6 +157,36 @@ public abstract class EnemyBase : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        if (player.isCrouched && player.canGambleCrouch)
+        {
+            if (Random.Range(0, 1) > 0.5f)
+            {
+                isAngered = true;
+                StopCoroutine(CalmDown());
+                StartCoroutine(CalmDown());
+            }
+        }
+    }
+
+    protected IEnumerator CalmDown()
+    {
+
+        float t = 0;
+
+        while (t < calmTime && canCalm)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        if (canCalm)
+        {
+            isAngered = false;
+        }
+        else
+        {
+            canCalm = true;
+        }
+        
     }
 
     protected void Stun(float stunTime) //Stunnear por un periodo de tiempo
@@ -193,7 +223,6 @@ public abstract class EnemyBase : MonoBehaviour
             }
             yield return null;
         }
-        onFire = false;
     }
 
     private IEnumerator IceTimer()

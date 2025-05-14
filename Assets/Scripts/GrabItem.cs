@@ -6,6 +6,7 @@ using UnityEngine;
 public class GrabItem : MonoBehaviour
 {
     public int materialType;
+    public int materialQuantity;
     private Inventory inventory;
     private void Start()
     {
@@ -15,7 +16,7 @@ public class GrabItem : MonoBehaviour
     {
         if (other.GetComponentInParent<PlayerActions>())
         {
-            inventory.addToInventory(materialType);
+            inventory.addToInventory(materialType, materialQuantity);
             Destroy(gameObject);
         }
     }

@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   materialType: 0
+  materialQuantity: 5
 --- !u!136 &6801321186726984836
 CapsuleCollider:
   m_ObjectHideFlags: 0

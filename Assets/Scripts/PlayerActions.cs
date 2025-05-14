@@ -22,13 +22,14 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Gradient[] bulletColors;
     [SerializeField] MeshFilter gunMeshFilter;
     [SerializeField] Mesh pistolMesh, shotgunMesh;
+    [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
     [SerializeField] Color[] overloadingColors;
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
     [SerializeField] KeyCode inventoryKey = KeyCode.Tab;
-    [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2;
+    [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
     [SerializeField] KeyCode iceKey = KeyCode.Z, fireKey = KeyCode.X, acidKey = KeyCode.C;
     [SerializeField] KeyCode healKey = KeyCode.Q;
@@ -43,6 +44,9 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float shotgunFallOffMax = 15f;
     [SerializeField] float shotgunPelletCount = 5f;
     [SerializeField] float shotgunPelletSpreadMax = 20f;
+    [SerializeField] Collider flamethrowerCollider;
+    [SerializeField] float flamethrowerOverheatTime = 5f;
+    [SerializeField] float flamethrowerOverheatLength = 10f;
     [SerializeField] int maxHP = 100;
     [SerializeField] int dmgPerPellet = 10;
     [SerializeField] float grappleDistance = 15f;
@@ -69,15 +73,21 @@ public class PlayerActions : MonoBehaviour
     private bool canHeal = false;
     private Animator anim;
     private bool hasShotgun = false;
+    private bool hasFlamethrower = false;
     private bool isAllowedToOverload = false;
     private bool isAllowedToHeal = false;
     private bool canOverload = true;
     private List<bool> canHealMats = new List<bool>{ false, false, false };
     private bool haltHeal = false;
+    private bool canFlamethrow = true;
     public ParticleSystem partMax;
     public ParticleSystem partMin;
     public ParticleSystem partMid;
-
+    public bool isCrouched = false;
+    public bool canGambleCrouch = false;
+    private float flamethrowerCurrentTime;
+    
+    
     public enum damageType
     {
         None,
@@ -98,6 +108,15 @@ public class PlayerActions : MonoBehaviour
         {
             enableUpgrade(i);
         }
+        if (inventory.hasShotgun)
+        {
+            hasShotgun = true;
+        }
+        if (inventory.hasFlamethrower)
+        {
+            hasFlamethrower = true;
+        }
+        flamethrowerCollider.enabled = false;
         overloadIMG.gameObject.SetActive(false);
         //Preparaciones
 
@@ -108,17 +127,47 @@ public class PlayerActions : MonoBehaviour
     private void Update()
     {
 
+        if (Input.GetKeyDown(inventoryKey)) //Inventario
+        {
+            if (inventoryPlaceholder.activeSelf && Time.timeScale == 0)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                inventoryPlaceholder.SetActive(false);
+                Time.timeScale = 1.0f;
+            }
+            else if (Time.timeScale > 0) 
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                inventoryPlaceholder.SetActive(true);
+                Time.timeScale = 0.0f;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf) //Salir de inventario
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            inventoryPlaceholder.SetActive(false);
+            Time.timeScale = 1.0f;
+        }
+
+        if (Time.timeScale == 0) return;
+
+        isCrouched = playerMovement.isCrouching;
+
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
 
         HPDisplay.text = $"{currentHP}/{maxHP}"; //Mostrar HP
 
-        if (Input.GetKeyDown(Key1)) //Tipo de damage
+        if (Input.GetKeyDown(Key1)) //Armas
         {
             selectedWeapon = 0;
             fallOffDistace = pistolFallOffMax;
             fallOffStart = pistolFallOffStart;
             readyWeaponTime = pistolCooldown;
             gunMeshFilter.mesh = pistolMesh;
+            
         }
         if(Input.GetKeyDown(Key2) && hasShotgun)
         {
@@ -126,6 +175,12 @@ public class PlayerActions : MonoBehaviour
             fallOffDistace = shotgunFallOffMax;
             fallOffStart = shotgunFallOffStart;
             readyWeaponTime = shotgunCooldown;
+            gunMeshFilter.mesh = shotgunMesh;
+            
+        }
+        if (Input.GetKeyDown(Key3) && hasFlamethrower)
+        {
+            selectedWeapon = 2;
             gunMeshFilter.mesh = shotgunMesh;
         }
 
@@ -194,7 +249,7 @@ public class PlayerActions : MonoBehaviour
             OOBDie();
         }
 
-        if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0) //Disparar
+        if (Input.GetKeyDown(shootKey) && canShoot) //Disparar
         {
             switch (selectedWeapon)
             {
@@ -204,18 +259,50 @@ public class PlayerActions : MonoBehaviour
                 case 1:
                     shootShotgun();
                     break;
+                case 2:
+                    flamethrowerCollider.enabled = true;
+                    break;
                 default:
                     shoot(facingRay);
                     break;
 
             }
+        }
 
+        if (Input.GetKeyUp(shootKey))
+        {
+            if (selectedWeapon == 2)
+            {
+                flamethrowerCollider.enabled = false;
+            }
+        }
+
+        if (flamethrowerCollider.enabled && canFlamethrow)
+        {
+            if (flamethrowerCurrentTime < flamethrowerOverheatTime)
+            {
+                flamethrowerCurrentTime += Time.deltaTime;
+            }
+            else
+            {
+                flamethrowerCurrentTime = 0;
+                canFlamethrow = false;
+                Invoke("FlamethrowerOverheatOver", flamethrowerOverheatLength);
+            }
+        }
+        else if(flamethrowerOverheatTime > 0)
+        {
+            flamethrowerOverheatTime -= Time.deltaTime;
+        }
+        else
+        {
+            flamethrowerCurrentTime = 0;
         }
 
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 
-            if (Input.GetKeyDown(interactKey) && Time.timeScale > 0) //Interactuar
+            if (Input.GetKeyDown(interactKey)) //Interactuar
             {
 
                 if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
@@ -226,30 +313,6 @@ public class PlayerActions : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(inventoryKey)) //Inventario
-        {
-            if (inventoryPlaceholder.activeSelf && Time.timeScale == 0)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                inventoryPlaceholder.SetActive(false);
-                Time.timeScale = 1.0f;
-            }
-            else if (Time.timeScale > 0) 
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-                inventoryPlaceholder.SetActive(true);
-                Time.timeScale = 0.0f;
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf) //Salir de inventario
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            inventoryPlaceholder.SetActive(false);
-            Time.timeScale = 1.0f;
-        }
 
     }
 
@@ -315,6 +378,18 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
+    private IEnumerator FlamethrowerOverheatOver()
+    {
+        float t = 0f;
+        while (t < flamethrowerOverheatLength)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        
+        canFlamethrow = true;
+        
+    }
 
     IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit) //Feedback visual de disparo
     {
@@ -380,13 +455,30 @@ public class PlayerActions : MonoBehaviour
                 playerMovement.ChangeWalljump(true);
                 break;
             case 4:
-                hasShotgun = true;
-                break;
-            case 5:
                 isAllowedToOverload = true;
                 break;
-            case 6:
+            case 5:
                 isAllowedToHeal = true;
+                break;
+            case 6:
+                canGambleCrouch = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void unlockWeapon(int weapon)
+    {
+        switch (weapon)
+        {
+            case 0:
+                hasShotgun = true;
+                shotgunUnlockIMG.color = Color.white;
+                break;
+            case 1:
+                hasFlamethrower = true;
+                flamethrowerUnlockIMG.color = Color.white;
                 break;
             default:
                 break;
@@ -408,13 +500,13 @@ public class PlayerActions : MonoBehaviour
                 playerMovement.ChangeWalljump(false);
                 break;
             case 4:
-                hasShotgun = false;
-                break;
-            case 5:
                 isAllowedToOverload = false;
                 break;
-            case 6:
+            case 5:
                 isAllowedToHeal = false;
+                break;
+            case 6:
+                canGambleCrouch = false;
                 break;
             default:
                 break;
@@ -437,6 +529,10 @@ public class PlayerActions : MonoBehaviour
             {
                 playerMovement.GrappleTo(hit.point);
             }
+        }
+        else
+        {
+            playerMovement.FailGrapple(transform.position + facingRay.direction.normalized * grappleDistance);
         }
     }
 

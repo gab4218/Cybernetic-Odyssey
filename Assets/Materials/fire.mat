@@ -14,6 +14,7 @@ Material:
   m_ValidKeywords:
   - _ALPHABLEND_ON
   - _EMISSION
+  - _FADING_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -90,7 +91,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
-    - _SoftParticlesEnabled: 0
+    - _SoftParticlesEnabled: 1
     - _SoftParticlesFarFadeDistance: 2
     - _SoftParticlesNearFadeDistance: 0
     - _SpecularHighlights: 1
@@ -102,5 +103,5 @@ Material:
     - _Color: {r: 1, g: 0.8441373, b: 0, a: 1}
     - _ColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0.13333334, g: 0.03529412, b: 0, a: 1}
-    - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
+    - _SoftParticleFadeParams: {r: 0, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []

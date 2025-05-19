@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,6 +48,7 @@ public class InventoryManager : MonoBehaviour
 
             newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Agregar vacio
 
+            //https://stackoverflow.com/questions/55297626/disable-an-options-in-a-dropdown-unity
 
             oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text); //Guardar valor de mejora seleccionada
 
@@ -82,7 +84,6 @@ public class InventoryManager : MonoBehaviour
                 }
             }
             upgradeDropdown.options = newOptions; //Actualizar opciones
-
             if (upgradeDropdown.value != upgradeDropdown.options.IndexOf(Tina)) //Si el indice de la opcion seleccionada fue modificado, cambiar opcion seleccionada al nuevo indice y frenar error de Stack Overflow
             {
                 isChangedByPerson = false; //Indicar que el proximo cambio sera realizado por codigo para detener error de Stack Overflow
@@ -134,7 +135,7 @@ public class InventoryManager : MonoBehaviour
                     for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
                     {
 
-                        if (inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
+                        if (inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0 && !newOptions.Contains(DDIM.Tina)) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
                         {
                             newOptions.Add(DDIM.Tina); 
                         }

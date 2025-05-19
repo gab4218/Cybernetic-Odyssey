@@ -23,12 +23,13 @@ public class Flamethrower : MonoBehaviour
         if (onEnemy)
         {
             t += 1;
-            if (t % 3 == 0)
+            if (t % 10 == 0)
             {
-                if (eb!=null)
+                if (eb != null)
                 {
                     eb.takeDamage(flamethrowerDamage, PlayerActions.damageType.Fire);
-                }
+                    eb.WeakenArmor(PlayerActions.damageType.Fire);
+                } 
             }
         }
     }

@@ -33,7 +33,7 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected float fireRadius = 2;
     [SerializeField] protected ParticleSystem fireParticleSystem;
     [SerializeField] protected bool canSlow = true;
-    [SerializeField] protected int armorHealth = 40;
+    [SerializeField] protected int armorHealth = 300; 
     ParticleSystem currentFirePS;
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 

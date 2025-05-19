@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -35,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
     
 
     [Header("UI")]
-    [SerializeField] private RectTransform staminaImg;
+    [SerializeField] private Image staminaImg;
     [SerializeField] private Camera[] cams;
     [SerializeField] private float FOV_Sprint, FOV_Crouch;
 
@@ -86,7 +87,7 @@ public class PlayerMovement : MonoBehaviour
         if (Time.timeScale == 0) return; //Si esta pausado
         foreach (var cam in cams)
         {
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 2 * Time.deltaTime);
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 1 - Mathf.Pow(0.5f, Time.deltaTime * 8));
         }
 
         groundDetect();
@@ -159,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 currentStamina = Mathf.Min(currentStamina + Time.deltaTime * 2, maxStamina);
             }
-            staminaImg.sizeDelta = new Vector2(currentStamina * 80, staminaImg.sizeDelta.y);
+            staminaImg.fillAmount = currentStamina/maxStamina;
 
         }
 
@@ -191,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
         if (grounded && !isSprinting && walljumping)
         {
             walljumping = false;
-            staminaCR = StartCoroutine(RechargeStamina());
+            StartCoroutine(RechargeStamina());
         }
         
     }
@@ -292,10 +293,7 @@ public class PlayerMovement : MonoBehaviour
         {
             //Si el jugador se agacha, frenar Sprint y Slidear si es necesario
 
-            if(smoothSpeedCR != null)
-            {
-                StopCoroutine(smoothSpeedCR);
-            }
+            StopCoroutine(SmoothSpeed());
             fac = 0;
             
             if (isSprinting && !isSliding && allowedToSlide)
@@ -308,7 +306,7 @@ public class PlayerMovement : MonoBehaviour
                 targetSpeed = maxSpeed;
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
-                slideCR = StartCoroutine(slideTimer());
+                StartCoroutine(slideTimer());
             }
             else
             {
@@ -316,24 +314,25 @@ public class PlayerMovement : MonoBehaviour
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
                 targetSpeed = originalSpeed * crouchMult;
+                if (slideCR != null)
+                {
+                    StopCoroutine(slideCR);
+                }
                 smoothSpeedCR = StartCoroutine(SmoothSpeed());
             }
 
         }
         else if ((Input.GetKeyUp(crouchKey) && isCrouching) || !forceStopSlide) //Si termina el slide o se deja de agachar, volver a Default
         {
-
             if (slideCR != null)
             {
-                slideCR = StartCoroutine(slideTimer());
+                StopCoroutine(slideCR);
             }
+
             fac = 0;
-            if (smoothSpeedCR != null)
-            {
-                StopCoroutine(smoothSpeedCR);
-            }
+            StopCoroutine(SmoothSpeed());
             targetSpeed = originalSpeed;
-            smoothSpeedCR = StartCoroutine(SmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             isCrouching = false;
             isSliding = false;
             targetFOV = defaultFOV;
@@ -344,9 +343,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void checkSprint()
     {
-        if (Input.GetKey(sprintKey) && !isSprinting && !isCrouching && zDir > 0 && currentStamina > 0) //Si el jugador Sprintea, se esta moviendo para adelante y no esta agachado, sprintear
+        if (Input.GetKey(sprintKey) && !isSprinting && !isCrouching && zDir > 0 && currentStamina > 0 && !isSliding) //Si el jugador Sprintea, se esta moviendo para adelante y no esta agachado, sprintear
         {
-            maxSpeed *= sprintMult;
             accelMult = sprintMult;
             isSprinting = true;
             resting = false;
@@ -354,8 +352,9 @@ public class PlayerMovement : MonoBehaviour
             {
                 StopCoroutine(smoothSpeedCR);
             }
+            targetSpeed = sprintMult * originalSpeed; 
             fac = 0;
-            targetSpeed = sprintMult * originalSpeed;
+            smoothSpeedCR = StartCoroutine(SmoothSpeed());
             if (staminaCR != null)
             {
                 StopCoroutine(staminaCR);
@@ -364,13 +363,10 @@ public class PlayerMovement : MonoBehaviour
         }
         else if ((Input.GetKeyUp(sprintKey) || zDir < 1 || currentStamina <= 0) && isSprinting) //Si el jugador deja de sprintear o se le acaba la Stamina, dejar de sprintear
         {
-            if (smoothSpeedCR != null)
-            {
-                StopCoroutine(smoothSpeedCR);
-            }
+            StopCoroutine(SmoothSpeed());
             fac = 0;
             targetSpeed = originalSpeed;
-            smoothSpeedCR = StartCoroutine(SmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             isSprinting = false;
             accelMult = 1;
             StartCoroutine(RechargeStamina());
@@ -441,13 +437,14 @@ public class PlayerMovement : MonoBehaviour
             if (smoothSpeedCR != null)
             {
                 StopCoroutine(smoothSpeedCR);
-            };
+            }
+
             targetSpeed = originalSpeed;
             fac = 0;
-            smoothSpeedCR = StartCoroutine(SmoothSpeed());
+            StartCoroutine(RestartSmoothSpeed());
             forceStopSlide = false;
         }
-        slideCR = null;
+        
     }
 
     private IEnumerator RechargeStamina() //Recargar stamina
@@ -467,22 +464,28 @@ public class PlayerMovement : MonoBehaviour
         {
             resting = false;
         }
-        staminaCR = null;
+        
     }
 
     private IEnumerator SmoothSpeed() //Cambiar la velocidad de forma suave
     {
         fac = 0;
-        while (fac < 2)
+        while (fac < 1)
         {
             fac += Time.deltaTime;
-            maxSpeed = Mathf.Lerp(maxSpeed, targetSpeed, Mathf.Min(fac/2, 1));
+            maxSpeed = Mathf.Lerp(maxSpeed, targetSpeed, Mathf.Min(fac, 1));
             
             yield return null;
         }
         maxSpeed = targetSpeed;
-
-        smoothSpeedCR = null;
+        
+        
+    }
+    private IEnumerator RestartSmoothSpeed() //Frenar cambio de velocidad
+    {
+        yield return null;
+        StartCoroutine(SmoothSpeed());
+        
     }
 
     private IEnumerator GrappleFail()

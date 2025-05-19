@@ -13,7 +13,7 @@ public class PlayerActions : MonoBehaviour
     //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
-    [SerializeField] TMP_Text HPDisplay;
+    [SerializeField] Image HPDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
     [SerializeField] Image overloadIMG;
@@ -25,11 +25,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Mesh pistolMesh, shotgunMesh;
     [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
     [SerializeField] Color[] overloadingColors;
-<<<<<<< HEAD
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
     [SerializeField] Animator gunAnimator;
-=======
->>>>>>> parent of 2de1b67 (animation and UI work)
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
@@ -166,9 +163,9 @@ public class PlayerActions : MonoBehaviour
 
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
 
-        HPDisplay.text = $"{currentHP}/{maxHP}"; //Mostrar HP
+        HPDisplay.fillAmount = currentHP * 1f / maxHP; //Mostrar HP
 
-        if (Input.GetKeyDown(Key1)) //Armas
+        if (Input.GetKeyDown(Key1) && !Input.GetKey(KeyCode.Mouse0)) //Armas
         {
             selectedWeapon = 0;
             fallOffDistace = pistolFallOffMax;
@@ -177,7 +174,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = pistolMesh;
             
         }
-        if(Input.GetKeyDown(Key2) && hasShotgun)
+        if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
         {
             selectedWeapon = 1;
             fallOffDistace = shotgunFallOffMax;
@@ -186,7 +183,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = shotgunMesh;
             
         }
-        if (Input.GetKeyDown(Key3) && hasFlamethrower)
+        if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
         {
             selectedWeapon = 2;
             gunMeshFilter.mesh = shotgunMesh;
@@ -263,12 +260,17 @@ public class PlayerActions : MonoBehaviour
             {
                 case 0:
                     shoot(facingRay);
+                    ParticleSystem ps = Instantiate(shotPS, bulletSpawn);
+                    ps.Play();
+                    gunAnimator.SetTrigger("shot");
                     break;
                 case 1:
                     shootShotgun();
+                    ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
+                    ps1.Play();
+                    gunAnimator.SetTrigger("shot");
                     break;
                 case 2:
-<<<<<<< HEAD
                     if (canFlamethrow)
                     {
                         flamethrowerCollider.enabled = true;
@@ -276,9 +278,6 @@ public class PlayerActions : MonoBehaviour
                         gunAnimator.SetBool("flamethrower", true);
                     }
 
-=======
-                    flamethrowerCollider.enabled = true;
->>>>>>> parent of 2de1b67 (animation and UI work)
                     break;
                 default:
                     shoot(facingRay);
@@ -292,11 +291,8 @@ public class PlayerActions : MonoBehaviour
             if (selectedWeapon == 2)
             {
                 flamethrowerCollider.enabled = false;
-<<<<<<< HEAD
                 flamethrowerFire.enabled = false;
                 gunAnimator.SetBool("flamethrower", false);
-=======
->>>>>>> parent of 2de1b67 (animation and UI work)
             }
         }
 
@@ -322,7 +318,6 @@ public class PlayerActions : MonoBehaviour
             flamethrowerCurrentTime = 0;
         }
 
-<<<<<<< HEAD
         if (overheatIMG.gameObject.activeSelf && canFlamethrow)
         {
             overheatIMG.fillAmount = (flamethrowerOverheatTime - flamethrowerCurrentTime) / flamethrowerOverheatTime;
@@ -330,8 +325,6 @@ public class PlayerActions : MonoBehaviour
         }
 
 
-=======
->>>>>>> parent of 2de1b67 (animation and UI work)
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 
@@ -397,6 +390,11 @@ public class PlayerActions : MonoBehaviour
                         partSys.Play();
                     }
                 }
+            }
+            else
+            {
+                ParticleSystem bhPS = Instantiate(bulletHolePS, hit.point, Quaternion.LookRotation(-hit.normal));
+                bhPS.Play();
             }
         }
     }

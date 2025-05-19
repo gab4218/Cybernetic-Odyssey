@@ -17,6 +17,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
     [SerializeField] Image overloadIMG;
+    [SerializeField] Image overheatIMG;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
     [SerializeField] Gradient[] bulletColors;
@@ -24,12 +25,9 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Mesh pistolMesh, shotgunMesh;
     [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
     [SerializeField] Color[] overloadingColors;
-<<<<<<< Updated upstream
-
-=======
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
     [SerializeField] Animator gunAnimator;
->>>>>>> Stashed changes
+
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
@@ -91,7 +89,7 @@ public class PlayerActions : MonoBehaviour
     public bool isCrouched = false;
     public bool canGambleCrouch = false;
     private float flamethrowerCurrentTime;
-    
+    private ParticleSystem.EmissionModule flamethrowerFire;
     
     public enum damageType
     {
@@ -123,6 +121,8 @@ public class PlayerActions : MonoBehaviour
         }
         flamethrowerCollider.enabled = false;
         overloadIMG.gameObject.SetActive(false);
+        flamethrowerFire = flamethrowerFirePS.emission;
+        flamethrowerFire.enabled = false;
         //Preparaciones
 
 
@@ -271,16 +271,13 @@ public class PlayerActions : MonoBehaviour
                     gunAnimator.SetTrigger("shot");
                     break;
                 case 2:
-<<<<<<< Updated upstream
-                    flamethrowerCollider.enabled = true;
-=======
                     if (canFlamethrow)
                     {
                         flamethrowerCollider.enabled = true;
                         flamethrowerFire.enabled = true;
                         gunAnimator.SetBool("flamethrower", true);
                     }
->>>>>>> Stashed changes
+
                     break;
                 default:
                     shoot(facingRay);
@@ -294,11 +291,8 @@ public class PlayerActions : MonoBehaviour
             if (selectedWeapon == 2)
             {
                 flamethrowerCollider.enabled = false;
-<<<<<<< Updated upstream
-=======
                 flamethrowerFire.enabled = false;
                 gunAnimator.SetBool("flamethrower", false);
->>>>>>> Stashed changes
             }
         }
 
@@ -324,8 +318,6 @@ public class PlayerActions : MonoBehaviour
             flamethrowerCurrentTime = 0;
         }
 
-<<<<<<< Updated upstream
-=======
         if (overheatIMG.gameObject.activeSelf && canFlamethrow)
         {
             overheatIMG.fillAmount = (flamethrowerOverheatTime - flamethrowerCurrentTime) / flamethrowerOverheatTime;
@@ -333,7 +325,6 @@ public class PlayerActions : MonoBehaviour
         }
 
 
->>>>>>> Stashed changes
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 

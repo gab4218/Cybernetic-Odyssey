@@ -13,23 +13,20 @@ public class PlayerActions : MonoBehaviour
     //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
-    [SerializeField] Image HPDisplay;
+    [SerializeField] TMP_Text HPDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
+    [SerializeField] Image overheatIMG;
     [SerializeField] Image overloadIMG;
+    [SerializeField] Image overloadingIMG;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
     [SerializeField] Gradient[] bulletColors;
     [SerializeField] MeshFilter gunMeshFilter;
-    [SerializeField] Mesh pistolMesh, shotgunMesh;
+    [SerializeField] Mesh pistolMesh, shotgunMesh, flamethrowerMesh;
     [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
     [SerializeField] Color[] overloadingColors;
-<<<<<<< Updated upstream
-
-=======
-    [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
-    [SerializeField] Animator gunAnimator;
->>>>>>> Stashed changes
+    [SerializeField] ParticleSystem flamethrowerFirePS;
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
@@ -62,6 +59,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float strongPointMult = 0.5f;
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
+
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -91,8 +89,12 @@ public class PlayerActions : MonoBehaviour
     public bool isCrouched = false;
     public bool canGambleCrouch = false;
     private float flamethrowerCurrentTime;
-    
-    
+    private Coroutine healCR;
+    private ParticleSystem.EmissionModule flamethrowerFire;
+
+    private Color originalOverheatColor;
+
+    private Coroutine overheatCR;
     public enum damageType
     {
         None,
@@ -104,6 +106,12 @@ public class PlayerActions : MonoBehaviour
     damageType dmgType = damageType.None;
     private void Start()
     {
+        originalOverheatColor = overheatIMG.color;
+        overheatIMG.gameObject.SetActive(false);
+        overloadIMG.gameObject.SetActive(false);
+        grappleIMG.gameObject.SetActive(false);
+        flamethrowerFire = flamethrowerFirePS.emission;
+        flamethrowerFire.enabled = false;
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
         anim = GetComponentInChildren<Animator>();
@@ -122,7 +130,7 @@ public class PlayerActions : MonoBehaviour
             hasFlamethrower = true;
         }
         flamethrowerCollider.enabled = false;
-        overloadIMG.gameObject.SetActive(false);
+        overloadingIMG.gameObject.SetActive(false);
         //Preparaciones
 
 
@@ -163,9 +171,9 @@ public class PlayerActions : MonoBehaviour
 
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
 
-        HPDisplay.fillAmount = currentHP * 1f / maxHP; //Mostrar HP
+        HPDisplay.text = $"{currentHP}/{maxHP}"; //Mostrar HP
 
-        if (Input.GetKeyDown(Key1) && !Input.GetKey(KeyCode.Mouse0)) //Armas
+        if (Input.GetKeyDown(Key1)) //Armas
         {
             selectedWeapon = 0;
             fallOffDistace = pistolFallOffMax;
@@ -174,7 +182,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = pistolMesh;
             
         }
-        if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
+        if(Input.GetKeyDown(Key2) && hasShotgun)
         {
             selectedWeapon = 1;
             fallOffDistace = shotgunFallOffMax;
@@ -183,10 +191,10 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = shotgunMesh;
             
         }
-        if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKeyDown(Key3) && hasFlamethrower)
         {
             selectedWeapon = 2;
-            gunMeshFilter.mesh = shotgunMesh;
+            gunMeshFilter.mesh = flamethrowerMesh;
         }
 
         if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal)
@@ -209,8 +217,8 @@ public class PlayerActions : MonoBehaviour
                 dmgType = damageType.Ice;
                 inventory.removeFromInventory(0, 2);
                 canOverload = false;
-                overloadIMG.gameObject.SetActive(true);
-                overloadIMG.color = overloadingColors[0];
+                overloadingIMG.gameObject.SetActive(true);
+                overloadingIMG.color = overloadingColors[0];
                 StartCoroutine(WaitOverload());
             }
             if (Input.GetKeyDown(fireKey) && inventory.hasMaterials(1, 2))
@@ -218,8 +226,8 @@ public class PlayerActions : MonoBehaviour
                 dmgType = damageType.Fire;
                 inventory.removeFromInventory(1, 2);
                 canOverload = false;
-                overloadIMG.gameObject.SetActive(true);
-                overloadIMG.color = overloadingColors[1];
+                overloadingIMG.gameObject.SetActive(true);
+                overloadingIMG.color = overloadingColors[1];
                 StartCoroutine(WaitOverload());
             }
             if (Input.GetKeyDown(acidKey) && inventory.hasMaterials(2, 2))
@@ -227,8 +235,8 @@ public class PlayerActions : MonoBehaviour
                 dmgType = damageType.Acid;
                 inventory.removeFromInventory(2, 2);
                 canOverload = false;
-                overloadIMG.gameObject.SetActive(true);
-                overloadIMG.color = overloadingColors[2];
+                overloadingIMG.gameObject.SetActive(true);
+                overloadingIMG.color = overloadingColors[2];
                 StartCoroutine(WaitOverload());
             }
 
@@ -260,27 +268,16 @@ public class PlayerActions : MonoBehaviour
             {
                 case 0:
                     shoot(facingRay);
-                    ParticleSystem ps = Instantiate(shotPS, bulletSpawn);
-                    ps.Play();
-                    gunAnimator.SetTrigger("shot");
                     break;
                 case 1:
                     shootShotgun();
-                    ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
-                    ps1.Play();
-                    gunAnimator.SetTrigger("shot");
                     break;
                 case 2:
-<<<<<<< Updated upstream
-                    flamethrowerCollider.enabled = true;
-=======
                     if (canFlamethrow)
                     {
                         flamethrowerCollider.enabled = true;
                         flamethrowerFire.enabled = true;
-                        gunAnimator.SetBool("flamethrower", true);
                     }
->>>>>>> Stashed changes
                     break;
                 default:
                     shoot(facingRay);
@@ -294,11 +291,7 @@ public class PlayerActions : MonoBehaviour
             if (selectedWeapon == 2)
             {
                 flamethrowerCollider.enabled = false;
-<<<<<<< Updated upstream
-=======
                 flamethrowerFire.enabled = false;
-                gunAnimator.SetBool("flamethrower", false);
->>>>>>> Stashed changes
             }
         }
 
@@ -311,29 +304,32 @@ public class PlayerActions : MonoBehaviour
             else
             {
                 flamethrowerCurrentTime = 0;
+                flamethrowerFire.enabled = false;
                 canFlamethrow = false;
-                Invoke("FlamethrowerOverheatOver", flamethrowerOverheatLength);
+                overheatIMG.color = Color.red;
+
+
+                if (overheatCR != null)
+                {
+                    StopCoroutine(overheatCR);
+                }
+                overheatCR = StartCoroutine(FlamethrowerOverheatOver());
             }
         }
-        else if(flamethrowerOverheatTime > 0)
+        else if(flamethrowerCurrentTime > 0 && canFlamethrow)
         {
-            flamethrowerOverheatTime -= Time.deltaTime;
+            flamethrowerCurrentTime -= Time.deltaTime;
         }
-        else
+        else if (canFlamethrow) 
         {
             flamethrowerCurrentTime = 0;
         }
 
-<<<<<<< Updated upstream
-=======
         if (overheatIMG.gameObject.activeSelf && canFlamethrow)
         {
             overheatIMG.fillAmount = (flamethrowerOverheatTime - flamethrowerCurrentTime) / flamethrowerOverheatTime;
-            overheatIMG.color = Color.Lerp(Color.white, Color.red, flamethrowerCurrentTime / flamethrowerOverheatTime);
         }
 
-
->>>>>>> Stashed changes
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 
@@ -400,11 +396,6 @@ public class PlayerActions : MonoBehaviour
                     }
                 }
             }
-            else
-            {
-                ParticleSystem bhPS = Instantiate(bulletHolePS, hit.point, Quaternion.LookRotation(-hit.normal));
-                bhPS.Play();
-            }
         }
     }
 
@@ -423,12 +414,14 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < flamethrowerOverheatLength)
         {
+            overheatIMG.fillAmount = t / flamethrowerOverheatLength;
             t += Time.deltaTime;
             yield return null;
         }
-        
+        overheatIMG.color = originalOverheatColor;
+        overheatIMG.fillAmount = 1;
         canFlamethrow = true;
-        
+        overheatCR = null;
     }
 
     IEnumerator SpawnTrail(TrailRenderer Trail, RaycastHit Hit) //Feedback visual de disparo
@@ -463,7 +456,10 @@ public class PlayerActions : MonoBehaviour
             Invoke("resetDamage", 0.5f);
             canHeal = false;
             haltHeal = true;
-            StopCoroutine(Heal());
+            if (healCR != null)
+            {
+                StopCoroutine(healCR);
+            }
             if (currentHP <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -489,13 +485,14 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 2:
                 canGrapple = true;
-                grappleIMG.color = new Color(70, 50, 231);
+                grappleIMG.gameObject.SetActive(true);
                 break;
             case 3:
                 playerMovement.ChangeWalljump(true);
                 break;
             case 4:
                 isAllowedToOverload = true;
+                overloadIMG.gameObject.SetActive(true);
                 break;
             case 5:
                 isAllowedToHeal = true;
@@ -519,6 +516,7 @@ public class PlayerActions : MonoBehaviour
             case 1:
                 hasFlamethrower = true;
                 flamethrowerUnlockIMG.color = Color.white;
+                overheatIMG.gameObject.SetActive(true);
                 break;
             default:
                 break;
@@ -534,13 +532,14 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 2:
                 canGrapple = false;
-                grappleIMG.color = Color.red;
+                grappleIMG.gameObject.SetActive(false);
                 break;
             case 3:
                 playerMovement.ChangeWalljump(false);
                 break;
             case 4:
                 isAllowedToOverload = false;
+                overloadIMG.gameObject.SetActive(false);
                 break;
             case 5:
                 isAllowedToHeal = false;
@@ -561,7 +560,6 @@ public class PlayerActions : MonoBehaviour
     private void ShootGrapple() //Disparar Grapple
     {
         canGrapple = false;
-        grappleIMG.color = Color.red;
         StartCoroutine(GrappleReload());
         if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance))
         {
@@ -610,12 +608,14 @@ public class PlayerActions : MonoBehaviour
         float timer = 0f;
         while (timer < grappleDelay)
         {
+            grappleIMG.fillAmount = timer / grappleDelay;
             timer += Time.deltaTime;
             
             yield return null;
         }
+        grappleIMG.fillAmount = 1;
         canGrapple = true;
-        grappleIMG.color = new Color(70f, 50f, 231f);
+        
 
     }
 
@@ -624,16 +624,16 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < overloadCooldown)
         {
-
+            overloadIMG.fillAmount = t / overloadCooldown;
             if (t >= overloadTime && dmgType != damageType.None)
             {
                 dmgType = damageType.None;
-                overloadIMG.gameObject.SetActive(false);
+                overloadingIMG.gameObject.SetActive(false);
             }
             t += Time.deltaTime;
             yield return null;
         }
-
+        overloadIMG.fillAmount = 1;
         canOverload = true;
         
     }

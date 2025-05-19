@@ -56,8 +56,6 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float grappleDelay = 5.0f;
     [SerializeField] float healingTime = 5.0f;
     [SerializeField] int healingRate = 1;
-    [SerializeField] float weakPointMult = 2;
-    [SerializeField] float strongPointMult = 0.5f;
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
     //Otras variables
@@ -366,30 +364,28 @@ public class PlayerActions : MonoBehaviour
                     float mult = 1;
                     if (enemy.weakColliders.Contains(hit.collider))
                     {
-                        mult = weakPointMult;
-                    }
-                    else if (enemy.strongColliders.Contains(hit.collider))
-                    {
-                        mult = strongPointMult;
-                    }
-                    
-                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult), dmgType);
-                    
-                    if (mult == 1)
-                    {
-                        ParticleSystem partSys = Instantiate (partMid, hit.point, Quaternion.LookRotation(hit.normal));
-                        partSys.Play();
-                    }
-                    else if (mult == weakPointMult)
-                    {
+                        mult = enemy.weakPointMult;
                         ParticleSystem partSys = Instantiate(partMax, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
                     }
-                    else if (mult == strongPointMult)
+                    else if (enemy.strongColliders.Contains(hit.collider))
                     {
+                        mult = enemy.strongPointMult;
                         ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
+                        if (mult == 0)
+                        {
+                            enemy.WeakenArmor(dmgType);
+                        }
                     }
+                    else
+                    {
+                        mult = 1;
+                        ParticleSystem partSys = Instantiate (partMid, hit.point, Quaternion.LookRotation(hit.normal));
+                        partSys.Play();
+                    }
+                    
+                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult), dmgType);
                 }
             }
             else

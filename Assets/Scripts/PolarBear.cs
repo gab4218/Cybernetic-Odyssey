@@ -300,7 +300,7 @@ public class PolarBear : EnemyBase
     private void moveRush()
     {
         findDirection();
-        rushDirection = Vector3.Lerp(rushDirection, dir, 0.01f); //Girar lentamente
+        rushDirection = Vector3.Lerp(rushDirection, dir, 1 - Mathf.Pow(0.5f, Time.deltaTime)); //Girar lentamente
         transform.forward = rushDirection; 
         rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed; //Mover
     }

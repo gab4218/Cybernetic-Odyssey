@@ -443,7 +443,9 @@ MonoBehaviour:
   HPDisplay: {fileID: 0}
   crosshair: {fileID: 0}
   grappleIMG: {fileID: 0}
+  overheatIMG: {fileID: 0}
   overloadIMG: {fileID: 0}
+  overloadingIMG: {fileID: 0}
   bulletSpawn: {fileID: 0}
   bulletPrefab: {fileID: 4142949402675267902, guid: df53ad881397eec48b656481d69116fa, type: 3}
   bulletColors:
@@ -569,7 +571,18 @@ MonoBehaviour:
   pistolUnlockIMG: {fileID: 0}
   shotgunUnlockIMG: {fileID: 0}
   flamethrowerUnlockIMG: {fileID: 0}
+<<<<<<< Updated upstream
   overloadingColors: []
+=======
+  overloadingColors:
+  - {r: 0.19339621, g: 0.8998334, b: 1, a: 1}
+  - {r: 1, g: 0.3974151, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.015195131, a: 1}
+  flamethrowerFirePS: {fileID: 0}
+  shotPS: {fileID: 6805266536167677760, guid: 0a40c5ef0d33c4a44b4ba245223807e6, type: 3}
+  bulletHolePS: {fileID: 6648960303439227232, guid: df8ca23478106a64fbe2ecf01a732ce4, type: 3}
+  gunAnimator: {fileID: 0}
+>>>>>>> Stashed changes
   shootKey: 323
   interactKey: 101
   inventoryKey: 9

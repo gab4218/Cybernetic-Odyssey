@@ -13,7 +13,7 @@ public class PlayerActions : MonoBehaviour
     //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
-    [SerializeField] TMP_Text HPDisplay;
+    [SerializeField] Image HPDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
     [SerializeField] Image overloadIMG;
@@ -24,7 +24,12 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Mesh pistolMesh, shotgunMesh;
     [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
     [SerializeField] Color[] overloadingColors;
+<<<<<<< Updated upstream
 
+=======
+    [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
+    [SerializeField] Animator gunAnimator;
+>>>>>>> Stashed changes
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
     [SerializeField] KeyCode interactKey = KeyCode.E;
@@ -158,9 +163,9 @@ public class PlayerActions : MonoBehaviour
 
         facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
 
-        HPDisplay.text = $"{currentHP}/{maxHP}"; //Mostrar HP
+        HPDisplay.fillAmount = currentHP * 1f / maxHP; //Mostrar HP
 
-        if (Input.GetKeyDown(Key1)) //Armas
+        if (Input.GetKeyDown(Key1) && !Input.GetKey(KeyCode.Mouse0)) //Armas
         {
             selectedWeapon = 0;
             fallOffDistace = pistolFallOffMax;
@@ -169,7 +174,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = pistolMesh;
             
         }
-        if(Input.GetKeyDown(Key2) && hasShotgun)
+        if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
         {
             selectedWeapon = 1;
             fallOffDistace = shotgunFallOffMax;
@@ -178,7 +183,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = shotgunMesh;
             
         }
-        if (Input.GetKeyDown(Key3) && hasFlamethrower)
+        if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
         {
             selectedWeapon = 2;
             gunMeshFilter.mesh = shotgunMesh;
@@ -255,12 +260,27 @@ public class PlayerActions : MonoBehaviour
             {
                 case 0:
                     shoot(facingRay);
+                    ParticleSystem ps = Instantiate(shotPS, bulletSpawn);
+                    ps.Play();
+                    gunAnimator.SetTrigger("shot");
                     break;
                 case 1:
                     shootShotgun();
+                    ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
+                    ps1.Play();
+                    gunAnimator.SetTrigger("shot");
                     break;
                 case 2:
+<<<<<<< Updated upstream
                     flamethrowerCollider.enabled = true;
+=======
+                    if (canFlamethrow)
+                    {
+                        flamethrowerCollider.enabled = true;
+                        flamethrowerFire.enabled = true;
+                        gunAnimator.SetBool("flamethrower", true);
+                    }
+>>>>>>> Stashed changes
                     break;
                 default:
                     shoot(facingRay);
@@ -274,6 +294,11 @@ public class PlayerActions : MonoBehaviour
             if (selectedWeapon == 2)
             {
                 flamethrowerCollider.enabled = false;
+<<<<<<< Updated upstream
+=======
+                flamethrowerFire.enabled = false;
+                gunAnimator.SetBool("flamethrower", false);
+>>>>>>> Stashed changes
             }
         }
 
@@ -299,6 +324,16 @@ public class PlayerActions : MonoBehaviour
             flamethrowerCurrentTime = 0;
         }
 
+<<<<<<< Updated upstream
+=======
+        if (overheatIMG.gameObject.activeSelf && canFlamethrow)
+        {
+            overheatIMG.fillAmount = (flamethrowerOverheatTime - flamethrowerCurrentTime) / flamethrowerOverheatTime;
+            overheatIMG.color = Color.Lerp(Color.white, Color.red, flamethrowerCurrentTime / flamethrowerOverheatTime);
+        }
+
+
+>>>>>>> Stashed changes
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
         {
 
@@ -364,6 +399,11 @@ public class PlayerActions : MonoBehaviour
                         partSys.Play();
                     }
                 }
+            }
+            else
+            {
+                ParticleSystem bhPS = Instantiate(bulletHolePS, hit.point, Quaternion.LookRotation(-hit.normal));
+                bhPS.Play();
             }
         }
     }

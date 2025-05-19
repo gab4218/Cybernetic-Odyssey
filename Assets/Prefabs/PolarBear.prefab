@@ -364,15 +364,15 @@ MonoBehaviour:
   strongColliders: []
   enemySpawner: {fileID: 0}
   slamRange: 8
-  slamDamage: 30
+  slamDamage: 50
   slamKnockback: 10
   slamCollider: {fileID: 3252663761647022677}
-  clawDamage: 10
+  clawDamage: 30
   clawRange: 4
   clawKnockback: 7
   clawCollider: {fileID: 3854720099750436180}
   minRushDistance: 15
-  rushDamage: 70
+  rushDamage: 90
   rushKnockback: 15
   rushSpeed: 10
   rushStunTime: 1
@@ -615,8 +615,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 21.396719, y: 13.670641, z: 36.78574}
-  m_Center: {x: 0, y: 7.2183447, z: 9.073184}
+  m_Size: {x: 21.396719, y: 19.658957, z: 36.78574}
+  m_Center: {x: 0, y: 4.224188, z: 9.073184}
 --- !u!135 &1628751073234932202
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -62,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
     private RaycastHit slopeHit;
 
-    private Coroutine slideCR, smoothSpeedCR, staminaCR;
+
 
     
 
@@ -314,21 +314,30 @@ public class PlayerMovement : MonoBehaviour
                 isCrouching = true;
                 transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y / 2, transform.localScale.z);
                 targetSpeed = originalSpeed * crouchMult;
+<<<<<<< Updated upstream
+                StartCoroutine(RestartSmoothSpeed());
+=======
                 if (slideCR != null)
                 {
                     StopCoroutine(slideCR);
                 }
                 smoothSpeedCR = StartCoroutine(SmoothSpeed());
+>>>>>>> Stashed changes
             }
 
         }
         else if ((Input.GetKeyUp(crouchKey) && isCrouching) || !forceStopSlide) //Si termina el slide o se deja de agachar, volver a Default
         {
+<<<<<<< Updated upstream
+            
+            StopCoroutine(slideTimer());
+=======
+
             if (slideCR != null)
             {
                 StopCoroutine(slideCR);
             }
-
+>>>>>>> Stashed changes
             fac = 0;
             StopCoroutine(SmoothSpeed());
             targetSpeed = originalSpeed;
@@ -348,6 +357,12 @@ public class PlayerMovement : MonoBehaviour
             accelMult = sprintMult;
             isSprinting = true;
             resting = false;
+<<<<<<< Updated upstream
+            StopCoroutine(SmoothSpeed());
+            fac = 0;
+            targetSpeed = sprintMult * originalSpeed;
+            StopCoroutine(RechargeStamina());
+=======
             if (smoothSpeedCR != null)
             {
                 StopCoroutine(smoothSpeedCR);
@@ -359,6 +374,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 StopCoroutine(staminaCR);
             }
+>>>>>>> Stashed changes
             targetFOV = FOV_Sprint;
         }
         else if ((Input.GetKeyUp(sprintKey) || zDir < 1 || currentStamina <= 0) && isSprinting) //Si el jugador deja de sprintear o se le acaba la Stamina, dejar de sprintear
@@ -434,11 +450,14 @@ public class PlayerMovement : MonoBehaviour
         }
         if (isSliding)
         {
+<<<<<<< Updated upstream
+            StopCoroutine(SmoothSpeed());
+=======
             if (smoothSpeedCR != null)
             {
                 StopCoroutine(smoothSpeedCR);
             }
-
+>>>>>>> Stashed changes
             targetSpeed = originalSpeed;
             fac = 0;
             StartCoroutine(RestartSmoothSpeed());

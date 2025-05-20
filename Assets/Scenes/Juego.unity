@@ -644,7 +644,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 64773315}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 64773314}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &64773314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1906,10 +1918,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 226640799}
   m_Template: {fileID: 1843461217}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1437795544}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 1536353309}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -1918,7 +1930,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 226640797}
+        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
+        m_MethodName: selectUpgrade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &226640799
 MonoBehaviour:
@@ -2940,7 +2964,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 406419586}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 406419585}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &406419585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3253,10 +3289,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 432370495}
   m_Template: {fileID: 931722884}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 150989161}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 80758325}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -3265,7 +3301,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 432370497}
+        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
+        m_MethodName: selectUpgrade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &432370495
 MonoBehaviour:
@@ -6276,10 +6324,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 708466716}
   m_Template: {fileID: 2045648339}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1540221572}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 1538425880}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -6288,7 +6336,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 708466714}
+        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
+        m_MethodName: selectUpgrade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &708466716
 MonoBehaviour:
@@ -9465,7 +9525,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1001218824}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1001218823}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1001218823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12650,7 +12722,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1494170412}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1494170411}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1494170411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12788,7 +12872,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1502268568}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1502268567}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1502268567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14714,11 +14810,8 @@ RectTransform:
   - {fileID: 1454387424}
   - {fileID: 475207417}
   - {fileID: 11208869}
-  - {fileID: 2095366334}
   - {fileID: 982656263}
-  - {fileID: 2071352790}
   - {fileID: 779787299}
-  - {fileID: 1947407628}
   - {fileID: 1584984904}
   - {fileID: 990324090}
   - {fileID: 414165754}
@@ -14812,7 +14905,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1716315724}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1716315723}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1716315723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15993,7 +16098,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1738018751}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1738018750}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1738018750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17157,10 +17274,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 1880898064}
   m_Template: {fileID: 1989728373}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1892093386}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 156613296}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -17169,7 +17286,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1880898062}
+        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
+        m_MethodName: selectUpgrade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1880898064
 MonoBehaviour:
@@ -17735,81 +17864,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5382944002613277788, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
   m_PrefabInstance: {fileID: 2051812347873674626}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1947407627
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1947407628}
-  - component: {fileID: 1947407630}
-  - component: {fileID: 1947407629}
-  m_Layer: 5
-  m_Name: FlamethrowerBg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1947407628
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947407627}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7621321, y: 0.7621321, z: 0.7621321}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1698831116}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 126.8, y: 139.3}
-  m_SizeDelta: {x: 96, y: 166}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1947407629
+--- !u!114 &1918893589 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+  m_PrefabInstance: {fileID: 2051812347873674626}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947407627}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: bbf1cd66ce8613b4ba9b709ee98742ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.42, g: 0.42, b: 0.42, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: da26ac75f0906a94ca1e59d0039b0200, type: 3}
-  m_Type: 3
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 1
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1947407630
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947407627}
-  m_CullTransparentMesh: 1
 --- !u!1 &1953086020
 GameObject:
   m_ObjectHideFlags: 0
@@ -17968,7 +18033,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1964473175}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1918893589}
+        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+        m_MethodName: unlockUpgrade
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1964473177}
+          m_ObjectArgumentAssemblyTypeName: ItemCost, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1964473175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19046,81 +19123,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067801801}
   m_CullTransparentMesh: 1
---- !u!1 &2071352789
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2071352790}
-  - component: {fileID: 2071352792}
-  - component: {fileID: 2071352791}
-  m_Layer: 5
-  m_Name: OveloadBg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2071352790
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2071352789}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2402003, y: 0.2402003, z: 0.2402003}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1698831116}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 364, y: 179}
-  m_SizeDelta: {x: 265, y: 265}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2071352791
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2071352789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.16799998, g: 0.41176474, b: 0.42, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f5dfc537f8985d044bddde0d5442445e, type: 3}
-  m_Type: 3
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 2
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &2071352792
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2071352789}
-  m_CullTransparentMesh: 1
 --- !u!1001 &2090757780
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19178,81 +19180,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae20f6ae16e7ab24382ca00814f14894, type: 3}
---- !u!1 &2095366333
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2095366334}
-  - component: {fileID: 2095366336}
-  - component: {fileID: 2095366335}
-  m_Layer: 5
-  m_Name: GrappleBg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2095366334
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095366333}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2402003, y: 0.2402003, z: 0.2402003}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1698831116}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 241, y: 179}
-  m_SizeDelta: {x: 265, y: 265}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2095366335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095366333}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.16719998, g: 0.40980396, b: 0.41799998, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f5dfc537f8985d044bddde0d5442445e, type: 3}
-  m_Type: 3
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 2
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &2095366336
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095366333}
-  m_CullTransparentMesh: 1
 --- !u!1001 &2122473342
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19951,15 +19878,15 @@ PrefabInstance:
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: matDisplay.Array.data[0]
       value: 
-      objectReference: {fileID: 51520396}
+      objectReference: {fileID: 1075102468}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: matDisplay.Array.data[1]
       value: 
-      objectReference: {fileID: 1075102468}
+      objectReference: {fileID: 2039938544}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: matDisplay.Array.data[2]
       value: 
-      objectReference: {fileID: 2039938544}
+      objectReference: {fileID: 51520396}
     - target: {fileID: 1058994343694560215, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: availableUpgrades.Array.size
       value: 0
@@ -20308,10 +20235,6 @@ PrefabInstance:
       propertyPath: interactionDisplay
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
-      propertyPath: overloadCooldownIMG
-      value: 
-      objectReference: {fileID: 779787300}
     - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: flamethrowerCollider
       value: 
@@ -21253,7 +21176,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 544879585079904627}
-  m_Material: {fileID: 13400000, guid: abcb268b4e23ac14e9e829d828f62d93, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -21294,7 +21217,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7603225880926235468}
-  m_Material: {fileID: 13400000, guid: 498ff8d5d2510d042961d7b870bf087a, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

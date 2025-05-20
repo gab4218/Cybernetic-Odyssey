@@ -443,8 +443,9 @@ MonoBehaviour:
   HPDisplay: {fileID: 0}
   crosshair: {fileID: 0}
   grappleIMG: {fileID: 0}
-  overloadIMG: {fileID: 0}
   overheatIMG: {fileID: 0}
+  overloadIMG: {fileID: 0}
+  overloadingIMG: {fileID: 0}
   bulletSpawn: {fileID: 0}
   bulletPrefab: {fileID: 4142949402675267902, guid: df53ad881397eec48b656481d69116fa, type: 3}
   bulletColors:
@@ -607,6 +608,8 @@ MonoBehaviour:
   grappleDelay: 5
   healingTime: 5
   healingRate: 1
+  weakPointMult: 2
+  strongPointMult: 0.5
   overloadTime: 10
   overloadCooldown: 20
   currentHP: 0
@@ -2072,7 +2075,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6428121544066747226}
-  m_Material: {fileID: 13400000, guid: 498ff8d5d2510d042961d7b870bf087a, type: 2}
+  m_Material: {fileID: 13400000, guid: abcb268b4e23ac14e9e829d828f62d93, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

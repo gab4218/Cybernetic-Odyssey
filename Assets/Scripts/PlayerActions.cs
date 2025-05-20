@@ -16,9 +16,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Image HPDisplay;
     [SerializeField] Image crosshair;
     [SerializeField] Image grappleIMG;
-    [SerializeField] Image overheatIMG;
-    [SerializeField] Image overloadCooldownIMG;
     [SerializeField] Image overloadIMG;
+    [SerializeField] Image overheatIMG;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
     [SerializeField] Gradient[] bulletColors;
@@ -89,7 +88,7 @@ public class PlayerActions : MonoBehaviour
     public bool canGambleCrouch = false;
     private float flamethrowerCurrentTime;
     private ParticleSystem.EmissionModule flamethrowerFire;
-    Coroutine overheatCR, healCR, checkHealCR;
+    
     public enum damageType
     {
         None,
@@ -120,8 +119,6 @@ public class PlayerActions : MonoBehaviour
         }
         flamethrowerCollider.enabled = false;
         overloadIMG.gameObject.SetActive(false);
-        overheatIMG.gameObject.SetActive(false);
-        overloadCooldownIMG.gameObject.SetActive(false);
         grappleIMG.gameObject.SetActive(false);
         flamethrowerFire = flamethrowerFirePS.emission;
         flamethrowerFire.enabled = false;
@@ -308,11 +305,7 @@ public class PlayerActions : MonoBehaviour
             {
                 flamethrowerCurrentTime = 0;
                 canFlamethrow = false;
-                if (overheatCR != null)
-                {
-                    StopCoroutine(overheatCR);
-                }
-                overheatCR = StartCoroutine(FlamethrowerOverheatOver());
+                Invoke("FlamethrowerOverheatOver", flamethrowerOverheatLength);
             }
         }
         else if(flamethrowerOverheatTime > 0)
@@ -455,19 +448,10 @@ public class PlayerActions : MonoBehaviour
         {
             currentHP -= dmg;
             canGetHit = false;
-            Invoke("resetDamage", 0.25f);
+            Invoke("resetDamage", 0.5f);
             canHeal = false;
             haltHeal = true;
-            if (healCR != null)
-            {
-                StopCoroutine(healCR);
-                healCR = null;
-            }
-            if (checkHealCR != null)
-            {
-                StopCoroutine(checkHealCR);
-                checkHealCR = null;
-            }
+            StopCoroutine(Heal());
             if (currentHP <= 0)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -479,7 +463,7 @@ public class PlayerActions : MonoBehaviour
     {
         haltHeal = false;
         canGetHit = true;
-        checkHealCR = StartCoroutine(CheckHeal());
+        StartCoroutine(CheckHeal());
     }
 
     
@@ -493,14 +477,13 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 2:
                 canGrapple = true;
-                grappleIMG.gameObject.SetActive(true);
+                grappleIMG.color = new Color(70, 50, 231);
                 break;
             case 3:
                 playerMovement.ChangeWalljump(true);
                 break;
             case 4:
                 isAllowedToOverload = true;
-                overloadCooldownIMG.gameObject.SetActive(true);
                 break;
             case 5:
                 isAllowedToHeal = true;
@@ -524,7 +507,6 @@ public class PlayerActions : MonoBehaviour
             case 1:
                 hasFlamethrower = true;
                 flamethrowerUnlockIMG.color = Color.white;
-                overheatIMG.gameObject.SetActive(true);
                 break;
             default:
                 break;
@@ -540,14 +522,13 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 2:
                 canGrapple = false;
-                grappleIMG.gameObject.SetActive(false);
+                grappleIMG.color = Color.red;
                 break;
             case 3:
                 playerMovement.ChangeWalljump(false);
                 break;
             case 4:
                 isAllowedToOverload = false;
-                overloadCooldownIMG.gameObject.SetActive(false);
                 break;
             case 5:
                 isAllowedToHeal = false;
@@ -581,7 +562,6 @@ public class PlayerActions : MonoBehaviour
         {
             playerMovement.FailGrapple(transform.position + facingRay.direction.normalized * grappleDistance);
         }
-        
     }
 
     private IEnumerator CheckHeal() //Revisar si se puede curar
@@ -598,7 +578,7 @@ public class PlayerActions : MonoBehaviour
             yield return null;
         }
         canHeal = true;
-        if (isAllowedToHeal) healCR = StartCoroutine(Heal());
+        if (isAllowedToHeal) StartCoroutine(Heal());
 
     }
 
@@ -609,7 +589,6 @@ public class PlayerActions : MonoBehaviour
             currentHP += currentHP > (maxHP-healingRate)? (maxHP-currentHP) : healingRate;
             yield return new WaitForSeconds(0.1f);
         }
-        healCR = null;
         
     }
 
@@ -619,12 +598,12 @@ public class PlayerActions : MonoBehaviour
         float timer = 0f;
         while (timer < grappleDelay)
         {
-            grappleIMG.fillAmount = timer/grappleDelay;
             timer += Time.deltaTime;
+            
             yield return null;
         }
-        grappleIMG.fillAmount = 1;
         canGrapple = true;
+        grappleIMG.color = new Color(70f, 50f, 231f);
 
     }
 
@@ -633,7 +612,7 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < overloadCooldown)
         {
-            overloadCooldownIMG.fillAmount = t/overloadCooldown;
+
             if (t >= overloadTime && dmgType != damageType.None)
             {
                 dmgType = damageType.None;
@@ -642,9 +621,8 @@ public class PlayerActions : MonoBehaviour
             t += Time.deltaTime;
             yield return null;
         }
-        overloadIMG.fillAmount = 1;
+
         canOverload = true;
-        
         
     }
     

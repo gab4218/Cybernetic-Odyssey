@@ -317,6 +317,12 @@ public class PlayerMovement : MonoBehaviour
                 if (slideCR != null)
                 {
                     StopCoroutine(slideCR);
+                    slideCR = null;
+                }
+                if (smoothSpeedCR != null)
+                {
+                    StopCoroutine(smoothSpeedCR);
+                    smoothSpeedCR = null;
                 }
                 smoothSpeedCR = StartCoroutine(SmoothSpeed());
             }
@@ -327,12 +333,17 @@ public class PlayerMovement : MonoBehaviour
             if (slideCR != null)
             {
                 StopCoroutine(slideCR);
+                slideCR = null;
             }
 
             fac = 0;
-            StopCoroutine(SmoothSpeed());
+            if (smoothSpeedCR != null)
+            {
+                StopCoroutine(smoothSpeedCR);
+                smoothSpeedCR = null;
+            }
             targetSpeed = originalSpeed;
-            StartCoroutine(RestartSmoothSpeed());
+            smoothSpeedCR = StartCoroutine(SmoothSpeed());
             isCrouching = false;
             isSliding = false;
             targetFOV = defaultFOV;
@@ -351,6 +362,7 @@ public class PlayerMovement : MonoBehaviour
             if (smoothSpeedCR != null)
             {
                 StopCoroutine(smoothSpeedCR);
+                smoothSpeedCR = null;
             }
             targetSpeed = sprintMult * originalSpeed; 
             fac = 0;
@@ -358,18 +370,28 @@ public class PlayerMovement : MonoBehaviour
             if (staminaCR != null)
             {
                 StopCoroutine(staminaCR);
+                staminaCR = null;
             }
             targetFOV = FOV_Sprint;
         }
         else if ((Input.GetKeyUp(sprintKey) || zDir < 1 || currentStamina <= 0) && isSprinting) //Si el jugador deja de sprintear o se le acaba la Stamina, dejar de sprintear
         {
-            StopCoroutine(SmoothSpeed());
+            if (smoothSpeedCR != null)
+            {
+                StopCoroutine(smoothSpeedCR);
+                smoothSpeedCR = null;
+            }
             fac = 0;
             targetSpeed = originalSpeed;
-            StartCoroutine(RestartSmoothSpeed());
+            smoothSpeedCR = StartCoroutine(SmoothSpeed());
+            if (staminaCR != null)
+            {
+                StopCoroutine(staminaCR);
+                staminaCR = null;
+            }
+            staminaCR = StartCoroutine(RechargeStamina());
             isSprinting = false;
             accelMult = 1;
-            StartCoroutine(RechargeStamina());
             targetFOV = defaultFOV;
         }
     }
@@ -441,9 +463,10 @@ public class PlayerMovement : MonoBehaviour
 
             targetSpeed = originalSpeed;
             fac = 0;
-            StartCoroutine(RestartSmoothSpeed());
+            smoothSpeedCR = StartCoroutine(SmoothSpeed());
             forceStopSlide = false;
         }
+        slideCR = null;
         
     }
 
@@ -464,7 +487,7 @@ public class PlayerMovement : MonoBehaviour
         {
             resting = false;
         }
-        
+        staminaCR = null;
     }
 
     private IEnumerator SmoothSpeed() //Cambiar la velocidad de forma suave
@@ -478,13 +501,7 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         maxSpeed = targetSpeed;
-        
-        
-    }
-    private IEnumerator RestartSmoothSpeed() //Frenar cambio de velocidad
-    {
-        yield return null;
-        StartCoroutine(SmoothSpeed());
+        smoothSpeedCR = null;
         
     }
 

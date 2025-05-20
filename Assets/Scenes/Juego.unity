@@ -1906,10 +1906,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 226640799}
   m_Template: {fileID: 1843461217}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1437795544}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 1536353309}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -3253,10 +3253,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 432370495}
   m_Template: {fileID: 931722884}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 150989161}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 80758325}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -6276,10 +6276,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 708466716}
   m_Template: {fileID: 2045648339}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1540221572}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 1538425880}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -17157,10 +17157,10 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 1880898064}
   m_Template: {fileID: 1989728373}
-  m_CaptionText: {fileID: 0}
+  m_CaptionText: {fileID: 1892093386}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 156613296}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:

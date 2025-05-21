@@ -29,6 +29,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Color[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
     [SerializeField] Animator gunAnimator;
+    [SerializeField] CameraController camContoller;
+    [SerializeField] Image damagedIMG;
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
@@ -127,6 +129,7 @@ public class PlayerActions : MonoBehaviour
         grappleIMG.gameObject.SetActive(false);
         flamethrowerFire = flamethrowerFirePS.emission;
         flamethrowerFire.enabled = false;
+        damagedIMG.color = new Color (damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 0);
         //Preparaciones
 
 
@@ -162,18 +165,21 @@ public class PlayerActions : MonoBehaviour
         }
 
         if (Time.timeScale == 0) return;
+        if (isAllowedToOverload && canOverload)
+        {
 
-        if (Input.mouseScrollDelta.y > 0)
-        {
-            selectedOverload = (selectedOverload + 1) % 3;
-            overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
-            overloadCooldownIMG.color = overloadingColors[selectedOverload];
-        }
-        else if (Input.mouseScrollDelta.y < 0)
-        {
-            selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
-            overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
-            overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            if (Input.mouseScrollDelta.y > 0)
+            {
+                selectedOverload = (selectedOverload + 1) % 3;
+                overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
+                overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            }
+            else if (Input.mouseScrollDelta.y < 0)
+            {
+                selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
+                overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
+                overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            }
         }
         
         isCrouched = playerMovement.isCrouching;
@@ -218,7 +224,6 @@ public class PlayerActions : MonoBehaviour
                 currentHP = Mathf.Min(currentHP + 50, maxHP);
             }
         }
-
         if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R))
         {
             switch (selectedOverload)
@@ -481,11 +486,15 @@ public class PlayerActions : MonoBehaviour
     {
         if (canGetHit)
         {
+            damagedIMG.color = new Color(damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 1);
             currentHP -= dmg;
             canGetHit = false;
             Invoke("resetDamage", 0.25f);
             canHeal = false;
             haltHeal = true;
+
+            StartCoroutine(camContoller.Shake(0.25f, 0.2f));
+            
             if (healCR != null)
             {
                 StopCoroutine(healCR);
@@ -509,8 +518,6 @@ public class PlayerActions : MonoBehaviour
         canGetHit = true;
         checkHealCR = StartCoroutine(CheckHeal());
     }
-
-    
 
     public void enableUpgrade(int upgrade) //Activar efecto de mejora
     {
@@ -618,6 +625,7 @@ public class PlayerActions : MonoBehaviour
         float timer = 0f;
         while (timer < healingTime)
         {
+            damagedIMG.color = Color.Lerp(Color.red, new Color(1, 0, 0, 0), timer/healingTime);
             timer += Time.deltaTime;
             if (haltHeal)
             {
@@ -627,6 +635,7 @@ public class PlayerActions : MonoBehaviour
             yield return null;
         }
         canHeal = true;
+        damagedIMG.color = new Color(1, 0, 0, 0);
         if (isAllowedToHeal) healCR = StartCoroutine(Heal());
 
     }

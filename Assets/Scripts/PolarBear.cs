@@ -48,11 +48,12 @@ public class PolarBear : EnemyBase
     [SerializeField] private float ballDelayMax = 3f;
     [SerializeField] private BoxCollider ballTriggerCollider;
     [SerializeField] private MeshFilter bearMeshFilter;
+    [SerializeField] private GameObject armorObject;
     [SerializeField] private Mesh bearMesh, ballMesh;
     [SerializeField] private SphereCollider ballCollider;
 
     private BoxCollider[] bearColliders;
-    private bool weakened = false;
+    //private bool weakened = false;
     
 
     
@@ -77,10 +78,7 @@ public class PolarBear : EnemyBase
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
-        foreach (Collider c in weakColliders)
-        {
-            c.enabled = false;
-        }
+        
         //Preparaciones generales
         
     }
@@ -141,6 +139,7 @@ public class PolarBear : EnemyBase
             } 
             
         }
+        /*
         if (!weakened && armorHealth <= 0)
         {
             weakened = true;
@@ -149,6 +148,7 @@ public class PolarBear : EnemyBase
                 c.enabled = true;
             }
         }
+        */
         
     }
 
@@ -287,6 +287,7 @@ public class PolarBear : EnemyBase
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true;
         navMeshAgent.isStopped = true;
+        armorObject.SetActive(false);
         rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
         Invoke("EndBall", 1f);
     }
@@ -307,6 +308,7 @@ public class PolarBear : EnemyBase
                 bc.enabled = true;
             }
         }
+        armorObject.SetActive(true);
         ballTriggerCollider.enabled = true;
         ballCollider.enabled = false;
     }

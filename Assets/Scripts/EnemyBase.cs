@@ -26,7 +26,8 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected float escapeDistance = 20f;
     [SerializeField] protected float calmTime = 15f;
     [SerializeField] protected float positionThreshold = 0.5f;
-    [SerializeField] protected Vector3[] randomMovementDimensions;
+    [SerializeField] protected float randomMovementRadius = 0;
+    [SerializeField] protected bool isAerial;
     [SerializeField] protected GameObject strongCollidersGO;
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
@@ -34,10 +35,11 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected ParticleSystem fireParticleSystem;
     [SerializeField] protected bool canSlow = true;
     [SerializeField] protected int armorHealth = 300; 
-    ParticleSystem currentFirePS;
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 
     //Otras variables comunes de enemigo
+    ParticleSystem currentFirePS;
+    protected Vector3[] randomMovementDimensions;
     public float weakPointMult = 2;
     public float strongPointMult = 0;
     public int currentHP;
@@ -88,6 +90,22 @@ public abstract class EnemyBase : MonoBehaviour
         if (weakCollidersGO != null)
         {
             weakColliders = weakCollidersGO.GetComponents<Collider>();
+        }
+        if (isAerial)
+        {
+            randomMovementDimensions = new Vector3[]
+            {
+                new Vector3(transform.position.x - randomMovementRadius, transform.position.y - randomMovementRadius, transform.position.z - randomMovementRadius),
+                new Vector3(transform.position.x + randomMovementRadius, transform.position.y + randomMovementRadius, transform.position.z + randomMovementRadius)
+            };
+        }
+        else
+        {
+            randomMovementDimensions = new Vector3[]
+            {
+                new Vector3(transform.position.x - randomMovementRadius, transform.position.y, transform.position.z - randomMovementRadius),
+                new Vector3(transform.position.x + randomMovementRadius, transform.position.y, transform.position.z + randomMovementRadius)
+            };
         }
     }
 
@@ -149,7 +167,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType)
     {
-        currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid ? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
+        currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid ? 1.5f : 1)); //Restar HP acorde al tipo de damage recibido
         if (dmgType == PlayerActions.damageType.Fire)
         {
             if (currentFirePS == null)
@@ -234,7 +252,10 @@ public abstract class EnemyBase : MonoBehaviour
     
     public void WeakenArmor(PlayerActions.damageType dmgType)
     {
-        armorHealth -= dmgType == PlayerActions.damageType.Fire ? 3 : 1;
+        if (armorHealth > 0)
+        {
+            armorHealth -= dmgType == PlayerActions.damageType.Fire ? 3 : 1;
+        }
     }
 
     protected void Stun(float stunTime) //Stunnear por un periodo de tiempo

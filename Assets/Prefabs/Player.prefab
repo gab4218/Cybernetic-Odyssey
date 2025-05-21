@@ -443,6 +443,8 @@ MonoBehaviour:
   HPDisplay: {fileID: 0}
   crosshair: {fileID: 0}
   grappleIMG: {fileID: 0}
+  overheatIMG: {fileID: 0}
+  overloadCooldownIMG: {fileID: 0}
   overloadIMG: {fileID: 0}
   bulletSpawn: {fileID: 0}
   bulletPrefab: {fileID: 4142949402675267902, guid: df53ad881397eec48b656481d69116fa, type: 3}
@@ -566,10 +568,22 @@ MonoBehaviour:
   gunMeshFilter: {fileID: 0}
   pistolMesh: {fileID: 313342534689051398, guid: d967e07b45b54ca4db35301924083b96, type: 3}
   shotgunMesh: {fileID: 5314951041115539915, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
+  flamethrowerMesh: {fileID: -5579741352678751231, guid: 6211a51ffadd13d48bd74fc86157ca3a, type: 3}
   pistolUnlockIMG: {fileID: 0}
   shotgunUnlockIMG: {fileID: 0}
   flamethrowerUnlockIMG: {fileID: 0}
-  overloadingColors: []
+  selectedOverloads:
+  - {fileID: 21300000, guid: a81e6f4a1687bfc49872262a5756d41c, type: 3}
+  - {fileID: 21300000, guid: dc5ad62bf5b178f4d839a94c4f4d389c, type: 3}
+  - {fileID: 21300000, guid: d9b67be7cef47114eb71b05f449737a3, type: 3}
+  overloadingColors:
+  - {r: 0.19339621, g: 0.8998334, b: 1, a: 1}
+  - {r: 1, g: 0.3974151, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.015195131, a: 1}
+  flamethrowerFirePS: {fileID: 0}
+  shotPS: {fileID: 6805266536167677760, guid: 0a40c5ef0d33c4a44b4ba245223807e6, type: 3}
+  bulletHolePS: {fileID: 6648960303439227232, guid: df8ca23478106a64fbe2ecf01a732ce4, type: 3}
+  gunAnimator: {fileID: 0}
   shootKey: 323
   interactKey: 101
   inventoryKey: 9
@@ -599,8 +613,6 @@ MonoBehaviour:
   grappleDelay: 5
   healingTime: 5
   healingRate: 1
-  weakPointMult: 2
-  strongPointMult: 0.5
   overloadTime: 10
   overloadCooldown: 20
   currentHP: 0

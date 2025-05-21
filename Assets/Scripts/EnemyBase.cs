@@ -9,7 +9,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class EnemyBase : MonoBehaviour
 {
- 
+
 
     //Variables de estado
     protected const int IDLE = 0;
@@ -30,11 +30,16 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected GameObject strongCollidersGO;
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
-    
-
+    [SerializeField] protected float fireRadius = 2;
+    [SerializeField] protected ParticleSystem fireParticleSystem;
+    [SerializeField] protected bool canSlow = true;
+    [SerializeField] protected int armorHealth = 300; 
+    ParticleSystem currentFirePS;
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
 
     //Otras variables comunes de enemigo
+    public float weakPointMult = 2;
+    public float strongPointMult = 0;
     public int currentHP;
     public Collider[] ignoreColliders;
     public Collider[] weakColliders;
@@ -48,11 +53,16 @@ public abstract class EnemyBase : MonoBehaviour
     protected float slowMult = 0.75f;
     protected float slowTime = 5f;
     protected bool slowed = false;
+    protected bool onFire = false;
     //Variables para deteccion de jugador
     protected Transform playerTranform;
     protected PlayerActions player;
     protected Vector3 dir;
-    
+    protected Coroutine fireCoroutine;
+    protected Coroutine calmCoroutine;
+    protected Coroutine iceCoroutine;
+    protected float originalSpeed;
+
 
 
     protected virtual void Start()
@@ -64,6 +74,7 @@ public abstract class EnemyBase : MonoBehaviour
         playerTranform = player.transform;
         state = IDLE;
         navMeshAgent = GetComponent<NavMeshAgent>();
+        originalSpeed = navMeshAgent.speed;
         if (ignoreCollidersGO != null)
         {
             ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();
@@ -86,7 +97,7 @@ public abstract class EnemyBase : MonoBehaviour
     }
     protected virtual void detectPlayer() //Detectar jugador
     {
-        if ((Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance * (player.isCrouched? 0.5f : 1) || isAngered) && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
+        if ((Vector3.Distance(transform.position, playerTranform.position) <= detectionDistance * (player.isCrouched ? 0.5f : 1) || isAngered) && state == IDLE) //Si el jugador esta dentro del radio de deteccion y estado = idle, cambiar a buscar
         {
             state = SEEKING;
         }
@@ -105,7 +116,7 @@ public abstract class EnemyBase : MonoBehaviour
         dir.Normalize();
         navMeshAgent.destination = playerTranform.position;
     }
-    
+
     protected void setDestination(Vector2 newSpot) //Si la llamada de la funcion toma un Vector2, mirar a la proyeccion de la posicion pasada en el plano xz
     {
         navMeshAgent.destination = new Vector3(newSpot.x, transform.position.y, newSpot.y);
@@ -123,35 +134,55 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected bool hasReachedDestination(Vector2 targetPos) //Si la llamada de la funcion toma un Vector2, chequear si la posicion esta dentro de una tolerancia de la proyeccion en el plano xz del vector
     {
-        
+
         return Vector3.Distance(transform.position, new Vector3(targetPos.x, transform.position.y, targetPos.y)) <= positionThreshold;
-        
+
     }
 
     protected bool hasReachedDestination(Vector3 targetPos) //Si la llamada de la funcion toma un Vector3, chequear si la posicion esta dentro de una tolerancia del vector
     {
-       return Vector3.Distance(transform.position, targetPos) <= positionThreshold;
+        return Vector3.Distance(transform.position, targetPos) <= positionThreshold;
 
     }
 
 
 
-    public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType) 
+    public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType)
     {
-        currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
+        currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid ? 1.1f : 1)); //Restar HP acorde al tipo de damage recibido
         if (dmgType == PlayerActions.damageType.Fire)
         {
-            StopCoroutine(FireDamage());
-            StartCoroutine(FireDamage());
+            if (currentFirePS == null)
+            {
+                currentFirePS = Instantiate(fireParticleSystem, transform.position, Quaternion.identity);
+                currentFirePS.gameObject.transform.SetParent(transform, true);
+
+                ParticleSystem.ShapeModule sphere = currentFirePS.shape;
+                sphere.radius = fireRadius;
+            }
+            if (fireCoroutine != null)
+            {
+                StopCoroutine(fireCoroutine);
+            }
+            fireCoroutine = StartCoroutine(FireDamage());
         }
         if (!slowed && dmgType == PlayerActions.damageType.Ice)
         {
-            StartCoroutine(IceTimer());
-            slowed = true;
+            if (canSlow)
+            {
+                if (iceCoroutine != null)
+                {
+                    StopCoroutine(iceCoroutine);
+                }
+                navMeshAgent.speed = originalSpeed * slowMult;
+                iceCoroutine = StartCoroutine(IceTimer());
+                slowed = true;
+
+            }
         }
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
-            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP,0)}/{maxHP}";
+            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
         if (currentHP <= 0) //Si muerto, destruir
         {
@@ -159,12 +190,24 @@ public abstract class EnemyBase : MonoBehaviour
         }
         if (player.isCrouched && player.canGambleCrouch)
         {
-            if (Random.Range(0, 1) > 0.5f)
+            if (Random.Range(0, 1f) > 0.5f)
             {
                 isAngered = true;
-                StopCoroutine(CalmDown());
-                StartCoroutine(CalmDown());
+                if (calmCoroutine != null)
+                {
+                    StopCoroutine(calmCoroutine);
+                }
+                calmCoroutine = StartCoroutine(CalmDown());
             }
+        }
+        else
+        {
+            isAngered = true;
+            if (calmCoroutine != null)
+            {
+                StopCoroutine(calmCoroutine);
+            }
+            calmCoroutine = StartCoroutine(CalmDown());
         }
     }
 
@@ -186,7 +229,12 @@ public abstract class EnemyBase : MonoBehaviour
         {
             canCalm = true;
         }
-        
+        calmCoroutine = null;
+    }
+    
+    public void WeakenArmor(PlayerActions.damageType dmgType)
+    {
+        armorHealth -= dmgType == PlayerActions.damageType.Fire ? 3 : 1;
     }
 
     protected void Stun(float stunTime) //Stunnear por un periodo de tiempo
@@ -223,17 +271,26 @@ public abstract class EnemyBase : MonoBehaviour
             }
             yield return null;
         }
+        Destroy(currentFirePS.gameObject);
+        currentFirePS = null;
+        fireCoroutine = null;
+
     }
 
     private IEnumerator IceTimer()
     {
+        MeshRenderer mr = GetComponentInChildren<MeshRenderer>();
+        Color oldColor = mr.material.color;
+        mr.material.SetColor("_Color", new Vector4(0.8f, 1f, 1f, 1f));
         float t = 0;
         while (t < slowTime)
         {
             t += Time.deltaTime;
             yield return null;
         }
-
+        mr.material.SetColor("_Color", new Vector4(oldColor.r,oldColor.g,oldColor.b,1f));
         slowed = false;
+        navMeshAgent.speed = originalSpeed;
+        yield break;
     }
 }

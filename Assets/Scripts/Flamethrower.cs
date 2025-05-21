@@ -7,7 +7,7 @@ public class Flamethrower : MonoBehaviour
     [SerializeField] int flamethrowerDamage = 1;
     
 
-    float t = 0;
+    int t = 0;
     bool onEnemy;
     EnemyBase eb;
     private void OnTriggerEnter(Collider other)
@@ -22,11 +22,15 @@ public class Flamethrower : MonoBehaviour
     {
         if (onEnemy)
         {
-            if (t % 3 < Time.fixedDeltaTime)
+            t += 1;
+            if (t % 10 == 0)
             {
-                eb.takeDamage(flamethrowerDamage, PlayerActions.damageType.Fire);
+                if (eb != null)
+                {
+                    eb.takeDamage(flamethrowerDamage, PlayerActions.damageType.Fire);
+                    eb.WeakenArmor(PlayerActions.damageType.Fire);
+                } 
             }
-            t += Time.fixedDeltaTime;
         }
     }
 

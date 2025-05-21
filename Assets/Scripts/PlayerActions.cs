@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class PlayerActions : MonoBehaviour
 {
 
-    //Variables de UI y feedback visual
+    [Header("UI")] //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
     [SerializeField] Image HPDisplay;
@@ -61,6 +61,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] int healingRate = 1;
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
+    [SerializeField] LayerMask bounds;
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -606,7 +607,7 @@ public class PlayerActions : MonoBehaviour
     {
         canGrapple = false;
         StartCoroutine(GrappleReload());
-        if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance))
+        if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance, bounds))
         {
             if(hit.collider.gameObject != null)
             {

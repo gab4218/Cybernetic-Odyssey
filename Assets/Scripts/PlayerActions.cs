@@ -36,7 +36,6 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] KeyCode inventoryKey = KeyCode.Tab;
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
-    [SerializeField] KeyCode iceKey = KeyCode.Z, fireKey = KeyCode.X, acidKey = KeyCode.C;
     [SerializeField] KeyCode healKey = KeyCode.Q;
 
     [Header("Parameters")] //Parametros posiblemente modificados en el editor
@@ -341,9 +340,9 @@ public class PlayerActions : MonoBehaviour
                 overheatCR = StartCoroutine(FlamethrowerOverheatOver());
             }
         }
-        else if(flamethrowerOverheatTime > 0)
+        else if(flamethrowerCurrentTime > 0)
         {
-            flamethrowerOverheatTime -= Time.deltaTime;
+            flamethrowerCurrentTime -= Time.deltaTime;
         }
         else
         {
@@ -444,10 +443,13 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < flamethrowerOverheatLength)
         {
+            overheatIMG.fillAmount = t / flamethrowerOverheatLength;
+            overheatIMG.color = Color.Lerp(Color.white, Color.red, t / flamethrowerOverheatLength);
             t += Time.deltaTime;
             yield return null;
         }
-        
+        overheatIMG.fillAmount = 1;
+        overheatIMG.color = Color.white;
         canFlamethrow = true;
         
     }

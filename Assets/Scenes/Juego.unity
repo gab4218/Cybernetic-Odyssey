@@ -11954,8 +11954,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerTransform: {fileID: 1918893585}
   POVTransform: {fileID: 239637464}
-  cameraSensitivityX: 1000
-  cameraSensitivityY: 1000
+  cameraSensitivityX: 150
+  cameraSensitivityY: 150
   sensDisplay: {fileID: 872947794}
 --- !u!4 &1207463209
 Transform:
@@ -21452,6 +21452,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 989451174}
     - target: {fileID: 3282890684703991109, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: maxSlopeAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282890684703991109, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: cams.Array.data[0]
       value: 
       objectReference: {fileID: 963194227}
@@ -21581,7 +21585,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: bounds.m_Bits
-      value: 3758129279
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: gunMeshFilter
@@ -22791,7 +22795,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5994139609064087737}
-  m_Material: {fileID: 13400000, guid: 498ff8d5d2510d042961d7b870bf087a, type: 2}
+  m_Material: {fileID: 13400000, guid: 6661d271a14767741b8e7af6a543a3b7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

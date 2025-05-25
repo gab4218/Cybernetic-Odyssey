@@ -205,7 +205,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void SlopeDetect()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 0.3f, groundRayLayerMask))
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundRayLen*1.1f, groundRayLayerMask))
         {
 
             slopeHit = hit;

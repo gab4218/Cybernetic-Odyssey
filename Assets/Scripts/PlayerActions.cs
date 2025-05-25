@@ -39,7 +39,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
     [SerializeField] KeyCode healKey = KeyCode.Q;
-
+    [SerializeField] KeyCode cheatKey = KeyCode.P;
+    [SerializeField] Transform cheatTransform;
     [Header("Parameters")] //Parametros posiblemente modificados en el editor
     [SerializeField] float interactDistance;
     [SerializeField] float pistolCooldown = 0.33f;
@@ -225,6 +226,12 @@ public class PlayerActions : MonoBehaviour
                 currentHP = Mathf.Min(currentHP + 50, maxHP);
             }
         }
+
+        if (Input.GetKeyDown(cheatKey))
+        {
+            Cheat();
+        }
+
         if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R))
         {
             switch (selectedOverload)
@@ -687,5 +694,12 @@ public class PlayerActions : MonoBehaviour
         
     }
     
+    private void Cheat()
+    {
+        inventory.addToInventory(0,100);
+        inventory.addToInventory(1, 100);
+        inventory.addToInventory(2, 100);
+        transform.position = cheatTransform.position;
+    }
 
 }

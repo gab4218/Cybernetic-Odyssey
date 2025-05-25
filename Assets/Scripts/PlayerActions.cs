@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class PlayerActions : MonoBehaviour
 {
 
-    //Variables de UI y feedback visual
+    [Header("UI")] //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
     [SerializeField] Image HPDisplay;
@@ -29,6 +29,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Color[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
     [SerializeField] Animator gunAnimator;
+    [SerializeField] CameraController camContoller;
+    [SerializeField] Image damagedIMG;
 
     [Header("Inputs")] //Teclas de input
     [SerializeField] KeyCode shootKey = KeyCode.Mouse0;
@@ -37,7 +39,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] KeyCode Key1 = KeyCode.Alpha1, Key2 = KeyCode.Alpha2, Key3 = KeyCode.Alpha3;
     [SerializeField] KeyCode grappleKey = KeyCode.F;
     [SerializeField] KeyCode healKey = KeyCode.Q;
-
+    [SerializeField] KeyCode cheatKey = KeyCode.P;
+    [SerializeField] Transform cheatTransform;
     [Header("Parameters")] //Parametros posiblemente modificados en el editor
     [SerializeField] float interactDistance;
     [SerializeField] float pistolCooldown = 0.33f;
@@ -59,6 +62,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] int healingRate = 1;
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
+    [SerializeField] LayerMask bounds;
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -127,6 +131,7 @@ public class PlayerActions : MonoBehaviour
         grappleIMG.gameObject.SetActive(false);
         flamethrowerFire = flamethrowerFirePS.emission;
         flamethrowerFire.enabled = false;
+        damagedIMG.color = new Color (damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 0);
         //Preparaciones
 
 
@@ -162,18 +167,21 @@ public class PlayerActions : MonoBehaviour
         }
 
         if (Time.timeScale == 0) return;
+        if (isAllowedToOverload && canOverload)
+        {
 
-        if (Input.mouseScrollDelta.y > 0)
-        {
-            selectedOverload = (selectedOverload + 1) % 3;
-            overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
-            overloadCooldownIMG.color = overloadingColors[selectedOverload];
-        }
-        else if (Input.mouseScrollDelta.y < 0)
-        {
-            selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
-            overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
-            overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            if (Input.mouseScrollDelta.y > 0)
+            {
+                selectedOverload = (selectedOverload + 1) % 3;
+                overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
+                overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            }
+            else if (Input.mouseScrollDelta.y < 0)
+            {
+                selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
+                overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
+                overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            }
         }
         
         isCrouched = playerMovement.isCrouching;
@@ -217,6 +225,11 @@ public class PlayerActions : MonoBehaviour
                 inventory.removeFromInventory(canHealMats.IndexOf(true), 1);
                 currentHP = Mathf.Min(currentHP + 50, maxHP);
             }
+        }
+
+        if (Input.GetKeyDown(cheatKey))
+        {
+            Cheat();
         }
 
         if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R))
@@ -481,11 +494,15 @@ public class PlayerActions : MonoBehaviour
     {
         if (canGetHit)
         {
+            damagedIMG.color = new Color(damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 1);
             currentHP -= dmg;
             canGetHit = false;
             Invoke("resetDamage", 0.25f);
             canHeal = false;
             haltHeal = true;
+
+            StartCoroutine(camContoller.Shake(0.25f, 0.2f));
+            
             if (healCR != null)
             {
                 StopCoroutine(healCR);
@@ -509,8 +526,6 @@ public class PlayerActions : MonoBehaviour
         canGetHit = true;
         checkHealCR = StartCoroutine(CheckHeal());
     }
-
-    
 
     public void enableUpgrade(int upgrade) //Activar efecto de mejora
     {
@@ -599,7 +614,7 @@ public class PlayerActions : MonoBehaviour
     {
         canGrapple = false;
         StartCoroutine(GrappleReload());
-        if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance))
+        if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance, bounds))
         {
             if(hit.collider.gameObject != null)
             {
@@ -618,6 +633,7 @@ public class PlayerActions : MonoBehaviour
         float timer = 0f;
         while (timer < healingTime)
         {
+            damagedIMG.color = Color.Lerp(Color.red, new Color(1, 0, 0, 0), timer/healingTime);
             timer += Time.deltaTime;
             if (haltHeal)
             {
@@ -627,6 +643,7 @@ public class PlayerActions : MonoBehaviour
             yield return null;
         }
         canHeal = true;
+        damagedIMG.color = new Color(1, 0, 0, 0);
         if (isAllowedToHeal) healCR = StartCoroutine(Heal());
 
     }
@@ -677,5 +694,12 @@ public class PlayerActions : MonoBehaviour
         
     }
     
+    private void Cheat()
+    {
+        inventory.addToInventory(0,100);
+        inventory.addToInventory(1, 100);
+        inventory.addToInventory(2, 100);
+        transform.position = cheatTransform.position;
+    }
 
 }

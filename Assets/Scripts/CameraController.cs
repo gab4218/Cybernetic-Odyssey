@@ -49,5 +49,16 @@ public class CameraController : MonoBehaviour
         PlayerTransform.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
+    public IEnumerator Shake(float length, float intensity)
+    {
+        while (length > 0)
+        {
+            float randomx = Random.Range(0, intensity), randomy = Random.Range(0, intensity);
+            Camera.main.transform.localPosition = new Vector3(randomx, randomy, 0);
+            length -= Time.deltaTime;
+            yield return null;
+        }
+        Camera.main.transform.localPosition = Vector3.zero;
+    }
 
 }

@@ -109,7 +109,7 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         enemySpawner.enemyCount--;
     }

@@ -17,6 +17,10 @@ public class Menu : MonoBehaviour
     {
         SceneManager.LoadScene(menu);
     }
+    public void Restart(string Win)
+    {
+        SceneManager.LoadScene(Win);
+    }
 
     public void Salir()
     {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PolarBear : EnemyBase
 {
@@ -27,6 +28,8 @@ public class PolarBear : EnemyBase
     [SerializeField] private int slamDamage;
     [SerializeField] private float slamKnockback = 2.0f;
     [SerializeField] private BoxCollider slamCollider;
+    [SerializeField] private ParticleSystem slamParticle;
+    [SerializeField] private Transform slamLocation;
 
     //Variables del ataque de Claw
     [SerializeField] private int clawDamage;
@@ -82,6 +85,7 @@ public class PolarBear : EnemyBase
         //Preparaciones generales
         
     }
+
 
     private void Update()
     {
@@ -149,7 +153,6 @@ public class PolarBear : EnemyBase
             }
         }
         */
-        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -209,9 +212,11 @@ public class PolarBear : EnemyBase
 
 
     //Las siguientes funciones son usadas para llamado detro de animaciones
-    public void slamAttack() 
+    public void slamAttack()
     {
         slamCollider.enabled = true;
+        ParticleSystem partSys = Instantiate(slamParticle, slamLocation.position, Quaternion.identity);
+        partSys.Play();
     }
 
     public void slamReset()

@@ -134,7 +134,7 @@
     "m_SourceType": 1,
     "m_FunctionName": "getLight",
     "m_FunctionSource": "",
-    "m_FunctionBody": "#if SHADERGRAPH_PREVIEW\r\nDirection = float3(0.5, 0.5,0);\r\r\n#else\r\nDirection = _WorldSpaceLightPos0.xyz;\r\r\n#endif"
+    "m_FunctionBody": "#if SHADERGRAPH_PREVIEW\r\nDirection = float3(0.5, 0.5,0);\r\r\n#else\r\nDirection = _WorldSpaceLightPos0;\r\r\n#endif"
 }
 
 {

@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class PlayerActions : MonoBehaviour
 {
 
+    public static bool dead = false;
+
     [Header("UI")] //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
     [SerializeField] GameObject inventoryPlaceholder;
@@ -107,6 +109,7 @@ public class PlayerActions : MonoBehaviour
     int selectedOverload = 0;
     private void Start()
     {
+        dead = false;
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
         anim = GetComponentInChildren<Animator>();
@@ -167,7 +170,7 @@ public class PlayerActions : MonoBehaviour
         }
 
         if (Time.timeScale == 0) return;
-        if (isAllowedToOverload && canOverload)
+        if (isAllowedToOverload && canOverload && selectedWeapon != 2)
         {
 
             if (Input.mouseScrollDelta.y > 0)
@@ -183,6 +186,10 @@ public class PlayerActions : MonoBehaviour
                 overloadCooldownIMG.color = overloadingColors[selectedOverload];
             }
         }
+        else if (selectedWeapon == 2)
+        {
+            overloadCooldownIMG.color = new Color(0.45f,0.5f,0.6f);
+        }
         
         isCrouched = playerMovement.isCrouching;
 
@@ -197,7 +204,7 @@ public class PlayerActions : MonoBehaviour
             fallOffStart = pistolFallOffStart;
             readyWeaponTime = pistolCooldown;
             gunMeshFilter.mesh = pistolMesh;
-            
+            overloadCooldownIMG.color = overloadingColors[selectedOverload];
         }
         if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -206,7 +213,7 @@ public class PlayerActions : MonoBehaviour
             fallOffStart = shotgunFallOffStart;
             readyWeaponTime = shotgunCooldown;
             gunMeshFilter.mesh = shotgunMesh;
-            
+            overloadCooldownIMG.color = overloadingColors[selectedOverload];
         }
         if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -232,7 +239,7 @@ public class PlayerActions : MonoBehaviour
             Cheat();
         }
 
-        if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R))
+        if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R) && selectedWeapon != 2)
         {
             switch (selectedOverload)
             {
@@ -276,6 +283,7 @@ public class PlayerActions : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
         {
+            dead = true;
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
@@ -515,6 +523,7 @@ public class PlayerActions : MonoBehaviour
             }
             if (currentHP <= 0)
             {
+                dead = true;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
@@ -607,6 +616,7 @@ public class PlayerActions : MonoBehaviour
 
     private void OOBDie() //Morir si OOB
     {
+        dead = true;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -627,7 +637,7 @@ public class PlayerActions : MonoBehaviour
         }
         
     }
-
+    
     private IEnumerator CheckHeal() //Revisar si se puede curar
     {
         float timer = 0f;

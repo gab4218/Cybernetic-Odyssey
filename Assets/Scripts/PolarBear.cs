@@ -155,6 +155,14 @@ public class PolarBear : EnemyBase
         */
     }
 
+    protected override void OnDestroy()
+    {
+        if (!PlayerActions.dead)
+        {
+            SceneManager.LoadScene(3);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         PlayerActions pAct = other.GetComponentInParent<PlayerActions>();

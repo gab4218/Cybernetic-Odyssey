@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ using UnityEngine.UI;
 public class CraftingStation : MonoBehaviour, IInteractable
 {
     private Inventory inventory;
+    [SerializeField] TMP_Text[] matDisplay;
     private bool isCrafting = false;
     [SerializeField] private GameObject craftingMenu;
     [SerializeField] private Button[] craftingButtons;
@@ -19,6 +21,11 @@ public class CraftingStation : MonoBehaviour, IInteractable
         craftingMenu.SetActive(true);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+        for (int ii = 0; ii < matDisplay.Length; ii++)
+        {
+            matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+        }
+
         for (int i = 0; i < craftingButtons.Length; i++)
         {
             bool[] hasColors = new bool[] { false, false, false };
@@ -65,6 +72,11 @@ public class CraftingStation : MonoBehaviour, IInteractable
         }
         if (isCrafting)
         {
+
+            for (int ii = 0; ii < matDisplay.Length; ii++)
+            {
+                matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+            }
             for (int i = 0; i < craftingButtons.Length; i++)
             {
                 bool[] hasColors = new bool[] { false, false, false };

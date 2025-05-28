@@ -132,7 +132,11 @@ public abstract class EnemyBase : MonoBehaviour
         dir = playerTranform.position - transform.position;
         dir.y = 0;
         dir.Normalize();
-        navMeshAgent.destination = playerTranform.position;
+        if (navMeshAgent.enabled)
+        {
+
+            navMeshAgent.destination = playerTranform.position;
+        }
     }
 
     protected void setDestination(Vector2 newSpot) //Si la llamada de la funcion toma un Vector2, mirar a la proyeccion de la posicion pasada en el plano xz

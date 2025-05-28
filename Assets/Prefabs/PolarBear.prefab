@@ -406,6 +406,37 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 2.5
   m_Center: {x: 0, y: 2.5, z: 0}
+--- !u!1 &4006490650052107864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 59989779520571304}
+  m_Layer: 6
+  m_Name: particle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &59989779520571304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4006490650052107864}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3341850620320679601}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5387487663594672142
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,6 +544,7 @@ Transform:
   - {fileID: 5253619908627776750}
   - {fileID: 2755469664054055090}
   - {fileID: 827683627895443203}
+  - {fileID: 59989779520571304}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &358515833174210469
@@ -528,13 +560,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  maxHP: 600
+  maxHP: 350
   speed: 4
   detectionDistance: 20
   escapeDistance: 25
   calmTime: 15
   positionThreshold: 1
-  randomMovementRadius: 20
+  randomMovementRadius: 6
   isAerial: 0
   strongCollidersGO: {fileID: 3978334807006766953}
   weakCollidersGO: {fileID: 3569965223330514953}
@@ -542,10 +574,10 @@ MonoBehaviour:
   fireRadius: 3
   fireParticleSystem: {fileID: 7298929676011750005, guid: b94c03d9ac7b7cb4c9753fa359776f52, type: 3}
   canSlow: 1
-  armorHealth: 300
+  armorHealth: 0
   HPDisplay: {fileID: 0}
-  weakPointMult: 2
-  strongPointMult: 0
+  weakPointMult: 3
+  strongPointMult: 0.25
   currentHP: 0
   ignoreColliders: []
   weakColliders: []
@@ -555,6 +587,8 @@ MonoBehaviour:
   slamDamage: 50
   slamKnockback: 10
   slamCollider: {fileID: 3252663761647022677}
+  slamParticle: {fileID: 554407078824296162, guid: bf1a293d857cbce4c815ac6d3e887943, type: 3}
+  slamLocation: {fileID: 59989779520571304}
   clawDamage: 30
   clawRange: 4
   clawKnockback: 7
@@ -614,7 +648,7 @@ BoxCollider:
     m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 3758129271
+    m_Bits: 4026564727
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -635,7 +669,7 @@ BoxCollider:
     m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 1610645623
+    m_Bits: 4026564727
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -656,7 +690,7 @@ BoxCollider:
     m_Bits: 2147483656
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 1610645623
+    m_Bits: 1879081079
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0

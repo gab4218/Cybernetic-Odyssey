@@ -114,7 +114,7 @@ public class PolarBear : EnemyBase
             if (Vector3.Distance(transform.position, playerTranform.position) > minRushDistance && canRush) //Rush
             {
                 RushAttack();
-                navMeshAgent.isStopped = true;
+                navMeshAgent.enabled = false;
             }
 
 
@@ -160,6 +160,8 @@ public class PolarBear : EnemyBase
         if (!PlayerActions.dead)
         {
             SceneManager.LoadScene(3);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
@@ -270,6 +272,7 @@ public class PolarBear : EnemyBase
     public void RushReset() //Volver a base de Rush
     {
         rushCollider.enabled = false;
+        navMeshAgent.enabled = true;
         Stun(rushStunTime);
         Invoke("RushReload", 15f);
     }
@@ -330,6 +333,6 @@ public class PolarBear : EnemyBase
         findDirection();
         rushDirection = Vector3.Lerp(rushDirection, dir, 1 - Mathf.Pow(0.5f, Time.deltaTime)); //Girar lentamente
         transform.forward = rushDirection; 
-        rb.velocity = new Vector3(rushDirection.x, transform.position.y, rushDirection.z).normalized * rushSpeed * (slowed? slowMult : 1); //Mover
+        rb.velocity = new Vector3(rushDirection.x, 0, rushDirection.z).normalized * rushSpeed * (slowed? slowMult : 1) + Vector3.up * rb.velocity.y; //Mover
     }
 }

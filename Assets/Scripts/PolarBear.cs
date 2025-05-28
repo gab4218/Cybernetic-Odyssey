@@ -198,6 +198,9 @@ public class PolarBear : EnemyBase
                 {
                     pRB.drag = 0;
                     pRB.AddForce((dir + 3 * Vector3.up).normalized * rushKnockback, ForceMode.Impulse);
+                    ParticleSystem ps = Instantiate(slamParticle, transform.position + rushCollider.center * 2, Quaternion.identity);
+                    ps.gameObject.transform.up = -transform.forward;
+                    ps.Play();
                     RushReset();
                 }
             }
@@ -206,6 +209,9 @@ public class PolarBear : EnemyBase
         {
             if (rushCollider.enabled) //Si la colision fue con cualquier otra cosa y esta haciendo Rush, detener Rush
             {
+                ParticleSystem ps = Instantiate(slamParticle, transform.position + rushCollider.center * 2, Quaternion.identity);
+                ps.gameObject.transform.up = -transform.forward;
+                ps.Play();
                 RushReset();
             }
         }

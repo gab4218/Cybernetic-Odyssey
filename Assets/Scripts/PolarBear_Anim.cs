@@ -10,6 +10,8 @@ public class PolarBear_Anim : MonoBehaviour
     //Scripts necesarios y AnimatorController
     private PolarBear pb;
     private Animator anim;
+    [SerializeField] private ParticleSystem clawPS;
+    [SerializeField] private Transform clawPos;
 
     private void Start()
     {
@@ -32,5 +34,7 @@ public class PolarBear_Anim : MonoBehaviour
     public void claw()
     {
         pb.clawAttack();
+        ParticleSystem cps = Instantiate(clawPS, clawPos);
+        cps.Play();
     }
 }

@@ -71,9 +71,9 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _Freq1: 0.33
-    - _Freq2: 0.66
-    - _Freq3: 0.42
+    - _Freq1: 0.46
+    - _Freq2: 0.74
+    - _Freq3: 0.3
     - _Freq4: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -89,14 +89,14 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SpecularStength: 9.6
-    - _SpecularStrength: 99.52
+    - _SpecularStrength: 21.1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.083971165, g: 0.30433586, b: 0.4811321, a: 0.78039217}
+    - _Color: {r: 0.08235295, g: 0.24829705, b: 0.48235294, a: 0.78039217}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HighlightColor: {r: 1, g: 1, b: 1, a: 0}
+    - _HighlightColor: {r: 1, g: 0.9669139, b: 0.9103774, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &8790003671792554798
 MonoBehaviour:

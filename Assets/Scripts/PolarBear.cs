@@ -29,6 +29,7 @@ public class PolarBear : EnemyBase
     [SerializeField] private float slamKnockback = 2.0f;
     [SerializeField] private BoxCollider slamCollider;
     [SerializeField] private ParticleSystem slamParticle;
+    [SerializeField] private ParticleSystem holeParticle;
     [SerializeField] private Transform slamLocation;
 
     //Variables del ataque de Claw
@@ -143,16 +144,6 @@ public class PolarBear : EnemyBase
             } 
             
         }
-        /*
-        if (!weakened && armorHealth <= 0)
-        {
-            weakened = true;
-            foreach (Collider c in weakColliders)
-            {
-                c.enabled = true;
-            }
-        }
-        */
     }
 
     protected override void OnDestroy()
@@ -233,13 +224,15 @@ public class PolarBear : EnemyBase
         slamCollider.enabled = true;
         ParticleSystem partSys = Instantiate(slamParticle, slamLocation.position, Quaternion.identity);
         partSys.Play();
+        partSys = Instantiate(holeParticle, slamLocation.position, Quaternion.identity);
+        partSys.transform.forward = -transform.up;
+        partSys.Play();
     }
 
     public void slamReset()
     {
         slamCollider.enabled = false;
-        state = IDLE;
-        navMeshAgent.isStopped = false;
+        Stun(1);
         Invoke("slamReload", 10f);
     }
 
@@ -256,9 +249,8 @@ public class PolarBear : EnemyBase
     public void clawReset() 
     {
         clawCollider.enabled = false;
-        state = IDLE;
+        Stun(1);
         Invoke("clawReload", 1f);
-        navMeshAgent.isStopped = false;
     }
 
     private void clawReload() //Para Invoke

@@ -400,28 +400,28 @@ MonoBehaviour:
   sprintKey: 304
   crouchKey: 306
   maxSpeed: 5
-  groundDrag: 4
+  groundDrag: 10
   airDrag: 0.5
-  jumpForce: 6
+  jumpForce: 8
   accelerationForce: 2000
   sprintMult: 2
   maxStamina: 5
   staminaTimer: 2
   crouchMult: 0.25
-  groundRayLen: 0.2
+  groundRayLen: 0.5
   slideImpulse: 2
   slideTime: 0.5
   grapplingForce: 3000
   groundRayLayerMask:
     serializedVersion: 2
     m_Bits: 1073741888
-  maxSlopeAngle: 45
+  maxSlopeAngle: 60
   staminaImg: {fileID: 0}
   cams:
   - {fileID: 0}
   - {fileID: 0}
-  FOV_Sprint: 75
-  FOV_Crouch: 50
+  FOV_Sprint: 90
+  FOV_Crouch: 68
   grappleLinePF: {fileID: 475410914824258222, guid: 5ffc0f8668ccee04683b583321f25344, type: 3}
   grapplePoint: {fileID: 6593229390381334881}
   isCrouching: 0
@@ -584,6 +584,8 @@ MonoBehaviour:
   shotPS: {fileID: 6805266536167677760, guid: 0a40c5ef0d33c4a44b4ba245223807e6, type: 3}
   bulletHolePS: {fileID: 6648960303439227232, guid: df8ca23478106a64fbe2ecf01a732ce4, type: 3}
   gunAnimator: {fileID: 0}
+  camContoller: {fileID: 0}
+  damagedIMG: {fileID: 0}
   shootKey: 323
   interactKey: 101
   inventoryKey: 9
@@ -591,10 +593,9 @@ MonoBehaviour:
   Key2: 50
   Key3: 51
   grappleKey: 102
-  iceKey: 122
-  fireKey: 120
-  acidKey: 99
   healKey: 113
+  cheatKey: 112
+  cheatTransform: {fileID: 0}
   interactDistance: 3
   pistolCooldown: 0.33
   pistolFallOffStart: 10
@@ -615,6 +616,9 @@ MonoBehaviour:
   healingRate: 1
   overloadTime: 10
   overloadCooldown: 20
+  bounds:
+    serializedVersion: 2
+    m_Bits: 0
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
   partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
@@ -664,6 +668,7 @@ MonoBehaviour:
   numberOfUpgradeSlots: 4
   matDisplay: []
   availableUpgrades: 
+  materialInventory: 000000000000000000000000
   hasShotgun: 0
   hasFlamethrower: 0
 --- !u!1 &2014876763128716355

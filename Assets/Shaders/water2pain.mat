@@ -89,7 +89,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SpecularStength: 9.6
-    - _SpecularStrength: 21.1
+    - _SpecularStrength: 31.3
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1

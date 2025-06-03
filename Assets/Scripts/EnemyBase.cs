@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -36,7 +37,6 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected bool canSlow = true;
     [SerializeField] protected int armorHealth = 300; 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
-
     //Otras variables comunes de enemigo
     ParticleSystem currentFirePS;
     protected Vector3[] randomMovementDimensions;
@@ -77,6 +77,7 @@ public abstract class EnemyBase : MonoBehaviour
         state = IDLE;
         navMeshAgent = GetComponent<NavMeshAgent>();
         originalSpeed = navMeshAgent.speed;
+        
         if (ignoreCollidersGO != null)
         {
             ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();

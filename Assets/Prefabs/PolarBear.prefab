@@ -222,6 +222,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5253619908627776750}
   - component: {fileID: 9197890523126715182}
+  - component: {fileID: 7885886948924216029}
   m_Layer: 6
   m_Name: WeakPoints
   m_TagString: Untagged
@@ -263,8 +264,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.659048, y: 1.3287749, z: 2.7309837}
-  m_Center: {x: 0, y: 2.8577297, z: 1.8601856}
+  m_Size: {x: 2.58, y: 1.3287749, z: 2.57}
+  m_Center: {x: 0, y: 2.8577297, z: 1.42}
+--- !u!65 &7885886948924216029
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569965223330514953}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.09, y: 1.59, z: 1}
+  m_Center: {x: 0, y: 3.87, z: 4}
 --- !u!1 &3978334807006766953
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,7 +453,7 @@ Transform:
   m_GameObject: {fileID: 4006490650052107864}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.85}
+  m_LocalPosition: {x: 0, y: 0, z: 2.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -620,6 +642,7 @@ MonoBehaviour:
   slamKnockback: 10
   slamCollider: {fileID: 3252663761647022677}
   slamParticle: {fileID: 554407078824296162, guid: bf1a293d857cbce4c815ac6d3e887943, type: 3}
+  holeParticle: {fileID: 5110752933235125815, guid: 14e6e740858f93346acbf4c88ee32b46, type: 3}
   slamLocation: {fileID: 59989779520571304}
   clawDamage: 30
   clawRange: 4
@@ -629,7 +652,7 @@ MonoBehaviour:
   rushDamage: 90
   rushKnockback: 15
   rushSpeed: 10
-  rushStunTime: 1
+  rushStunTime: 2
   rushCollider: {fileID: 5290198108620238391}
   ballImpulse: 500
   ballDelayMin: 1

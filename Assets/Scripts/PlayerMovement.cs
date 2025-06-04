@@ -246,7 +246,7 @@ public class PlayerMovement : MonoBehaviour
         if (onSlope)
         {
             
-            rb.AddForce(SlopeMoveDir() * accelerationForce * Time.fixedDeltaTime * accelMult * 2, ForceMode.Force);
+            rb.AddForce(SlopeMoveDir() * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded? 1 : 0.25f), ForceMode.Force);
             if (rb.velocity.y > 0)
             {
                 rb.AddForce(Vector3.down * 10f, ForceMode.Force);
@@ -254,7 +254,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult * 2, ForceMode.Force);
+            rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded ? 1 : 0.25f), ForceMode.Force);
         }
 
     }

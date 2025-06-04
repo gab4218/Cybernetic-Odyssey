@@ -188,7 +188,7 @@ public class PlayerActions : MonoBehaviour
         }
         else if (selectedWeapon == 2)
         {
-            overloadCooldownIMG.color = new Color(0.45f,0.5f,0.6f);
+            overloadCooldownIMG.color = new Color(0.45f,0.5f,0.6f, 0f);
         }
         
         isCrouched = playerMovement.isCrouching;
@@ -219,9 +219,11 @@ public class PlayerActions : MonoBehaviour
         {
             selectedWeapon = 2;
             gunMeshFilter.mesh = flamethrowerMesh;
+            dmgType = damageType.None;
+            overloadIMG.gameObject.SetActive(false);
         }
 
-        if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal)
+        if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal && !isAllowedToHeal)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -414,31 +416,40 @@ public class PlayerActions : MonoBehaviour
             {
                 if (!enemy.ignoreColliders.Contains(hit.collider))
                 {
+                    int damage = 0;
                     float mult = 1;
                     if (enemy.weakColliders.Contains(hit.collider))
                     {
                         mult = enemy.weakPointMult;
-                        ParticleSystem partSys = Instantiate(partMax, hit.point, Quaternion.LookRotation(hit.normal));
-                        partSys.Play();
+                    
                     }
                     else if (enemy.strongColliders.Contains(hit.collider))
                     {
                         mult = enemy.strongPointMult;
+                    
+                    }
+                    else
+                    {
+                        mult = 1;
+                    
+                    }
+                    damage = (int)((dist > fallOffStart ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult);
+                    if (damage > 0)
+                    {
+                        enemy.takeDamage(damage, dmgType);
+                        ParticleSystem partSys = Instantiate(damage > 5? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
+                        partSys.Play();
+                    }
+                    else
+                    {
                         ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
                         if (mult == 0)
                         {
                             enemy.WeakenArmor(dmgType);
                         }
+
                     }
-                    else
-                    {
-                        mult = 1;
-                        ParticleSystem partSys = Instantiate (partMid, hit.point, Quaternion.LookRotation(hit.normal));
-                        partSys.Play();
-                    }
-                    
-                    enemy.takeDamage((int)((dist > fallOffStart? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult), dmgType);
                 }
             }
             else
@@ -689,7 +700,7 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < overloadCooldown)
         {
-            overloadCooldownIMG.fillAmount = t/overloadCooldown;
+            if(overloadIMG.gameObject.activeSelf)overloadCooldownIMG.fillAmount = t/overloadCooldown;
             if (t >= overloadTime && dmgType != damageType.None)
             {
                 dmgType = damageType.None;

@@ -52,7 +52,6 @@ public class PolarBear : EnemyBase
     [SerializeField] private float ballDelayMax = 3f;
     [SerializeField] private BoxCollider ballTriggerCollider;
     [SerializeField] private MeshFilter bearMeshFilter;
-    [SerializeField] private GameObject armorObject;
     [SerializeField] private Mesh bearMesh, ballMesh;
     [SerializeField] private SphereCollider ballCollider;
 
@@ -301,7 +300,6 @@ public class PolarBear : EnemyBase
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true;
         navMeshAgent.isStopped = true;
-        armorObject.SetActive(false);
         rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
         Invoke("EndBall", 1f);
     }
@@ -322,7 +320,6 @@ public class PolarBear : EnemyBase
                 bc.enabled = true;
             }
         }
-        armorObject.SetActive(true);
         ballTriggerCollider.enabled = true;
         ballCollider.enabled = false;
     }

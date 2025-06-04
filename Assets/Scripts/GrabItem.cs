@@ -11,10 +11,20 @@ public class GrabItem : MonoBehaviour
     private Inventory inventory;
     [SerializeField] private ParticleSystem pickupParticles;
     [SerializeField] private Gradient colorGradient;
+    [SerializeField] private float pickupAreaSize = 5;
     private void Start()
     {
         inventory = FindObjectOfType<Inventory>();
     }
+
+    private void Update()
+    {
+        if (Vector3.Distance(inventory.transform.position, transform.position) < pickupAreaSize)
+        {
+            transform.position = Vector3.Lerp(transform.position, inventory.transform.position, 1 - Mathf.Pow(0.2f, Time.deltaTime * 2));
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponentInParent<PlayerActions>())

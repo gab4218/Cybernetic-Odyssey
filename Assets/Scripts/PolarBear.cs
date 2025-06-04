@@ -232,12 +232,19 @@ public class PolarBear : EnemyBase
     {
         slamCollider.enabled = false;
         Stun(1);
-        Invoke("slamReload", 10f);
+        StartCoroutine(slamReload());
     }
 
-    private void slamReload() //Para Invoke
+    private IEnumerator slamReload() //Para Invoke
     {
+        float t = 0;
+        while (t < 10f)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
         canSlam = true;
+        yield break;
     }
 
     public void clawAttack() 

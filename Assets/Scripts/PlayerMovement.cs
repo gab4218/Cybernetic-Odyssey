@@ -96,6 +96,7 @@ public class PlayerMovement : MonoBehaviour
         {
             dir = grapplePosition - transform.position;
             grappleLine.SetPosition(0, grapplePoint.position);
+            rb.drag = airDrag;
             if (Vector3.Distance(transform.position, grapplePosition) < 3 || forceStopGrapple)
             {
                 isGrappling = false;

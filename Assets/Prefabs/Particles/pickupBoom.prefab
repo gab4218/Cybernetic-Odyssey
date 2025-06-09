@@ -77,6 +77,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 7.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 2.32
       objectReference: {fileID: 0}
@@ -202,7 +206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
-      value: 30
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
       propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[0].inSlope

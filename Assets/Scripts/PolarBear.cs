@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class PolarBear : EnemyBase
 {
-    
+
     //Variables de estado extra
     private const int CLAWING = 4;
     private const int RUSHING = 5;
     private const int BALL = 6;
 
-    
+
     private Vector2 randomPosition;
     private Animator anim;
 
@@ -45,6 +46,9 @@ public class PolarBear : EnemyBase
     [SerializeField] private float rushSpeed = 10f;
     [SerializeField] private float rushStunTime = 1f;
     [SerializeField] private BoxCollider rushCollider;
+    [SerializeField] private ParticleSystem rushParticle;
+    [SerializeField] private Transform rushPartTransform;
+    private ParticleSystem currentRushParticle;
 
     //Variables del ataque/evasion de Ball
     [SerializeField] private float ballImpulse = 10f;
@@ -270,6 +274,7 @@ public class PolarBear : EnemyBase
         rushCollider.enabled = true;
         navMeshAgent.isStopped = true;
         rushDirection = dir;
+        currentRushParticle = Instantiate(rushParticle, rushPartTransform);
         canRush = false; 
     }
 
@@ -277,6 +282,7 @@ public class PolarBear : EnemyBase
     {
         rushCollider.enabled = false;
         navMeshAgent.enabled = true;
+        Destroy(currentRushParticle.gameObject);
         Stun(rushStunTime);
         Invoke("RushReload", 15f);
     }

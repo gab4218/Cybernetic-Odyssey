@@ -45,10 +45,15 @@ public class PolarBear : EnemyBase
     [SerializeField] private float rushKnockback = 20f;
     [SerializeField] private float rushSpeed = 10f;
     [SerializeField] private float rushStunTime = 1f;
+    [SerializeField] private float rushChargeTime = 1.5f;
+    [SerializeField] private float maxRushTime = 5f;
     [SerializeField] private BoxCollider rushCollider;
     [SerializeField] private ParticleSystem rushParticle;
+    [SerializeField] private ParticleSystem rushChargeParticle;
     [SerializeField] private Transform rushPartTransform;
+    private bool canMoveRush = false;
     private ParticleSystem currentRushParticle;
+    private Coroutine rushCR;
 
     //Variables del ataque/evasion de Ball
     [SerializeField] private float ballImpulse = 10f;
@@ -220,7 +225,6 @@ public class PolarBear : EnemyBase
         }
     }
 
-
     //Las siguientes funciones son usadas para llamado detro de animaciones
     public void slamAttack()
     {
@@ -270,12 +274,39 @@ public class PolarBear : EnemyBase
 
     private void RushAttack() //Iniciar ataque de Rush
     {
-        state = RUSHING;
         rushCollider.enabled = true;
         navMeshAgent.isStopped = true;
         rushDirection = dir;
+        currentRushParticle = Instantiate(rushChargeParticle, transform.position, Quaternion.LookRotation(transform.up));
+        state = RUSHING;
+        canMoveRush = false;
+        Invoke("StartRush", rushChargeTime);
+    }
+
+    private void StartRush()
+    {
+        Destroy(currentRushParticle.gameObject);
+        canMoveRush = true;
         currentRushParticle = Instantiate(rushParticle, rushPartTransform);
-        canRush = false; 
+        canRush = false;
+        rushCR = StartCoroutine(RushTimer());
+    }
+
+    private IEnumerator RushTimer()
+    {
+        float t = 0;
+
+        while (t < maxRushTime)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        RushReset();
+        
+        rushCR = null;
+        yield break;
+
     }
 
     public void RushReset() //Volver a base de Rush
@@ -284,7 +315,13 @@ public class PolarBear : EnemyBase
         navMeshAgent.enabled = true;
         Destroy(currentRushParticle.gameObject);
         Stun(rushStunTime);
+        if (rushCR != null)
+        {
+            StopCoroutine(rushCR);
+            rushCR = null;
+        }
         Invoke("RushReload", 15f);
+        canMoveRush = false;
     }
 
     private void RushReload() //Para Invoke
@@ -339,8 +376,11 @@ public class PolarBear : EnemyBase
     private void moveRush()
     {
         findDirection();
-        rushDirection = Vector3.Lerp(rushDirection, dir, 1 - Mathf.Pow(0.5f, Time.deltaTime)); //Girar lentamente
-        transform.forward = rushDirection; 
-        rb.velocity = new Vector3(rushDirection.x, 0, rushDirection.z).normalized * rushSpeed * (slowed? slowMult : 1) + Vector3.up * rb.velocity.y; //Mover
+        rushDirection = Vector3.Lerp(transform.forward, dir, 1 - Mathf.Pow(0.2f, Time.deltaTime)); //Girar lentamente
+        transform.forward = rushDirection;
+        if (canMoveRush)
+        {
+            rb.velocity = new Vector3(rushDirection.x, 0, rushDirection.z).normalized * rushSpeed * (slowed? slowMult : 1) + Vector3.up * rb.velocity.y; //Mover
+        }
     }
 }

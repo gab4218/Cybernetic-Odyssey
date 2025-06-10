@@ -239,7 +239,7 @@ public class PolarBear : EnemyBase
     public void slamReset()
     {
         slamCollider.enabled = false;
-        Stun(1);
+        Stun(0.5f);
         StartCoroutine(slamReload());
     }
 
@@ -263,8 +263,8 @@ public class PolarBear : EnemyBase
     public void clawReset() 
     {
         clawCollider.enabled = false;
-        Stun(1);
-        Invoke("clawReload", 1f);
+        Stun(0.5f);
+        Invoke("clawReload", 1.5f);
     }
 
     private void clawReload() //Para Invoke

@@ -12,6 +12,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
     private bool isCrafting = false;
     [SerializeField] private GameObject craftingMenu;
     [SerializeField] private Button[] craftingButtons;
+    [SerializeField] private GameObject[] pages;
     private ItemCost[] costs;
 
     public void onInteract() //Al interactuar, 
@@ -104,6 +105,16 @@ public class CraftingStation : MonoBehaviour, IInteractable
     }
 
 
+
+    public void goToPage(int p)
+    {
+        foreach (GameObject pa in pages)
+        {
+            pa.SetActive(false);
+        }
+        pages[p].SetActive(true);
+
+    }
 
     public void closeMenu()
     {

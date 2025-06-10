@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -21,6 +22,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Image overheatIMG;
     [SerializeField] Image overloadCooldownIMG;
     [SerializeField] Image overloadIMG;
+    [SerializeField] Image hitImage;
+    [SerializeField] Color hitColor, missColor, critColor;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
     [SerializeField] Gradient[] bulletColors;
@@ -345,7 +348,7 @@ public class PlayerActions : MonoBehaviour
                 gunAnimator.SetBool("flamethrower", false);
             }
         }
-
+        hitImage.color = Color.Lerp(hitImage.color, new Color(hitImage.color.r, hitImage.color.g, hitImage.color.b, 0), 1 - Mathf.Pow(0.05f,Time.deltaTime));
         if (flamethrowerCollider.enabled && canFlamethrow)
         {
             if (flamethrowerCurrentTime < flamethrowerOverheatTime)
@@ -439,10 +442,12 @@ public class PlayerActions : MonoBehaviour
                         enemy.takeDamage(damage, dmgType);
                         ParticleSystem partSys = Instantiate(damage > 5? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
+                        hitImage.color = damage > 5? critColor : hitColor;
                     }
                     else
                     {
                         ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
+                        hitImage.color = missColor;
                         partSys.Play();
                         if (mult == 0)
                         {

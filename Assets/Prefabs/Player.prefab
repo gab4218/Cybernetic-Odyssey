@@ -408,7 +408,7 @@ MonoBehaviour:
   maxStamina: 5
   staminaTimer: 2
   crouchMult: 0.25
-  groundRayLen: 0.5
+  groundRayLen: 0.4
   slideImpulse: 2
   slideTime: 0.5
   grapplingForce: 3000
@@ -446,6 +446,10 @@ MonoBehaviour:
   overheatIMG: {fileID: 0}
   overloadCooldownIMG: {fileID: 0}
   overloadIMG: {fileID: 0}
+  hitImage: {fileID: 0}
+  hitColor: {r: 1, g: 0.69943273, b: 0, a: 1}
+  missColor: {r: 0, g: 0.2535498, b: 1, a: 1}
+  critColor: {r: 1, g: 0, b: 0, a: 1}
   bulletSpawn: {fileID: 0}
   bulletPrefab: {fileID: 4142949402675267902, guid: df53ad881397eec48b656481d69116fa, type: 3}
   bulletColors:
@@ -566,8 +570,8 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   gunMeshFilter: {fileID: 0}
-  pistolMesh: {fileID: 313342534689051398, guid: d967e07b45b54ca4db35301924083b96, type: 3}
-  shotgunMesh: {fileID: 5314951041115539915, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
+  pistolMesh: {fileID: 8989324824668654689, guid: d967e07b45b54ca4db35301924083b96, type: 3}
+  shotgunMesh: {fileID: 4068373912626513877, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
   flamethrowerMesh: {fileID: -5579741352678751231, guid: 6211a51ffadd13d48bd74fc86157ca3a, type: 3}
   pistolUnlockIMG: {fileID: 0}
   shotgunUnlockIMG: {fileID: 0}
@@ -609,7 +613,7 @@ MonoBehaviour:
   flamethrowerOverheatTime: 5
   flamethrowerOverheatLength: 10
   maxHP: 100
-  dmgPerPellet: 10
+  dmgPerPellet: 5
   grappleDistance: 30
   grappleDelay: 5
   healingTime: 5
@@ -618,7 +622,7 @@ MonoBehaviour:
   overloadCooldown: 20
   bounds:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
   partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}

@@ -146,7 +146,7 @@ public class PolarBear : EnemyBase
         if(state == RUSHING) //Si hace un ataque de Rush, frenar si se aleja mucho del jugador
         {
             
-            if (Vector3.Distance(transform.position, playerTranform.position) > escapeDistance)
+            if (Vector3.Distance(transform.position, playerTranform.position) > escapeDistance && !isAngered)
             {
                 RushReset();
             } 
@@ -285,7 +285,10 @@ public class PolarBear : EnemyBase
 
     private void StartRush()
     {
-        Destroy(currentRushParticle.gameObject);
+        if (currentRushParticle != null)
+        {
+            Destroy(currentRushParticle.gameObject);
+        }
         canMoveRush = true;
         currentRushParticle = Instantiate(rushParticle, rushPartTransform);
         canRush = false;

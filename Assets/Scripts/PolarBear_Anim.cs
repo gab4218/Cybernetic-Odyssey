@@ -19,10 +19,15 @@ public class PolarBear_Anim : MonoBehaviour
         pb = GetComponentInParent<PolarBear>();
         anim = GetComponent<Animator>();
     }
-    public void returnToIdle() 
+    public void backFromSlam() 
     {
         anim.Play("BearIdle");
         pb.slamReset();
+    }
+
+    public void backFromClaw()
+    {
+        anim.Play("BearIdle");
         pb.clawReset();
     }
 

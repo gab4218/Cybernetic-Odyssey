@@ -26,12 +26,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 605920301855873345}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.187, y: 1, z: 1}
+  m_LocalScale: {x: 1.9783332, y: 1.6666665, z: 1.6666665}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3341850620320679601}
+  m_Father: {fileID: 7976016683761337419}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!65 &6184680234717397760
 BoxCollider:
@@ -154,12 +154,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3569965223330514953}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1262, y: 1, z: 1}
+  m_LocalScale: {x: 1.8769997, y: 1.6666665, z: 1.6666665}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3341850620320679601}
+  m_Father: {fileID: 7976016683761337419}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!65 &9197890523126715182
 BoxCollider:
@@ -232,12 +232,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3978334807006766953}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.187, y: 1, z: 1}
+  m_LocalScale: {x: 1.9783332, y: 1.6666665, z: 1.6666665}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3341850620320679601}
+  m_Father: {fileID: 7976016683761337419}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!65 &5900972897936473181
 BoxCollider:
@@ -510,9 +510,6 @@ Transform:
   - {fileID: 7976016683761337419}
   - {fileID: 4968215847135304968}
   - {fileID: 8220243774868496896}
-  - {fileID: 5253619908627776750}
-  - {fileID: 2755469664054055090}
-  - {fileID: 827683627895443203}
   - {fileID: 59989779520571304}
   - {fileID: 4561530200801051257}
   - {fileID: 4882572857814451303}
@@ -531,8 +528,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  maxHP: 350
-  speed: 4
+  maxHP: 400
+  speed: 5
   detectionDistance: 20
   escapeDistance: 25
   calmTime: 15
@@ -759,7 +756,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5253619908627776750}
+  - {fileID: 2755469664054055090}
+  - {fileID: 827683627895443203}
   m_Father: {fileID: 3341850620320679601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4424223542236794718

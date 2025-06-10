@@ -149,7 +149,7 @@ public class PolarBear : EnemyBase
             if (Vector3.Distance(transform.position, playerTranform.position) > escapeDistance && !isAngered)
             {
                 RushReset();
-            } 
+            }
             
         }
     }

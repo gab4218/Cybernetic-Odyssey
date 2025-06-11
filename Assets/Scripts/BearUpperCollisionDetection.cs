@@ -6,7 +6,6 @@ public class BearUpperCollisionDetection : MonoBehaviour
 {
     // Usado por PolarBear para deteccion de colisiones en la zona superior
     private PolarBear pb;
-
     void Start()
     {
         pb = GetComponentInParent<PolarBear>();

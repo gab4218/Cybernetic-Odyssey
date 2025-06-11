@@ -56,13 +56,13 @@ public class PolarBear : EnemyBase
     private Coroutine rushCR;
 
     //Variables del ataque/evasion de Ball
-    [SerializeField] private float ballImpulse = 10f;
+    [SerializeField] private float ballImpulse = 3f;
     [SerializeField] private float ballDelayMin = 1f;
     [SerializeField] private float ballDelayMax = 3f;
     [SerializeField] private BoxCollider ballTriggerCollider;
-    [SerializeField] private MeshFilter bearMeshFilter;
-    [SerializeField] private Mesh bearMesh, ballMesh;
+    [SerializeField] private GameObject bearMesh, ballMesh;
     [SerializeField] private SphereCollider ballCollider;
+    [SerializeField] private float ballWaitTime = 10f;
 
     private BoxCollider[] bearColliders;
     //private bool weakened = false;
@@ -123,6 +123,7 @@ public class PolarBear : EnemyBase
             if (Vector3.Distance(transform.position, playerTranform.position) > minRushDistance && canRush) //Rush
             {
                 RushAttack();
+                anim.SetTrigger("Rush");
                 navMeshAgent.enabled = false;
             }
 
@@ -317,6 +318,7 @@ public class PolarBear : EnemyBase
         rushCollider.enabled = false;
         navMeshAgent.enabled = true;
         Destroy(currentRushParticle.gameObject);
+        anim.SetTrigger("Crash");
         Stun(rushStunTime);
         if (rushCR != null)
         {
@@ -344,16 +346,17 @@ public class PolarBear : EnemyBase
     
     private void DoBall() //Para Invoke, usado para volver Oso a Ball
     {
-        bearMeshFilter.mesh = ballMesh; //Cambiar mesh a Ball
+        ballMesh.SetActive(true);
+        bearMesh.SetActive(false);
         state = BALL;
-        foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
-        {
-            bc.enabled = false;
-        }
+        //foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
+        //{
+        //    bc.enabled = false;
+        //}
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true;
         navMeshAgent.isStopped = true;
-        rb.AddForce(transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
+        rb.AddForce(-transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
         Invoke("EndBall", 1f);
     }
     
@@ -362,20 +365,27 @@ public class PolarBear : EnemyBase
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.rotation = Quaternion.identity; 
         transform.rotation = Quaternion.identity; //Hacer rotacion Default
-        bearMeshFilter.mesh = bearMesh; //Cambiar mesh a Oso
+        ballMesh.SetActive(false);
+        bearMesh.SetActive(true);
         state = SEEKING;
-        canBall = true;
+        Invoke("AllowBall", ballWaitTime);
         navMeshAgent.isStopped = false;
-        foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
-        {
-            if (!bc.isTrigger)
-            {
-                bc.enabled = true;
-            }
-        }
-        ballTriggerCollider.enabled = true;
+        //foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
+        //{
+        //    if (!bc.isTrigger)
+        //    {
+        //        bc.enabled = true;
+        //    }
+        //}
         ballCollider.enabled = false;
     }
+
+    private void AllowBall()
+    {
+        canBall = true;
+        ballTriggerCollider.enabled = true;
+    }
+
     private void moveRush()
     {
         findDirection();

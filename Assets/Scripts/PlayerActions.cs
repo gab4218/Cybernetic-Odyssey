@@ -705,11 +705,14 @@ public class PlayerActions : MonoBehaviour
         float t = 0f;
         while (t < overloadCooldown)
         {
-            if(overloadIMG.gameObject.activeSelf)overloadCooldownIMG.fillAmount = t/overloadCooldown;
-            if (t >= overloadTime && dmgType != damageType.None)
+            overloadCooldownIMG.fillAmount = t/overloadCooldown;
+            if (overloadIMG.gameObject.activeSelf)
             {
-                dmgType = damageType.None;
-                overloadIMG.gameObject.SetActive(false);
+                if (t >= overloadTime && dmgType != damageType.None)
+                {
+                    dmgType = damageType.None;
+                    overloadIMG.gameObject.SetActive(false);
+                }
             }
             t += Time.deltaTime;
             yield return null;

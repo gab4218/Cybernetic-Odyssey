@@ -25,6 +25,14 @@ public class CameraController : MonoBehaviour
     }
     private void Update()
     {
+        transform.position = POVTransform.position;
+        if (DialogueManager.instance != null)
+        {
+            if (DialogueManager.instance.inDialogue)
+            {
+                return;
+            }
+        }
         //Obtener input de mouse
         mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * cameraSensitivityX;
         mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * cameraSensitivityY;
@@ -45,7 +53,6 @@ public class CameraController : MonoBehaviour
 
         //Rotar camara y jugador
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
-        transform.position = POVTransform.position;
         PlayerTransform.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 

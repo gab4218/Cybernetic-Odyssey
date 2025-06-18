@@ -23,6 +23,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Image overloadCooldownIMG;
     [SerializeField] Image overloadIMG;
     [SerializeField] Image hitImage;
+    [SerializeField] Image uiBGIMG;
+    [SerializeField] Sprite[] UIarray;
     [SerializeField] Color hitColor, missColor, critColor;
     [SerializeField] Transform bulletSpawn;
     [SerializeField] TrailRenderer bulletPrefab;
@@ -33,7 +35,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Sprite[] selectedOverloads;
     [SerializeField] Color[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
-    [SerializeField] Animator gunAnimator;
+    [SerializeField] Animator gunAnimator, handAnimator;
     [SerializeField] CameraController camContoller;
     [SerializeField] Image damagedIMG;
 
@@ -99,6 +101,8 @@ public class PlayerActions : MonoBehaviour
     private float flamethrowerCurrentTime;
     private ParticleSystem.EmissionModule flamethrowerFire;
     Coroutine overheatCR, healCR, checkHealCR;
+    private bool canChangeOverload = true;
+
     public enum damageType
     {
         None,
@@ -118,18 +122,6 @@ public class PlayerActions : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         inventory = GetComponent<Inventory>();
         playerMovement = GetComponent<PlayerMovement>();
-        foreach (int i in inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
-        {
-            enableUpgrade(i);
-        }
-        if (Inventory.hasShotgun)
-        {
-            hasShotgun = true;
-        }
-        if (Inventory.hasFlamethrower)
-        {
-            hasFlamethrower = true;
-        }
         flamethrowerCollider.enabled = false;
         overloadIMG.gameObject.SetActive(false);
         overheatIMG.gameObject.SetActive(false);
@@ -138,14 +130,40 @@ public class PlayerActions : MonoBehaviour
         flamethrowerFire = flamethrowerFirePS.emission;
         flamethrowerFire.enabled = false;
         damagedIMG.color = new Color (damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 0);
+        uiBGIMG.sprite = UIarray[0];
+        foreach (int i in Inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
+        {
+            enableUpgrade(i);
+        }
+        if (Inventory.hasShotgun)
+        {
+            hasShotgun = true;
+            unlockWeapon(0);
+        }
+        if (Inventory.hasFlamethrower)
+        {
+            hasFlamethrower = true;
+            unlockWeapon(1);
+        }
         //Preparaciones
 
 
     }
 
-
+    private IEnumerator WaitOverloadChange()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        canChangeOverload = true;
+    }
     private void Update()
     {
+        if (DialogueManager.instance != null)
+        {
+            if (DialogueManager.instance.inDialogue)
+            {
+                return;
+            }
+        }
 
         if (Input.GetKeyDown(inventoryKey)) //Inventario
         {
@@ -176,17 +194,29 @@ public class PlayerActions : MonoBehaviour
         if (isAllowedToOverload && canOverload && selectedWeapon != 2)
         {
 
-            if (Input.mouseScrollDelta.y > 0)
+            if (Input.mouseScrollDelta.y > 0 && canChangeOverload)
             {
                 selectedOverload = (selectedOverload + 1) % 3;
                 overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
                 overloadCooldownIMG.color = overloadingColors[selectedOverload];
+                canChangeOverload = false;
+                StartCoroutine(WaitOverloadChange());
+                if (!inventory.hasMaterials(selectedOverload, 2))
+                {
+                    overloadCooldownIMG.color = Color.red;
+                }
             }
-            else if (Input.mouseScrollDelta.y < 0)
+            else if (Input.mouseScrollDelta.y < 0 && canChangeOverload)
             {
                 selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
                 overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
                 overloadCooldownIMG.color = overloadingColors[selectedOverload];
+                canChangeOverload = false;
+                StartCoroutine(WaitOverloadChange());
+                if (!inventory.hasMaterials(selectedOverload, 2))
+                {
+                    overloadCooldownIMG.color = Color.red;
+                }
             }
         }
         else if (selectedWeapon == 2)
@@ -208,6 +238,7 @@ public class PlayerActions : MonoBehaviour
             readyWeaponTime = pistolCooldown;
             gunMeshFilter.mesh = pistolMesh;
             overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            handAnimator.SetTrigger("Pistol");
         }
         if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -217,6 +248,7 @@ public class PlayerActions : MonoBehaviour
             readyWeaponTime = shotgunCooldown;
             gunMeshFilter.mesh = shotgunMesh;
             overloadCooldownIMG.color = overloadingColors[selectedOverload];
+            handAnimator.SetTrigger("Shotgun");
         }
         if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -224,6 +256,7 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = flamethrowerMesh;
             dmgType = damageType.None;
             overloadIMG.gameObject.SetActive(false);
+            handAnimator.SetTrigger("Flamethrower");
         }
 
         if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal && !isAllowedToHeal)
@@ -239,7 +272,7 @@ public class PlayerActions : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(cheatKey))
+        if (Input.GetKeyDown(cheatKey) && cheatTransform != null)
         {
             Cheat();
         }
@@ -359,6 +392,9 @@ public class PlayerActions : MonoBehaviour
             {
                 flamethrowerCurrentTime = 0;
                 canFlamethrow = false;
+                flamethrowerCollider.enabled = false;
+                flamethrowerFire.enabled = false;
+                gunAnimator.SetBool("flamethrower", false);
                 if (overheatCR != null)
                 {
                     StopCoroutine(overheatCR);
@@ -368,7 +404,7 @@ public class PlayerActions : MonoBehaviour
         }
         else if(flamethrowerCurrentTime > 0)
         {
-            flamethrowerCurrentTime -= Time.deltaTime;
+            flamethrowerCurrentTime -= Time.deltaTime / 3;
         }
         else
         {
@@ -481,7 +517,7 @@ public class PlayerActions : MonoBehaviour
         while (t < flamethrowerOverheatLength)
         {
             overheatIMG.fillAmount = t / flamethrowerOverheatLength;
-            overheatIMG.color = Color.Lerp(Color.white, Color.red, t / flamethrowerOverheatLength);
+            overheatIMG.color = Color.Lerp(Color.red, Color.white, t / flamethrowerOverheatLength);
             t += Time.deltaTime;
             yield return null;
         }
@@ -562,6 +598,10 @@ public class PlayerActions : MonoBehaviour
             case 2:
                 canGrapple = true;
                 grappleIMG.gameObject.SetActive(true);
+                if (!isAllowedToOverload)
+                {
+                    uiBGIMG.sprite = UIarray[1];
+                }
                 break;
             case 3:
                 playerMovement.ChangeWalljump(true);
@@ -571,6 +611,7 @@ public class PlayerActions : MonoBehaviour
                 overloadCooldownIMG.gameObject.SetActive(true);
                 overloadCooldownIMG.sprite = selectedOverloads[selectedOverload];
                 overloadCooldownIMG.color = overloadingColors[selectedOverload];
+                uiBGIMG.sprite = UIarray[2];
                 break;
             case 5:
                 isAllowedToHeal = true;
@@ -611,6 +652,10 @@ public class PlayerActions : MonoBehaviour
             case 2:
                 canGrapple = false;
                 grappleIMG.gameObject.SetActive(false);
+                if (!isAllowedToOverload)
+                {
+                    uiBGIMG.sprite = UIarray[0];
+                }
                 break;
             case 3:
                 playerMovement.ChangeWalljump(false);
@@ -618,6 +663,14 @@ public class PlayerActions : MonoBehaviour
             case 4:
                 isAllowedToOverload = false;
                 overloadCooldownIMG.gameObject.SetActive(false);
+                if (grappleIMG.gameObject.activeSelf)
+                {
+                    uiBGIMG.sprite = UIarray[1];
+                }
+                else
+                {
+                    uiBGIMG.sprite = UIarray[0];
+                }
                 break;
             case 5:
                 isAllowedToHeal = false;
@@ -717,10 +770,13 @@ public class PlayerActions : MonoBehaviour
             t += Time.deltaTime;
             yield return null;
         }
+        if (!inventory.hasMaterials(selectedOverload, 2))
+        {
+            overloadCooldownIMG.color = Color.red;
+        }
         overloadIMG.fillAmount = 1;
         canOverload = true;
-        
-        
+
     }
     
     private void Cheat()

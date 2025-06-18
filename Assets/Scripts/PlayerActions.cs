@@ -122,11 +122,11 @@ public class PlayerActions : MonoBehaviour
         {
             enableUpgrade(i);
         }
-        if (inventory.hasShotgun)
+        if (Inventory.hasShotgun)
         {
             hasShotgun = true;
         }
-        if (inventory.hasFlamethrower)
+        if (Inventory.hasFlamethrower)
         {
             hasFlamethrower = true;
         }

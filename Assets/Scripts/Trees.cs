@@ -8,13 +8,13 @@ using UnityEngine.AI;
 public class Trees : MonoBehaviour
 {
     private Rigidbody rb; //Rigidbody para prender/apagar gravedad
-    NavMeshSurface[] allNavmeshes;
+    
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
-        allNavmeshes = FindObjectsOfType<NavMeshSurface>();
+        //rb = GetComponent<Rigidbody>();
+        //rb.useGravity = false;
+    
     }
 
     private void OnTriggerEnter(Collider other)

@@ -24,7 +24,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.None;
         for (int ii = 0; ii < matDisplay.Length; ii++)
         {
-            matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+            matDisplay[ii].text = Inventory.materialInventory[ii].ToString();
         }
 
         for (int i = 0; i < craftingButtons.Length; i++)
@@ -76,7 +76,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
 
             for (int ii = 0; ii < matDisplay.Length; ii++)
             {
-                matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+                matDisplay[ii].text = Inventory.materialInventory[ii].ToString();
             }
             for (int i = 0; i < craftingButtons.Length; i++)
             {

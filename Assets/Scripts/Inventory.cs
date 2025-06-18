@@ -11,15 +11,15 @@ public class Inventory : MonoBehaviour
     //Variables modificables o publicas
     [SerializeField] int numberOfUpgradeSlots = 4;
     public TMP_Text[] matDisplay;
-    public List<int> availableUpgrades = new List<int>();
+    public static List<int> availableUpgrades = new List<int>();
 
 
     //Variables de crafteo e inventario
     PlayerActions playerActions;
-    int[] secondarySlots;
-    public int[] materialInventory = new int[3];
-    public bool hasShotgun = false;
-    public bool hasFlamethrower = false;
+    static int[] secondarySlots;
+    public static int[] materialInventory = new int[3];
+    public static bool hasShotgun = false;
+    public static bool hasFlamethrower = false;
     
     
     

@@ -570,7 +570,7 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   gunMeshFilter: {fileID: 0}
-  pistolMesh: {fileID: 8989324824668654689, guid: d967e07b45b54ca4db35301924083b96, type: 3}
+  pistolMesh: {fileID: 1446200243280803077, guid: fbe87beec45d7004a8f17b3aba473301, type: 3}
   shotgunMesh: {fileID: 4068373912626513877, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
   flamethrowerMesh: {fileID: -5579741352678751231, guid: 6211a51ffadd13d48bd74fc86157ca3a, type: 3}
   pistolUnlockIMG: {fileID: 0}

@@ -11,6 +11,9 @@ public class DialogueManager : MonoBehaviour
     public string[] dialogues;
     public bool inDialogue = false;
     public int currentIndex = 0;
+    public AudioSource audioSource;
+    public AudioClip talking;
+
     private void Awake()
     {
         if (instance == null)
@@ -27,6 +30,7 @@ public class DialogueManager : MonoBehaviour
 
     public void nextDialogue()
     {
+        SoundSingleton.Instance.Boton();
         if (currentIndex < dialogues.Length - 1)
         {
             currentIndex++;
@@ -38,6 +42,7 @@ public class DialogueManager : MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             inDialogue = false;
+            audioSource.Stop();
         }
     }
 
@@ -45,6 +50,8 @@ public class DialogueManager : MonoBehaviour
     {
         dialogues = newDialogue;
         dialogueBox.SetActive(true);
+        audioSource.clip = talking;
+        audioSource.Play();
         inDialogue = true;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;

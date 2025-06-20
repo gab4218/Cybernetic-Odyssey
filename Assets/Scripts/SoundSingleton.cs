@@ -5,9 +5,8 @@ using UnityEngine;
 public class SoundSingleton : MonoBehaviour
 {
     public static SoundSingleton Instance { get; private set; }
-    private AudioSource audioSource;
+    [SerializeField] private AudioSource sfxSource;
     public AudioClip button;
-    public AudioClip musicMenu;
     public AudioClip osoMuerte;
     public AudioClip viaje;
 
@@ -21,8 +20,6 @@ public class SoundSingleton : MonoBehaviour
         {
             Instance = this;
         }
-        audioSource = GetComponent<AudioSource>();
-        DontDestroyOnLoad(gameObject);
     }
 
     private void FixedUpdate()
@@ -32,6 +29,16 @@ public class SoundSingleton : MonoBehaviour
 
     public void Boton()
     {
-        audioSource.PlayOneShot(button, 1);
+        sfxSource.PlayOneShot(button, 1);
+    }
+
+    public void OsoMuerte()
+    {
+        sfxSource.PlayOneShot(osoMuerte, 1);
+    }
+
+    public void Viaje()
+    {
+        sfxSource.PlayOneShot(viaje, 1);
     }
 }

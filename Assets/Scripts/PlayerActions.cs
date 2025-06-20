@@ -102,6 +102,10 @@ public class PlayerActions : MonoBehaviour
     private ParticleSystem.EmissionModule flamethrowerFire;
     Coroutine overheatCR, healCR, checkHealCR;
     private bool canChangeOverload = true;
+    public AudioSource audioSource;
+    public AudioClip gun;
+    public AudioClip shotgun;
+    public AudioClip flamethrower;
 
     public enum damageType
     {
@@ -349,12 +353,14 @@ public class PlayerActions : MonoBehaviour
                     ParticleSystem ps = Instantiate(shotPS, bulletSpawn);
                     ps.Play();
                     gunAnimator.SetTrigger("shot");
+                    audioSource.PlayOneShot(gun, 1);
                     break;
                 case 1:
                     shootShotgun();
                     ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
                     ps1.Play();
                     gunAnimator.SetTrigger("shot");
+                    audioSource.PlayOneShot(shotgun, 1);
                     break;
                 case 2:
                     if (canFlamethrow)
@@ -362,6 +368,8 @@ public class PlayerActions : MonoBehaviour
                         flamethrowerCollider.enabled = true;
                         flamethrowerFire.enabled = true;
                         gunAnimator.SetBool("flamethrower", true);
+                        audioSource.clip = flamethrower;
+                        audioSource.Play();
                     }
 
                     break;
@@ -379,6 +387,8 @@ public class PlayerActions : MonoBehaviour
                 flamethrowerCollider.enabled = false;
                 flamethrowerFire.enabled = false;
                 gunAnimator.SetBool("flamethrower", false);
+                audioSource.clip = flamethrower;
+                audioSource.Stop();
             }
         }
         hitImage.color = Color.Lerp(hitImage.color, new Color(hitImage.color.r, hitImage.color.g, hitImage.color.b, 0), 1 - Mathf.Pow(0.05f,Time.deltaTime));

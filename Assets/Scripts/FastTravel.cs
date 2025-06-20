@@ -52,13 +52,14 @@ public class FastTravel : MonoBehaviour, IInteractable
         Time.timeScale = 1;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        SoundSingleton.Instance.Boton();
     }
 
     public void GoToScene(string scene)
     {
+        SoundSingleton.Instance.Viaje();
         Time.timeScale = 1;
         Debug.Log(scene);
         SceneManager.LoadScene(scene);
-        
     }
 }

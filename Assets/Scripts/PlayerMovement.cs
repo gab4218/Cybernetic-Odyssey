@@ -63,7 +63,9 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit slopeHit;
 
     private Coroutine slideCR, smoothSpeedCR, staminaCR;
-
+    public AudioSource audioSource;
+    public AudioClip walking;
+    public AudioClip running;
     
 
 
@@ -171,7 +173,20 @@ public class PlayerMovement : MonoBehaviour
             staminaImg.fillAmount = currentStamina/maxStamina;
 
         }
-
+        if (rb.velocity.magnitude > 0 && rb.velocity.magnitude <= 5 && !audioSource.isPlaying && grounded)
+        {
+            audioSource.clip = walking;
+            audioSource.Play();
+        }
+        else if (rb.velocity.magnitude > 5 && !audioSource.isPlaying && grounded)
+        {
+            audioSource.clip = running;
+            audioSource.Play();
+        }
+        else if (rb.velocity.magnitude <= 0) 
+        {
+            audioSource.Stop();
+        }
     }
 
     private void FixedUpdate()

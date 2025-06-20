@@ -30,7 +30,55 @@ public class InventoryManager : MonoBehaviour
         //Preparaciones
         inventory = FindObjectOfType<Inventory>();
         upgradeDropdown = GetComponent<TMPro.TMP_Dropdown>();
-        oldUpgrade = possibleOptions.IndexOf(upgradeDropdown.captionText.text);
+        isRunning = false;
+        List<TMPro.TMP_Dropdown.OptionData> newOptions = new List<TMPro.TMP_Dropdown.OptionData>(); //Crear lista vacia de nuevas opciones
+
+        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[0])); //Agregar vacio
+
+        //https://stackoverflow.com/questions/55297626/disable-an-options-in-a-dropdown-unity
+        TMPro.TMP_Dropdown.OptionData ddOD = new TMPro.TMP_Dropdown.OptionData(possibleOptions[Inventory.getEnabledUpgrades()[id]]);
+        upgradeDropdown.options.Add(ddOD);
+
+        oldUpgrade = Inventory.getEnabledUpgrades()[id]; //Guardar valor de mejora seleccionada
+
+        Tina = upgradeDropdown.options[upgradeDropdown.options.IndexOf(ddOD)]; //Guardar mejora seleccionada
+
+
+        if (Inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente:
+        {
+            for (int i = 0; i < Inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
+            {
+
+                if (Inventory.availableUpgrades[i] > oldUpgrade && oldUpgrade > 0 && !newOptions.Contains(Tina)) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
+                {
+                    newOptions.Add(Tina);
+                }
+
+                newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[Inventory.availableUpgrades[i]])); //Agregar mejora disponible
+
+
+                if (i == Inventory.availableUpgrades.Count - 1 && Inventory.availableUpgrades[i] < oldUpgrade && !newOptions.Contains(Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
+                {
+                    newOptions.Add(Tina);
+                }
+            }
+        }
+        else
+
+        {
+            if (oldUpgrade > 0) //Si no hay mejoras disponibles y la mejora seleccionada no es vacio, agregar mejora seleccionada
+            {
+                newOptions.Add(Tina);
+
+            }
+        }
+        upgradeDropdown.options = newOptions; //Actualizar opciones
+        if (upgradeDropdown.value != upgradeDropdown.options.IndexOf(Tina)) //Si el indice de la opcion seleccionada fue modificado, cambiar opcion seleccionada al nuevo indice y frenar error de Stack Overflow
+        {
+            isChangedByPerson = false; //Indicar que el proximo cambio sera realizado por codigo para detener error de Stack Overflow
+            upgradeDropdown.value = upgradeDropdown.options.IndexOf(Tina);
+        }
+
 
 
     }
@@ -55,20 +103,20 @@ public class InventoryManager : MonoBehaviour
             Tina = upgradeDropdown.options[upgradeDropdown.value]; //Guardar mejora seleccionada
 
 
-            if (inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente:
+            if (Inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente:
             {
-                for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
+                for (int i = 0; i < Inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
                 {
 
-                    if (inventory.availableUpgrades[i] > oldUpgrade && oldUpgrade > 0) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
+                    if (Inventory.availableUpgrades[i] > oldUpgrade && oldUpgrade > 0 && !newOptions.Contains(Tina)) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
                     {
                         newOptions.Add(Tina);
                     }
 
-                    newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Agregar mejora disponible
+                    newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[Inventory.availableUpgrades[i]])); //Agregar mejora disponible
                     
                     
-                    if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < oldUpgrade && !newOptions.Contains(Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
+                    if (i == Inventory.availableUpgrades.Count - 1 && Inventory.availableUpgrades[i] < oldUpgrade && !newOptions.Contains(Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
                     {
                         newOptions.Add(Tina);
                     }
@@ -129,19 +177,19 @@ public class InventoryManager : MonoBehaviour
 
                 
 
-                if (inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente
+                if (Inventory.availableUpgrades.Count > 0) //Si hay mejoras disponibles, hacer lo siguiente
                 {
                     //Lo mismo que en Update pero para los otros Dropdowns
-                    for (int i = 0; i < inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
+                    for (int i = 0; i < Inventory.availableUpgrades.Count; i++) //Pasar por todas las mejoras disponibles
                     {
 
-                        if (inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0 && !newOptions.Contains(DDIM.Tina)) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
+                        if (Inventory.availableUpgrades[i] > DDIM.oldUpgrade && DDIM.oldUpgrade > 0 && !newOptions.Contains(DDIM.Tina)) //Si la mejora seleccionada no es vacio y es menor a la mejora disponible, agregar mejora seleccionada
                         {
                             newOptions.Add(DDIM.Tina); 
                         }
-                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[inventory.availableUpgrades[i]])); //Agregar mejora disponible
+                        newOptions.Add(new TMPro.TMP_Dropdown.OptionData(possibleOptions[Inventory.availableUpgrades[i]])); //Agregar mejora disponible
 
-                        if (i == inventory.availableUpgrades.Count - 1 && inventory.availableUpgrades[i] < DDIM.oldUpgrade && !newOptions.Contains(DDIM.Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
+                        if (i == Inventory.availableUpgrades.Count - 1 && Inventory.availableUpgrades[i] < DDIM.oldUpgrade && !newOptions.Contains(DDIM.Tina)) //Si todas las mejoras disponibles han sido chequeadas y la mejora seleccionada aun no ha sido agregada, agregarla
                         {
                             newOptions.Add(DDIM.Tina);
                         }

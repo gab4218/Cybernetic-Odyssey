@@ -15,16 +15,22 @@ public class CraftingStation : MonoBehaviour, IInteractable
     [SerializeField] private GameObject[] pages;
     private ItemCost[] costs;
 
+    private IEnumerator watABit()
+    {
+        yield return new WaitForEndOfFrame();
+        isCrafting = true;
+    }
+
     public void onInteract() //Al interactuar, 
     {
         Time.timeScale = 0;
-        isCrafting = true;
         craftingMenu.SetActive(true);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         for (int ii = 0; ii < matDisplay.Length; ii++)
         {
-            matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+            matDisplay[ii].text = Inventory.materialInventory[ii].ToString();
+
         }
 
         for (int i = 0; i < craftingButtons.Length; i++)
@@ -50,6 +56,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 craftingButtons[i].interactable = false;
             }
         }
+        StartCoroutine(watABit());
     }
 
     private void Start()
@@ -67,7 +74,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && isCrafting)
+        if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Escape)) && isCrafting)
         {
             closeMenu();
         }
@@ -76,7 +83,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
 
             for (int ii = 0; ii < matDisplay.Length; ii++)
             {
-                matDisplay[ii].text = inventory.materialInventory[ii].ToString();
+                matDisplay[ii].text = Inventory.materialInventory[ii].ToString();
             }
             for (int i = 0; i < craftingButtons.Length; i++)
             {

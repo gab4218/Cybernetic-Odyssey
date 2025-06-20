@@ -10,15 +10,9 @@ public class ItemCost : MonoBehaviour
     public int upgradeType;
     public bool hasBeenCrafted = false;
     public int majorUpgradeType;
-    private Inventory inventory;
-    private void Start()
-    {
-        inventory = FindObjectOfType<Inventory>();
-    }
-
     private void Update()
     {
-        if (inventory.availableUpgrades.Contains(upgradeType) && Time.timeScale == 0)
+        if (Inventory.availableUpgrades.Contains(upgradeType) && Time.timeScale == 0)
         {
             hasBeenCrafted = true;
         }

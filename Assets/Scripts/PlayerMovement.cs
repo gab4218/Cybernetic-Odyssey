@@ -85,6 +85,13 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (Time.timeScale == 0) return; //Si esta pausado
+        if (DialogueManager.instance != null)
+        {
+            if (DialogueManager.instance.inDialogue)
+            {
+                return;
+            }
+        }
         foreach (var cam in cams)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 1 - Mathf.Pow(0.5f, Time.deltaTime * 8));
@@ -169,6 +176,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (DialogueManager.instance != null)
+        {
+            if (DialogueManager.instance.inDialogue)
+            {
+                return;
+            }
+        }
         //Si el jugador se esta moviendo, moverlo
         if (dir.sqrMagnitude != 0 && !isGrappling)
         {
@@ -290,14 +304,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void checkCrouch()
     {
-        if (Input.GetKeyDown(crouchKey) && !isCrouching && grounded)
+        if (Input.GetKeyDown(crouchKey) && !isCrouching)
         {
             //Si el jugador se agacha, frenar Sprint y Slidear si es necesario
 
             StopCoroutine(SmoothSpeed());
             fac = 0;
             
-            if (isSprinting && !isSliding && allowedToSlide)
+            if (isSprinting && !isSliding && allowedToSlide && grounded)
             {
                 isSliding = true;
                 isSprinting = false;

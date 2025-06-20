@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -8,18 +9,19 @@ using UnityEngine.UI;
 public class Inventory : MonoBehaviour
 {
 
-    //Variables modificables o publicas
-    [SerializeField] int numberOfUpgradeSlots = 4;
+    
     public TMP_Text[] matDisplay;
-    public List<int> availableUpgrades = new List<int>();
-
+    public TMP_Text[] craftingMatDisplay;
+    public static List<int> availableUpgrades = new List<int>();
+    [SerializeField] private AudioClip craftSound;
+    [SerializeField] private AudioSource sfxSource;
 
     //Variables de crafteo e inventario
     PlayerActions playerActions;
-    int[] secondarySlots;
-    public int[] materialInventory = new int[3];
-    public bool hasShotgun = false;
-    public bool hasFlamethrower = false;
+    public static int[] secondarySlots = new int[4];
+    public static int[] materialInventory = new int[3];
+    public static bool hasShotgun = false;
+    public static bool hasFlamethrower = false;
     
     
     
@@ -27,7 +29,6 @@ public class Inventory : MonoBehaviour
     private void Awake()
     {
         //Preparaciones
-        secondarySlots = new int[numberOfUpgradeSlots];
         playerActions = FindObjectOfType<PlayerActions>();
     }
     private void Update()
@@ -45,12 +46,30 @@ public class Inventory : MonoBehaviour
         materialInventory[type] += quantity;
     }
 
+    private IEnumerator PrettyColors(TMP_Text text)
+    {
+        float t = 0;
+        text.color = Color.red;
+        while (t < 0.5f)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        text.color = Color.white;
+    }
+
     public void unlockUpgrade(ItemCost upgrade) //Desbloquear mejora y remover costo
     {
         for (int i = 0; i < upgrade.cost.Length; i++)
         {
             removeFromInventory(i, upgrade.cost[i]);
+            if (upgrade.cost[i] > 0)
+            {
+                StartCoroutine(PrettyColors(craftingMatDisplay[i]));
+            }
         }
+        sfxSource.clip = craftSound;
+        sfxSource.Play();
         upgrade.hasBeenCrafted = true;
         if (upgrade.upgradeType != 0)
         {
@@ -71,6 +90,7 @@ public class Inventory : MonoBehaviour
             }
             playerActions.unlockWeapon(upgrade.majorUpgradeType);
         }
+        
     }
 
     public void enableUpgrade(int upgrade, int slot) //Habilitar mejora
@@ -87,7 +107,7 @@ public class Inventory : MonoBehaviour
         availableUpgrades.Add(upgrade);
     }
 
-    public int[] getEnabledUpgrades() //Devuelve mejoras habilitadas
+    public static int[] getEnabledUpgrades() //Devuelve mejoras habilitadas
     {
         return secondarySlots;
     }

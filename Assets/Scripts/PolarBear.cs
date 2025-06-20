@@ -159,7 +159,7 @@ public class PolarBear : EnemyBase
     {
         if (!PlayerActions.dead)
         {
-            SceneManager.LoadScene(3);
+            SceneManager.LoadScene("win");
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }

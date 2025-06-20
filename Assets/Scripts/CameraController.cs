@@ -43,7 +43,6 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H)) cameraSensitivityX += 50;
         if (Input.GetKeyDown(KeyCode.J)) cameraSensitivityY -= 50;
         if (Input.GetKeyDown(KeyCode.K)) cameraSensitivityY += 50;
-        sensDisplay.text = $"X sensitivity: {cameraSensitivityX} \nY sensitivity: {cameraSensitivityY} ";
 
         //Calcular rotacion
         yRotation += mouseX;

@@ -274,30 +274,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'W, A, S, D - Movement
-
-    Space - Jump
-
-    Left Shift - Sprint
-
-    Left
-    Ctrl - Crouch
-
-    Ctrl + Shift - Slide
-
-    F - Grappling Hook
-
-    E - Interact
-
-    Tab
-    - Inventory
-
-    Left Click - Shoot
-
-    1, 2, 3 - Switch Damage Types
-
-    G,
-    H, J, K - Sensitivity Controls'
+  m_text: "W, A, S, D - Movimiento\nEspacio - Salto\nShift Izquierdo - Sprint\nCtrl
+    Izquierdo - Agacharse\nCtrl + Shift - Deslizar\nF - Gancho\nE - Interactuar\nTab
+    - Inventario\nClick Izquierdo - Disparar\nScroll - Cambio de da\xF1o"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -926,7 +905,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Return
+  m_Text: 'Volver
+
+'
 --- !u!222 &1828633334
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -203,7 +203,8 @@ MonoBehaviour:
   escapeDistance: 25
   calmTime: 15
   positionThreshold: 0.5
-  randomMovementDimensions: []
+  randomMovementRadius: 0
+  isAerial: 0
   strongCollidersGO: {fileID: 0}
   weakCollidersGO: {fileID: 0}
   ignoreCollidersGO: {fileID: 0}
@@ -224,6 +225,8 @@ MonoBehaviour:
   explosionDamage: 20
   explosionCollider: {fileID: 1050689844528334874}
   partExp: {fileID: 2918498673123971216, guid: e179afd256017f047a0421fc22480350, type: 3}
+  source: {fileID: 1575289815180384972, guid: 0fe14f6dcf6eda348999e6c0f500d686, type: 3}
+  explosion: {fileID: 8300000, guid: 7bf026d9c07ca5045bfb738861dbadad, type: 3}
 --- !u!95 &1806866940470901178
 Animator:
   serializedVersion: 5

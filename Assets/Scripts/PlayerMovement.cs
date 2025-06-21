@@ -183,7 +183,7 @@ public class PlayerMovement : MonoBehaviour
             audioSource.clip = running;
             audioSource.Play();
         }
-        else if (rb.velocity.magnitude <= 0) 
+        else if (rb.velocity.magnitude <= 4) 
         {
             audioSource.Stop();
         }

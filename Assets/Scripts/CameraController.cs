@@ -11,7 +11,6 @@ public class CameraController : MonoBehaviour
     [Header("Sensitivity")]
     [SerializeField] float cameraSensitivityX = 1;
     [SerializeField] float cameraSensitivityY = 1;
-    [SerializeField] TMP_Text sensDisplay;
 
     float xRotation, yRotation, mouseX, mouseY;
 

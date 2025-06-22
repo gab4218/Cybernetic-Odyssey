@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class PlataformaTemporal : MonoBehaviour
 {
-    
 
-  
+
+    [SerializeField] private AudioSource audioSource;
+
     private Animator _animator;
     private void Start()
     {
@@ -16,7 +17,7 @@ public class PlataformaTemporal : MonoBehaviour
     {
         if (other.GetComponentInParent<PlayerActions>())
         {
-            
+            audioSource.Play();
             _animator.SetTrigger("activado");
         }
     }

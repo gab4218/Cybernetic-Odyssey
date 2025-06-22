@@ -12,6 +12,7 @@ public class PlayerActions : MonoBehaviour
 {
 
     public static bool dead = false;
+    public static bool won = false;
 
     [Header("UI")] //Variables de UI y feedback visual
     [SerializeField] Transform cameraTransform;
@@ -70,6 +71,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
     [SerializeField] LayerMask bounds;
+    [SerializeField] private AudioSource badHit, midHit, goodHit, missHit;
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -120,6 +122,7 @@ public class PlayerActions : MonoBehaviour
     int selectedOverload = 0;
     private void Start()
     {
+        won = false;
         dead = false;
         inventoryPlaceholder.SetActive(false);
         currentHP = maxHP;
@@ -353,6 +356,7 @@ public class PlayerActions : MonoBehaviour
                     ParticleSystem ps = Instantiate(shotPS, bulletSpawn);
                     ps.Play();
                     gunAnimator.SetTrigger("shot");
+                    audioSource.pitch = Random.Range(0.8f, 1.2f);
                     audioSource.PlayOneShot(gun, 1);
                     break;
                 case 1:
@@ -360,6 +364,7 @@ public class PlayerActions : MonoBehaviour
                     ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
                     ps1.Play();
                     gunAnimator.SetTrigger("shot");
+                    audioSource.pitch = Random.Range(0.8f, 1.2f);
                     audioSource.PlayOneShot(shotgun, 1);
                     break;
                 case 2:
@@ -369,6 +374,7 @@ public class PlayerActions : MonoBehaviour
                         flamethrowerFire.enabled = true;
                         gunAnimator.SetBool("flamethrower", true);
                         audioSource.clip = flamethrower;
+                        audioSource.loop = true;
                         audioSource.Play();
                     }
 
@@ -387,7 +393,7 @@ public class PlayerActions : MonoBehaviour
                 flamethrowerCollider.enabled = false;
                 flamethrowerFire.enabled = false;
                 gunAnimator.SetBool("flamethrower", false);
-                audioSource.clip = flamethrower;
+                audioSource.loop = false;
                 audioSource.Stop();
             }
         }
@@ -405,6 +411,8 @@ public class PlayerActions : MonoBehaviour
                 flamethrowerCollider.enabled = false;
                 flamethrowerFire.enabled = false;
                 gunAnimator.SetBool("flamethrower", false);
+                audioSource.loop = false;
+                audioSource.Stop();
                 if (overheatCR != null)
                 {
                     StopCoroutine(overheatCR);
@@ -488,6 +496,9 @@ public class PlayerActions : MonoBehaviour
                         enemy.takeDamage(damage, dmgType);
                         ParticleSystem partSys = Instantiate(damage > 5? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
+                        AudioSource ass = Instantiate(damage > 5? goodHit : midHit, hit.point, Quaternion.identity);
+                        ass.Play();
+                        Destroy(ass.gameObject, ass.clip.length);
                         hitImage.color = damage > 5? critColor : hitColor;
                     }
                     else
@@ -495,6 +506,9 @@ public class PlayerActions : MonoBehaviour
                         ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
                         hitImage.color = missColor;
                         partSys.Play();
+                        AudioSource ass = Instantiate(badHit, hit.point, Quaternion.identity);
+                        ass.Play();
+                        Destroy(ass.gameObject, ass.clip.length);
                         if (mult == 0)
                         {
                             enemy.WeakenArmor(dmgType);
@@ -507,6 +521,10 @@ public class PlayerActions : MonoBehaviour
             {
                 ParticleSystem bhPS = Instantiate(bulletHolePS, hit.point, Quaternion.LookRotation(-hit.normal));
                 bhPS.Play();
+                AudioSource ass = Instantiate(missHit, hit.point, Quaternion.identity);
+                ass.gameObject.transform.position = hit.point;
+                ass.Play();
+                Destroy(ass.gameObject, ass.clip.length);
             }
         }
     }

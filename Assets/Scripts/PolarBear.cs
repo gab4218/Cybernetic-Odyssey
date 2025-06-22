@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 
 public class PolarBear : EnemyBase
 {
@@ -32,12 +31,14 @@ public class PolarBear : EnemyBase
     [SerializeField] private ParticleSystem slamParticle;
     [SerializeField] private ParticleSystem holeParticle;
     [SerializeField] private Transform slamLocation;
+    [SerializeField] private AudioSource slamSound;
 
     //Variables del ataque de Claw
     [SerializeField] private int clawDamage;
     [SerializeField] private float clawRange;
     [SerializeField] private float clawKnockback;
     [SerializeField] private BoxCollider clawCollider;
+    [SerializeField] private AudioSource clawSound;
 
     //Variables del ataque de Rush
     [SerializeField] private float minRushDistance = 15f;
@@ -51,6 +52,7 @@ public class PolarBear : EnemyBase
     [SerializeField] private ParticleSystem rushParticle;
     [SerializeField] private ParticleSystem rushChargeParticle;
     [SerializeField] private Transform rushPartTransform;
+    [SerializeField] private AudioSource rushSound, crashSound;
     private bool canMoveRush = false;
     private ParticleSystem currentRushParticle;
     private Coroutine rushCR;
@@ -102,12 +104,13 @@ public class PolarBear : EnemyBase
         
         if (state == SEEKING) //Si se persigue al jugador, atacarlo cuando sea posible 
         {
-            findDirection(); 
-            
+            findDirection();
+            anim.SetBool("Walking", true);
             if (Vector3.Distance(transform.position, playerTranform.position) < slamRange && canSlam) //Slam
             {
                 state = ATTACKING;
-                anim.Play("BearSlam");
+                anim.SetTrigger("Slam");
+                anim.SetBool("Walking", false);
                 canSlam = false;
                 navMeshAgent.isStopped = true;
             }
@@ -115,7 +118,8 @@ public class PolarBear : EnemyBase
             if (Vector3.Distance(transform.position, playerTranform.position) < clawRange && canClaw) //Claw
             {
                 state = CLAWING;
-                anim.Play("BearClaw");
+                anim.SetTrigger("Claw");
+                anim.SetBool("Walking", false);
                 canClaw = false;
                 navMeshAgent.isStopped = true;
             }
@@ -124,6 +128,7 @@ public class PolarBear : EnemyBase
             {
                 RushAttack();
                 anim.SetTrigger("Rush");
+                anim.SetBool("Walking", false);
                 navMeshAgent.enabled = false;
             }
 
@@ -141,7 +146,8 @@ public class PolarBear : EnemyBase
             }
             else 
             {
-                setDestination(randomPosition); 
+                setDestination(randomPosition);
+                anim.SetBool("Walking", true);
             }
         }
         if(state == RUSHING) //Si hace un ataque de Rush, frenar si se aleja mucho del jugador
@@ -159,10 +165,11 @@ public class PolarBear : EnemyBase
     {
         if (!PlayerActions.dead)
         {
-            SoundSingleton.Instance.OsoMuerte();
-            SceneManager.LoadScene("win");
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            PlayerActions.won = true;
+            if (SoundSingleton.Instance != null)
+            {
+                SoundSingleton.Instance.OsoMuerte();
+            }
         }
     }
 
@@ -203,6 +210,8 @@ public class PolarBear : EnemyBase
                     ps.gameObject.transform.up = -transform.forward;
                     ps.Play();
                     RushReset();
+                    AudioSource ass = Instantiate(crashSound, transform.position, Quaternion.identity);
+                    Destroy(ass.gameObject, ass.clip.length);
                 }
             }
         }
@@ -236,12 +245,16 @@ public class PolarBear : EnemyBase
         partSys = Instantiate(holeParticle, slamLocation.position, Quaternion.identity);
         partSys.transform.forward = -transform.up;
         partSys.Play();
+        AudioSource ass = Instantiate(slamSound, transform.position, Quaternion.identity);
+        ass.pitch = Random.Range(0.8f, 1.2f);
+        ass.Play();
+        Destroy(ass.gameObject, ass.clip.length);
     }
 
     public void slamReset()
     {
         slamCollider.enabled = false;
-        Stun(0.5f);
+        Stun(0.2f);
         StartCoroutine(slamReload());
     }
 
@@ -260,12 +273,16 @@ public class PolarBear : EnemyBase
     public void clawAttack() 
     {
         clawCollider.enabled = true;
+        AudioSource ass = Instantiate(clawSound, transform.position, Quaternion.identity);
+        ass.pitch = Random.Range(0.8f, 1.2f);
+        ass.Play();
+        Destroy(ass.gameObject, ass.clip.length);
     }
 
     public void clawReset() 
     {
         clawCollider.enabled = false;
-        Stun(0.5f);
+        Stun(0.2f);
         Invoke("clawReload", 1.5f);
     }
 
@@ -282,6 +299,9 @@ public class PolarBear : EnemyBase
         currentRushParticle = Instantiate(rushChargeParticle, transform.position, Quaternion.LookRotation(transform.up));
         state = RUSHING;
         canMoveRush = false;
+        AudioSource ass = Instantiate(rushSound, transform);
+        ass.Play();
+        Destroy(ass.gameObject, ass.clip.length);
         Invoke("StartRush", rushChargeTime);
     }
 

@@ -130,6 +130,8 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
+  pickupAreaSize: 5
+  pickupSource: {fileID: 1575289815180384972, guid: 14c5c123f969bdb428d3b1136eaa8c61, type: 3}
 --- !u!136 &6801321186726984836
 CapsuleCollider:
   m_ObjectHideFlags: 0

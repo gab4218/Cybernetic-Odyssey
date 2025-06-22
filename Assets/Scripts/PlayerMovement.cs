@@ -173,20 +173,6 @@ public class PlayerMovement : MonoBehaviour
             staminaImg.fillAmount = currentStamina/maxStamina;
 
         }
-        if (rb.velocity.magnitude > 0 && rb.velocity.magnitude <= 5 && !audioSource.isPlaying && grounded)
-        {
-            audioSource.clip = walking;
-            audioSource.Play();
-        }
-        else if (rb.velocity.magnitude > 5 && !audioSource.isPlaying && grounded)
-        {
-            audioSource.clip = running;
-            audioSource.Play();
-        }
-        else if (rb.velocity.magnitude <= 4) 
-        {
-            audioSource.Stop();
-        }
     }
 
     private void FixedUpdate()

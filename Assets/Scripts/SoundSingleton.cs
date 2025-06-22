@@ -20,11 +20,7 @@ public class SoundSingleton : MonoBehaviour
         {
             Instance = this;
         }
-    }
-
-    private void FixedUpdate()
-    {
-        
+        DontDestroyOnLoad(gameObject);
     }
 
     public void Boton()

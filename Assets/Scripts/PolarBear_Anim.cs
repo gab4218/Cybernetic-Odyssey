@@ -12,6 +12,7 @@ public class PolarBear_Anim : MonoBehaviour
     private Animator anim;
     [SerializeField] private ParticleSystem clawPS;
     [SerializeField] private Transform clawPos;
+    [SerializeField] private AudioSource stepSound;
 
     private void Start()
     {
@@ -21,13 +22,11 @@ public class PolarBear_Anim : MonoBehaviour
     }
     public void backFromSlam() 
     {
-        anim.Play("BearIdle");
         pb.slamReset();
     }
 
     public void backFromClaw()
     {
-        anim.Play("BearIdle");
         pb.clawReset();
     }
 
@@ -41,5 +40,11 @@ public class PolarBear_Anim : MonoBehaviour
         pb.clawAttack();
         ParticleSystem cps = Instantiate(clawPS, clawPos);
         cps.Play();
+    }
+
+    public void step()
+    {
+        stepSound.pitch = Random.Range(0.6f, 1.4f);
+        stepSound.Play();
     }
 }

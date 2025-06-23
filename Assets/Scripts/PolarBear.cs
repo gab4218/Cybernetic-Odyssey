@@ -87,7 +87,7 @@ public class PolarBear : EnemyBase
                             );
         setDestination(randomPosition);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-        HPDisplay = GameObject.FindWithTag("BearHP").GetComponent<TMPro.TMP_Text>();
+        //HPDisplay = GameObject.FindWithTag("BearHP").GetComponent<TMPro.TMP_Text>();
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";

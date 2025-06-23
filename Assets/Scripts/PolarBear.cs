@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -65,10 +66,11 @@ public class PolarBear : EnemyBase
     [SerializeField] private GameObject bearMesh, ballMesh;
     [SerializeField] private SphereCollider ballCollider;
     [SerializeField] private float ballWaitTime = 10f;
+    
 
     private BoxCollider[] bearColliders;
     //private bool weakened = false;
-    
+    [SerializeField] private TMP_Text winText;
 
     
 
@@ -80,6 +82,7 @@ public class PolarBear : EnemyBase
         slamCollider.enabled = false;
         clawCollider.enabled = false;
         bearColliders = GetComponentsInChildren<BoxCollider>();
+        winText.gameObject.SetActive(false);
         randomPosition = new Vector2
                             (
                                 Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
@@ -166,6 +169,7 @@ public class PolarBear : EnemyBase
         if (!PlayerActions.dead)
         {
             PlayerActions.won = true;
+            winText.gameObject.SetActive(true);
             if (SoundSingleton.Instance != null)
             {
                 SoundSingleton.Instance.OsoMuerte();

@@ -82,7 +82,7 @@ public class PolarBear : EnemyBase
         slamCollider.enabled = false;
         clawCollider.enabled = false;
         bearColliders = GetComponentsInChildren<BoxCollider>();
-        winText.gameObject.SetActive(false);
+        winText?.gameObject.SetActive(false);
         randomPosition = new Vector2
                             (
                                 Random.Range(randomMovementDimensions[0].x, randomMovementDimensions[1].x),
@@ -169,7 +169,7 @@ public class PolarBear : EnemyBase
         if (!PlayerActions.dead)
         {
             PlayerActions.won = true;
-            winText.gameObject.SetActive(true);
+            winText?.gameObject.SetActive(true);
             if (SoundSingleton.Instance != null)
             {
                 SoundSingleton.Instance.OsoMuerte();

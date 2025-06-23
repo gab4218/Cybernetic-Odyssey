@@ -38,10 +38,10 @@ public class CameraController : MonoBehaviour
 
 
         //Modificador de sensibilidad temporal
-        if (Input.GetKeyDown(KeyCode.G)) cameraSensitivityX -= 50;
-        if (Input.GetKeyDown(KeyCode.H)) cameraSensitivityX += 50;
-        if (Input.GetKeyDown(KeyCode.J)) cameraSensitivityY -= 50;
-        if (Input.GetKeyDown(KeyCode.K)) cameraSensitivityY += 50;
+      //  if (Input.GetKeyDown(KeyCode.G)) cameraSensitivityX -= 50;
+      //  if (Input.GetKeyDown(KeyCode.H)) cameraSensitivityX += 50;
+      //  if (Input.GetKeyDown(KeyCode.J)) cameraSensitivityY -= 50;
+      //  if (Input.GetKeyDown(KeyCode.K)) cameraSensitivityY += 50;
 
         //Calcular rotacion
         yRotation += mouseX;

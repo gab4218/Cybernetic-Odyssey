@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -46,6 +47,10 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 {
                     hasColors[j] = false;
                 }
+            }
+            if (Inventory.secondarySlots.Contains(costs[i].upgradeType) || Inventory.availableUpgrades.Contains(costs[i].upgradeType))
+            {
+                costs[i].hasBeenCrafted = true;
             }
             if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true && !costs[i].hasBeenCrafted)
             {

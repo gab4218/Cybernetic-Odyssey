@@ -38,6 +38,14 @@ public class FastTravel : MonoBehaviour, IInteractable
     }
     public void onInteract()
     {
+        if (PlayerActions.won)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Time.timeScale = 1;
+            Cursor.visible = true;
+            SceneManager.LoadScene("win");
+            return;
+        }
         menu.SetActive(true);
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
@@ -58,8 +66,8 @@ public class FastTravel : MonoBehaviour, IInteractable
     public void GoToScene(string scene)
     {
         SoundSingleton.Instance.Viaje();
+        AsyncLoadManager.instance.LoadScene(scene);
         Time.timeScale = 1;
-        Debug.Log(scene);
-        SceneManager.LoadScene(scene);
+        PlayerActions.dead = true;
     }
 }

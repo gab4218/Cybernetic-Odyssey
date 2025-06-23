@@ -11,7 +11,7 @@ public class DialogueManager : MonoBehaviour
     public string[] dialogues;
     public bool inDialogue = false;
     public int currentIndex = 0;
-    public AudioSource audioSource;
+    private AudioSource audioSource;
     public AudioClip talking;
 
     private void Awake()
@@ -35,6 +35,8 @@ public class DialogueManager : MonoBehaviour
         {
             currentIndex++;
             dialogueText.text = dialogues[currentIndex];
+            audioSource.pitch = Random.Range(0.4f,1.6f);
+            audioSource.Play();
         }
         else
         {
@@ -46,11 +48,13 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void setDialogues(string[] newDialogue)
+    public void setDialogues(string[] newDialogue, AudioSource aS)
     {
         dialogues = newDialogue;
         dialogueBox.SetActive(true);
+        audioSource = aS;
         audioSource.clip = talking;
+        audioSource.pitch = Random.Range(0.4f, 1.6f);
         audioSource.Play();
         inDialogue = true;
         Cursor.visible = true;

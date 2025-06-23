@@ -8,21 +8,28 @@ using UnityEngine.UI;
 public class Volumen_UI : MonoBehaviour
 {
     public AudioMixer mixer;
-    public GameObject window;
     public Slider masterSlider;
     public Slider sfxSlider;
     public Slider musicSlider;
 
-    private void Update()
+    private void Awake()
     {
-        UpdateMasterVolume();
-        UpdateMusicVolume();
-        UpdateSFXVolume();
+        float t;
+        mixer.GetFloat("MasterVolume", out t);
+        masterSlider.value = t;
+        mixer.GetFloat("MusicVolume", out t);
+        musicSlider.value = t;
+        mixer.GetFloat("SFXVolume", out t);
+        sfxSlider.value = t;
     }
 
     public void UpdateMasterVolume()
     {
         mixer.SetFloat("MasterVolume", masterSlider.value);
+        if (!SoundSingleton.Instance.sfxSource.isPlaying)
+        {
+            SoundSingleton.Instance.Boton();
+        }
     }
 
     public void UpdateMusicVolume()
@@ -33,5 +40,9 @@ public class Volumen_UI : MonoBehaviour
     public void UpdateSFXVolume()
     {
         mixer.SetFloat("SFXVolume", sfxSlider.value);
+        if (!SoundSingleton.Instance.sfxSource.isPlaying)
+        {
+            SoundSingleton.Instance.Boton();
+        }
     }
 }

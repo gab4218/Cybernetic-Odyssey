@@ -38,7 +38,7 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected int armorHealth = 300; 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
     //Otras variables comunes de enemigo
-    ParticleSystem currentFirePS;
+    protected ParticleSystem currentFirePS;
     protected Vector3[] randomMovementDimensions;
     public float weakPointMult = 2;
     public float strongPointMult = 0;
@@ -209,6 +209,9 @@ public abstract class EnemyBase : MonoBehaviour
         }
         if (currentHP <= 0) //Si muerto, destruir
         {
+            if (iceCoroutine != null) StopCoroutine(iceCoroutine);
+            if (fireCoroutine != null) StopCoroutine(fireCoroutine);
+            if (calmCoroutine != null) StopCoroutine(calmCoroutine);
             Destroy(gameObject);
         }
         if (player.isCrouched && player.canGambleCrouch)
@@ -276,7 +279,7 @@ public abstract class EnemyBase : MonoBehaviour
         navMeshAgent.isStopped = false;
     }
 
-    private IEnumerator FireDamage()
+    protected IEnumerator FireDamage()
     {
         float t = 0;
         while (t < fireTime)
@@ -303,7 +306,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     }
 
-    private IEnumerator IceTimer()
+    protected IEnumerator IceTimer()
     {
         MeshRenderer mr = GetComponentInChildren<MeshRenderer>();
         Color oldColor = mr.material.color;

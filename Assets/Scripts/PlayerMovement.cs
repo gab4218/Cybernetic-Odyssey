@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
@@ -91,6 +92,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if (DialogueManager.instance.inDialogue)
             {
+                anim.SetFloat("xDir", 0);
+                anim.SetFloat("zDir", 0);
                 return;
             }
         }
@@ -540,6 +543,7 @@ public class PlayerMovement : MonoBehaviour
             blend -= Time.deltaTime * 7;
             yield return null;
         }
+        
         Destroy(grappleLine.gameObject);
     }
 }

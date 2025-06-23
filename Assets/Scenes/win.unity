@@ -495,14 +495,26 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1741544427}
         m_TargetAssemblyTypeName: Menu, Assembly-CSharp
-        m_MethodName: Restart
+        m_MethodName: Play
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Juego
+          m_StringArgument: Village
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1741544427}
+        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+        m_MethodName: ResetAll
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &492832475
@@ -860,6 +872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 795f4370ab8f6f74590db5ebab0f3719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicSource: {fileID: 1499212658}
   sfxSource: {fileID: 913655535}
   button: {fileID: 8300000, guid: 5d2613e43eb3ed1408a1cae0cb257a66, type: 3}
   osoMuerte: {fileID: 8300000, guid: d076cca6f0f994444a5bf422e2682477, type: 3}
@@ -1450,6 +1463,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170d5a599721402489e26e5a9f3abed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicClip: {fileID: 8300000, guid: 006e1b3056eccbc42a0f4af4723eb37b, type: 3}
+  gameMusic: {fileID: 8300000, guid: 12706edb4b060b0429087ba14b87afdf, type: 3}
 --- !u!1 &1782716307
 GameObject:
   m_ObjectHideFlags: 0
@@ -1535,7 +1550,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1741544427}
         m_TargetAssemblyTypeName: Menu, Assembly-CSharp
-        m_MethodName: Restart
+        m_MethodName: Controls
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

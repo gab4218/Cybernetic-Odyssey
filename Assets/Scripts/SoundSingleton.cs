@@ -5,7 +5,8 @@ using UnityEngine;
 public class SoundSingleton : MonoBehaviour
 {
     public static SoundSingleton Instance { get; private set; }
-    [SerializeField] private AudioSource sfxSource;
+    public AudioSource musicSource;
+    public AudioSource sfxSource;
     public AudioClip button;
     public AudioClip osoMuerte;
     public AudioClip viaje;
@@ -36,5 +37,11 @@ public class SoundSingleton : MonoBehaviour
     public void Viaje()
     {
         sfxSource.PlayOneShot(viaje, 1);
+    }
+
+    public void SetMusic(AudioClip newSong)
+    {
+        musicSource.clip = newSong;
+        musicSource.Play();
     }
 }

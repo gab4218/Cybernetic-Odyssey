@@ -71,7 +71,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float overloadTime = 10f;
     [SerializeField] float overloadCooldown = 20f;
     [SerializeField] LayerMask bounds;
-    [SerializeField] private AudioSource badHit, midHit, goodHit, missHit;
+    [SerializeField] private AudioSource badHit, midHit, goodHit, missHit, damagedSound, healSound, grappleSound;
+    [SerializeField] private TMP_Text interactText;
     //Otras variables
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
@@ -152,6 +153,7 @@ public class PlayerActions : MonoBehaviour
             hasFlamethrower = true;
             unlockWeapon(1);
         }
+        interactText.gameObject.SetActive(false);
         //Preparaciones
 
 
@@ -276,12 +278,15 @@ public class PlayerActions : MonoBehaviour
             {
                 inventory.removeFromInventory(canHealMats.IndexOf(true), 1);
                 currentHP = Mathf.Min(currentHP + 50, maxHP);
+                AudioSource aS = Instantiate(healSound, transform.position, Quaternion.identity);
+                aS.Play();
+                Destroy(aS.gameObject, aS.clip.length);
             }
         }
-
+       
         if (Input.GetKeyDown(cheatKey) && cheatTransform != null)
         {
-            Cheat();
+            //Cheat();
         }
 
         if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R) && selectedWeapon != 2)
@@ -436,18 +441,18 @@ public class PlayerActions : MonoBehaviour
         }
 
 
-        if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance))
+        if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance) && hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
         {
-
+            interactText.gameObject.SetActive(true);
             if (Input.GetKeyDown(interactKey)) //Interactuar
             {
-
-                if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
-                {
-                    interactable.onInteract();
-                    anim.SetTrigger("Interact");
-                }
+                interactable.onInteract();
+                anim.SetTrigger("Interact");
             }
+        }
+        else
+        {
+            interactText.gameObject.SetActive(false);
         }
 
 
@@ -496,9 +501,9 @@ public class PlayerActions : MonoBehaviour
                         enemy.takeDamage(damage, dmgType);
                         ParticleSystem partSys = Instantiate(damage > 5? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
-                        AudioSource ass = Instantiate(damage > 5? goodHit : midHit, hit.point, Quaternion.identity);
-                        ass.Play();
-                        Destroy(ass.gameObject, ass.clip.length);
+                        AudioSource aS = Instantiate(damage > 5? goodHit : midHit, hit.point, Quaternion.identity);
+                        aS.Play();
+                        Destroy(aS.gameObject, aS.clip.length);
                         hitImage.color = damage > 5? critColor : hitColor;
                     }
                     else
@@ -506,9 +511,9 @@ public class PlayerActions : MonoBehaviour
                         ParticleSystem partSys = Instantiate(partMin, hit.point, Quaternion.LookRotation(hit.normal));
                         hitImage.color = missColor;
                         partSys.Play();
-                        AudioSource ass = Instantiate(badHit, hit.point, Quaternion.identity);
-                        ass.Play();
-                        Destroy(ass.gameObject, ass.clip.length);
+                        AudioSource aS = Instantiate(badHit, hit.point, Quaternion.identity);
+                        aS.Play();
+                        Destroy(aS.gameObject, aS.clip.length);
                         if (mult == 0)
                         {
                             enemy.WeakenArmor(dmgType);
@@ -521,10 +526,10 @@ public class PlayerActions : MonoBehaviour
             {
                 ParticleSystem bhPS = Instantiate(bulletHolePS, hit.point, Quaternion.LookRotation(-hit.normal));
                 bhPS.Play();
-                AudioSource ass = Instantiate(missHit, hit.point, Quaternion.identity);
-                ass.gameObject.transform.position = hit.point;
-                ass.Play();
-                Destroy(ass.gameObject, ass.clip.length);
+                AudioSource aS = Instantiate(missHit, hit.point, Quaternion.identity);
+                aS.gameObject.transform.position = hit.point;
+                aS.Play();
+                Destroy(aS.gameObject, aS.clip.length);
             }
         }
     }
@@ -585,6 +590,10 @@ public class PlayerActions : MonoBehaviour
             damagedIMG.color = new Color(damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 1);
             currentHP -= dmg;
             canGetHit = false;
+            AudioSource aS = Instantiate(damagedSound, transform);
+            aS.pitch = Random.Range(0.75f, 1.25f);
+            aS.Play();
+            Destroy(aS.gameObject, aS.clip.length);
             Invoke("resetDamage", 0.25f);
             canHeal = false;
             haltHeal = true;
@@ -720,19 +729,28 @@ public class PlayerActions : MonoBehaviour
     private void ShootGrapple() //Disparar Grapple
     {
         canGrapple = false;
-        StartCoroutine(GrappleReload());
+        AudioSource aS = Instantiate(grappleSound, transform.position, Quaternion.identity);
+        aS.Play();
+        Destroy(aS.gameObject, aS.clip.length);
         if (Physics.Raycast(facingRay, out RaycastHit hit, grappleDistance, bounds))
         {
             if(hit.collider.gameObject != null)
             {
+                StartCoroutine(GrappleReload());
                 playerMovement.GrappleTo(hit.point);
             }
         }
         else
         {
             playerMovement.FailGrapple(transform.position + facingRay.direction.normalized * grappleDistance);
+            Invoke("FailGrappleWait", 0.5f);
         }
         
+    }
+
+    private void FailGrappleWait()
+    {
+        canGrapple = true;
     }
     
     private IEnumerator CheckHeal() //Revisar si se puede curar

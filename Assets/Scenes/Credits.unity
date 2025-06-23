@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 795f4370ab8f6f74590db5ebab0f3719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicSource: {fileID: 83529391}
   sfxSource: {fileID: 956788223}
   button: {fileID: 8300000, guid: 5d2613e43eb3ed1408a1cae0cb257a66, type: 3}
   osoMuerte: {fileID: 8300000, guid: d076cca6f0f994444a5bf422e2682477, type: 3}
@@ -997,7 +998,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.019836426, y: -1.8083191}
+  m_AnchoredPosition: {x: -0.019836426, y: -1.8083496}
   m_SizeDelta: {x: 0, y: 138}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1362018420
@@ -1072,8 +1073,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000099894, y: -35}
-  m_SizeDelta: {x: 1397.58, y: 662.974}
+  m_AnchoredPosition: {x: -162.38629, y: -35}
+  m_SizeDelta: {x: 1072.8073, y: 662.974}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1563018274
 MonoBehaviour:
@@ -1096,8 +1097,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Programaci\xF3n y UI: Gabriel Ben\xE9s\n\nModelos y Animaciones: Andrea
-    Ferruelo\n\nDise\xF1o e Ideas: Luciano Szmukler\n\n\n\nM\xFAsica y sonidos: Pixabay
-    y Freesounds"
+    Ferruelo\n\nDise\xF1o e Ideas: Luciano Szmukler\n\nM\xFAsica del juego: Chris
+    Christodoulou - Risk of Rain 2\n\nM\xFAsica y sonidos: Pixabay y Freesounds"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1160,7 +1161,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -322.4458, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1270,9 +1271,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1362018419}
-  - {fileID: 420735090}
   - {fileID: 903112947}
   - {fileID: 1563018273}
+  - {fileID: 420735090}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1292,6 +1293,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170d5a599721402489e26e5a9f3abed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicClip: {fileID: 8300000, guid: 006e1b3056eccbc42a0f4af4723eb37b, type: 3}
+  gameMusic: {fileID: 8300000, guid: 12706edb4b060b0429087ba14b87afdf, type: 3}
 --- !u!1 &2112956193
 GameObject:
   m_ObjectHideFlags: 0

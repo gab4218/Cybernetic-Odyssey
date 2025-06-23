@@ -151,7 +151,7 @@ public class InventoryManager : MonoBehaviour
     {
         if (isChangedByPerson) //Chequear que el cambio fue hecho por una persona
         {
-
+            SoundSingleton.Instance.Boton();
 
             if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
             {

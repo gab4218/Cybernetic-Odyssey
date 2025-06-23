@@ -210,8 +210,8 @@ public class PolarBear : EnemyBase
                     ps.gameObject.transform.up = -transform.forward;
                     ps.Play();
                     RushReset();
-                    AudioSource ass = Instantiate(crashSound, transform.position, Quaternion.identity);
-                    Destroy(ass.gameObject, ass.clip.length);
+                    AudioSource aS = Instantiate(crashSound, transform.position, Quaternion.identity);
+                    Destroy(aS.gameObject, aS.clip.length);
                 }
             }
         }
@@ -245,10 +245,10 @@ public class PolarBear : EnemyBase
         partSys = Instantiate(holeParticle, slamLocation.position, Quaternion.identity);
         partSys.transform.forward = -transform.up;
         partSys.Play();
-        AudioSource ass = Instantiate(slamSound, transform.position, Quaternion.identity);
-        ass.pitch = Random.Range(0.8f, 1.2f);
-        ass.Play();
-        Destroy(ass.gameObject, ass.clip.length);
+        AudioSource aS = Instantiate(slamSound, transform.position, Quaternion.identity);
+        aS.pitch = Random.Range(0.8f, 1.2f);
+        aS.Play();
+        Destroy(aS.gameObject, aS.clip.length);
     }
 
     public void slamReset()
@@ -273,10 +273,10 @@ public class PolarBear : EnemyBase
     public void clawAttack() 
     {
         clawCollider.enabled = true;
-        AudioSource ass = Instantiate(clawSound, transform.position, Quaternion.identity);
-        ass.pitch = Random.Range(0.8f, 1.2f);
-        ass.Play();
-        Destroy(ass.gameObject, ass.clip.length);
+        AudioSource aS = Instantiate(clawSound, transform.position, Quaternion.identity);
+        aS.pitch = Random.Range(0.8f, 1.2f);
+        aS.Play();
+        Destroy(aS.gameObject, aS.clip.length);
     }
 
     public void clawReset() 
@@ -299,9 +299,9 @@ public class PolarBear : EnemyBase
         currentRushParticle = Instantiate(rushChargeParticle, transform.position, Quaternion.LookRotation(transform.up));
         state = RUSHING;
         canMoveRush = false;
-        AudioSource ass = Instantiate(rushSound, transform);
-        ass.Play();
-        Destroy(ass.gameObject, ass.clip.length);
+        AudioSource aS = Instantiate(rushSound, transform);
+        aS.Play();
+        Destroy(aS.gameObject, aS.clip.length);
         Invoke("StartRush", rushChargeTime);
     }
 

@@ -782,6 +782,10 @@ MonoBehaviour:
   midHit: {fileID: 1575289815180384972, guid: 14ab311a352fd72468e60d0e79fc1805, type: 3}
   goodHit: {fileID: 1575289815180384972, guid: fcc502a3b1b8d6a42b9e4a43971ec6f2, type: 3}
   missHit: {fileID: 1575289815180384972, guid: b31bd56e308fce64cb737f5bc247c88e, type: 3}
+  damagedSound: {fileID: 1575289815180384972, guid: 74334b12c7dd03942afa3f416a9e199b, type: 3}
+  healSound: {fileID: 1575289815180384972, guid: 2bed2f51165daea47acc836b389e4b09, type: 3}
+  grappleSound: {fileID: 1575289815180384972, guid: 4f2f58930c72b90428ba6cfa6616ebea, type: 3}
+  interactText: {fileID: 0}
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
   partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
@@ -832,7 +836,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf1cd66ce8613b4ba9b709ee98742ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matDisplay: []
+  matDisplay:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   craftingMatDisplay:
   - {fileID: 0}
   - {fileID: 0}

@@ -33,12 +33,12 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected GameObject weakCollidersGO;
     [SerializeField] protected GameObject ignoreCollidersGO;
     [SerializeField] protected float fireRadius = 2;
-    [SerializeField] protected ParticleSystem fireParticleSystem;
+    [SerializeField] protected ParticleSystem fireParticleSystem, iceParticleSystem;
     [SerializeField] protected bool canSlow = true;
     [SerializeField] protected int armorHealth = 300; 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
     //Otras variables comunes de enemigo
-    protected ParticleSystem currentFirePS;
+    protected ParticleSystem currentFirePS, currentIcePS;
     protected Vector3[] randomMovementDimensions;
     public float weakPointMult = 2;
     public float strongPointMult = 0;
@@ -193,6 +193,12 @@ public abstract class EnemyBase : MonoBehaviour
         {
             if (canSlow)
             {
+                if (currentIcePS == null)
+                {
+                    currentIcePS = Instantiate(iceParticleSystem, transform.position, Quaternion.identity);
+                    ParticleSystem.ShapeModule sphere = currentIcePS.shape;
+                    sphere.radius = fireRadius;
+                }
                 if (iceCoroutine != null)
                 {
                     StopCoroutine(iceCoroutine);
@@ -214,27 +220,14 @@ public abstract class EnemyBase : MonoBehaviour
             if (calmCoroutine != null) StopCoroutine(calmCoroutine);
             Destroy(gameObject);
         }
-        if (player.isCrouched && player.canGambleCrouch)
+        
+        isAngered = true;
+        if (calmCoroutine != null)
         {
-            if (Random.Range(0, 1f) > 0.5f)
-            {
-                isAngered = true;
-                if (calmCoroutine != null)
-                {
-                    StopCoroutine(calmCoroutine);
-                }
-                calmCoroutine = StartCoroutine(CalmDown());
-            }
+            StopCoroutine(calmCoroutine);
         }
-        else
-        {
-            isAngered = true;
-            if (calmCoroutine != null)
-            {
-                StopCoroutine(calmCoroutine);
-            }
-            calmCoroutine = StartCoroutine(CalmDown());
-        }
+        calmCoroutine = StartCoroutine(CalmDown());
+        
     }
 
     protected IEnumerator CalmDown()
@@ -277,6 +270,7 @@ public abstract class EnemyBase : MonoBehaviour
     {
         state = IDLE;
         navMeshAgent.isStopped = false;
+        
     }
 
     protected IEnumerator FireDamage()
@@ -308,18 +302,17 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected IEnumerator IceTimer()
     {
-        MeshRenderer mr = GetComponentInChildren<MeshRenderer>();
-        Color oldColor = mr.material.color;
-        mr.material.SetColor("_Color", new Vector4(0.8f, 1f, 1f, 1f));
         float t = 0;
         while (t < slowTime)
         {
             t += Time.deltaTime;
+            currentIcePS.gameObject.transform.position = transform.position;
             yield return null;
         }
-        mr.material.SetColor("_Color", new Vector4(oldColor.r,oldColor.g,oldColor.b,1f));
         slowed = false;
         navMeshAgent.speed = originalSpeed;
+        Destroy(currentIcePS.gameObject);
+        currentIcePS = null;
         yield break;
     }
 }

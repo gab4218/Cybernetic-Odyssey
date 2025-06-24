@@ -153,13 +153,13 @@ public class InventoryManager : MonoBehaviour
         {
             SoundSingleton.Instance.Boton();
 
-            if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
-            {
-                inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
-            }
             if (oldUpgrade > 0) //Si una mejora es deseleccionada, desactivarla
             {
                 inventory.disableUpgrade(oldUpgrade, id);
+            }
+            if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
+            {
+                inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
             }
 
 

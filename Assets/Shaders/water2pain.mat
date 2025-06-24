@@ -61,9 +61,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Amp1: 0.19
+    - _Amp1: 0.13
     - _Amp2: -0.06
-    - _Amp3: 0.22
+    - _Amp3: 0.19
     - _Amp4: 0
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0

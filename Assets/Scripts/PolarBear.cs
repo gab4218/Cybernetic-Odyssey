@@ -51,11 +51,11 @@ public class PolarBear : EnemyBase
     [SerializeField] private float maxRushTime = 5f;
     [SerializeField] private BoxCollider rushCollider;
     [SerializeField] private ParticleSystem rushParticle;
-    [SerializeField] private ParticleSystem rushChargeParticle;
-    [SerializeField] private Transform rushPartTransform;
+    [SerializeField] private ParticleSystem rushChargeParticle, crashParticleSystem;
+    [SerializeField] private Transform rushPartTransform, crashPartTransform;
     [SerializeField] private AudioSource rushSound, crashSound;
     private bool canMoveRush = false;
-    private ParticleSystem currentRushParticle;
+    private ParticleSystem currentRushParticle, currentCrashPS;
     private Coroutine rushCR;
 
     //Variables del ataque/evasion de Ball
@@ -344,6 +344,8 @@ public class PolarBear : EnemyBase
         navMeshAgent.enabled = true;
         Destroy(currentRushParticle.gameObject);
         anim.SetTrigger("Crash");
+        currentCrashPS = Instantiate(crashParticleSystem, crashPartTransform.position, Quaternion.identity);
+        Invoke("DeleteCrashPS", rushStunTime);
         Stun(rushStunTime);
         if (rushCR != null)
         {
@@ -352,6 +354,11 @@ public class PolarBear : EnemyBase
         }
         Invoke("RushReload", 15f);
         canMoveRush = false;
+    }
+
+    private void DeleteCrashPS()
+    {
+        if (currentCrashPS != null) Destroy(currentCrashPS.gameObject);
     }
 
     private void RushReload() //Para Invoke

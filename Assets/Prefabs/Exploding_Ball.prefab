@@ -111,6 +111,7 @@ MonoBehaviour:
   ignoreCollidersGO: {fileID: 0}
   fireRadius: 0.5
   fireParticleSystem: {fileID: 7298929676011750005, guid: b94c03d9ac7b7cb4c9753fa359776f52, type: 3}
+  iceParticleSystem: {fileID: 7298929676011750005, guid: 7553d545deaa4674aafd86b28af55a1f, type: 3}
   canSlow: 1
   armorHealth: 300
   HPDisplay: {fileID: 0}

@@ -1520,6 +1520,7 @@ Transform:
   - {fileID: 4882572857814451303}
   - {fileID: 4086972031985281000}
   - {fileID: 4016713178504812807}
+  - {fileID: 3729363976352833092}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &358515833174210469
@@ -1548,6 +1549,7 @@ MonoBehaviour:
   ignoreCollidersGO: {fileID: 3226735221289961410}
   fireRadius: 3
   fireParticleSystem: {fileID: 7298929676011750005, guid: b94c03d9ac7b7cb4c9753fa359776f52, type: 3}
+  iceParticleSystem: {fileID: 7298929676011750005, guid: 7553d545deaa4674aafd86b28af55a1f, type: 3}
   canSlow: 1
   armorHealth: 0
   HPDisplay: {fileID: 0}
@@ -1581,9 +1583,11 @@ MonoBehaviour:
   rushCollider: {fileID: 5290198108620238391}
   rushParticle: {fileID: 3561042952287324529, guid: 7da2fa911c396f849b1fe36243780689, type: 3}
   rushChargeParticle: {fileID: 3561042952287324529, guid: fb1408dd2de45554189ed9d1e4ed52bb, type: 3}
+  crashParticleSystem: {fileID: 7298929676011750005, guid: 8c1ecca6b7319a54ba7f5cf634081722, type: 3}
   rushPartTransform: {fileID: 4882572857814451303}
+  crashPartTransform: {fileID: 3729363976352833092}
   rushSound: {fileID: 1575289815180384972, guid: 4cf5c58480ec4ca41b5e015f7b73ee01, type: 3}
-  crashSound: {fileID: 0}
+  crashSound: {fileID: 1575289815180384972, guid: f5fc62ab0967a26498dc854bcfdb5a9b, type: 3}
   ballImpulse: 200
   ballDelayMin: 1
   ballDelayMax: 3
@@ -1592,6 +1596,7 @@ MonoBehaviour:
   ballMesh: {fileID: 8353923246303311419}
   ballCollider: {fileID: 8010876340365906560}
   ballWaitTime: 10
+  winText: {fileID: 0}
 --- !u!54 &8532958686004200035
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1899,6 +1904,37 @@ Transform:
   - {fileID: 3432129448700471990}
   m_Father: {fileID: 5139851080352276813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 33.87659}
+--- !u!1 &6898177261397974062
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3729363976352833092}
+  m_Layer: 6
+  m_Name: CrashTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3729363976352833092
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898177261397974062}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 5.03, z: 3.88}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3341850620320679601}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6923467321863181291
 GameObject:
   m_ObjectHideFlags: 0

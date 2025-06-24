@@ -154,7 +154,7 @@ public class ExplodingBall : EnemyBase
             }
             Destroy(gameObject);
         }
-        if (player.isCrouched && player.canGambleCrouch)
+        if (player.isCrouched && player.isArmored)
         {
             if (Random.Range(0, 1f) > 0.5f)
             {

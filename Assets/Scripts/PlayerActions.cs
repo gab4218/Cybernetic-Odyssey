@@ -36,7 +36,8 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Sprite[] selectedOverloads;
     [SerializeField] Color[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
-    [SerializeField] Animator gunAnimator, handAnimator;
+    [SerializeField] Animator gunAnimator;
+    [SerializeField] GameObject pistolHand, shotgunHand, flamethrowerHand;
     [SerializeField] CameraController camContoller;
     [SerializeField] Image damagedIMG;
 
@@ -100,7 +101,7 @@ public class PlayerActions : MonoBehaviour
     public ParticleSystem partMin;
     public ParticleSystem partMid;
     public bool isCrouched = false;
-    public bool canGambleCrouch = false;
+    public bool isArmored = false;
     private float flamethrowerCurrentTime;
     private ParticleSystem.EmissionModule flamethrowerFire;
     Coroutine overheatCR, healCR, checkHealCR;
@@ -247,7 +248,9 @@ public class PlayerActions : MonoBehaviour
             readyWeaponTime = pistolCooldown;
             gunMeshFilter.mesh = pistolMesh;
             overloadCooldownIMG.color = overloadingColors[selectedOverload];
-            handAnimator.SetTrigger("Pistol");
+            pistolHand.SetActive(true);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(false);
         }
         if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -257,7 +260,9 @@ public class PlayerActions : MonoBehaviour
             readyWeaponTime = shotgunCooldown;
             gunMeshFilter.mesh = shotgunMesh;
             overloadCooldownIMG.color = overloadingColors[selectedOverload];
-            handAnimator.SetTrigger("Shotgun");
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(true);
+            flamethrowerHand.SetActive(false);
         }
         if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
         {
@@ -265,7 +270,9 @@ public class PlayerActions : MonoBehaviour
             gunMeshFilter.mesh = flamethrowerMesh;
             dmgType = damageType.None;
             overloadIMG.gameObject.SetActive(false);
-            handAnimator.SetTrigger("Flamethrower");
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(true);
         }
 
         if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal && !isAllowedToHeal)
@@ -286,7 +293,7 @@ public class PlayerActions : MonoBehaviour
        
         if (Input.GetKeyDown(cheatKey) && cheatTransform != null)
         {
-            //Cheat();
+            Cheat();
         }
 
         if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R) && selectedWeapon != 2)
@@ -487,7 +494,8 @@ public class PlayerActions : MonoBehaviour
                     }
                     else if (enemy.strongColliders.Contains(hit.collider))
                     {
-                        mult = enemy.strongPointMult;
+                        if (selectedWeapon == 0) mult = 0.75f;
+                        else mult = enemy.strongPointMult;
                     
                     }
                     else
@@ -588,7 +596,7 @@ public class PlayerActions : MonoBehaviour
         if (canGetHit)
         {
             damagedIMG.color = new Color(damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 1);
-            currentHP -= dmg;
+            currentHP -= (int)(dmg * (isArmored? 0.6f : 1));
             canGetHit = false;
             AudioSource aS = Instantiate(damagedSound, transform);
             aS.pitch = Random.Range(0.75f, 1.25f);
@@ -641,7 +649,7 @@ public class PlayerActions : MonoBehaviour
                 }
                 break;
             case 3:
-                playerMovement.ChangeWalljump(true);
+                playerMovement.ChangeSprint(true);
                 break;
             case 4:
                 isAllowedToOverload = true;
@@ -654,7 +662,7 @@ public class PlayerActions : MonoBehaviour
                 isAllowedToHeal = true;
                 break;
             case 6:
-                canGambleCrouch = true;
+                isArmored = true;
                 break;
             default:
                 break;
@@ -695,7 +703,7 @@ public class PlayerActions : MonoBehaviour
                 }
                 break;
             case 3:
-                playerMovement.ChangeWalljump(false);
+                playerMovement.ChangeSprint(false);
                 break;
             case 4:
                 isAllowedToOverload = false;
@@ -713,7 +721,7 @@ public class PlayerActions : MonoBehaviour
                 isAllowedToHeal = false;
                 break;
             case 6:
-                canGambleCrouch = false;
+                isArmored = false;
                 break;
             default:
                 break;

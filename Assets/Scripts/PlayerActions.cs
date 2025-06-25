@@ -494,22 +494,23 @@ public class PlayerActions : MonoBehaviour
                     }
                     else if (enemy.strongColliders.Contains(hit.collider))
                     {
-                        if (selectedWeapon == 0) mult = 0.75f;
+                        if (selectedWeapon == 0) mult = 1.25f;
                         else mult = enemy.strongPointMult;
                     
                     }
                     else
                     {
-                        mult = 1;
+                        if (selectedWeapon == 0) mult = 1.25f;
+                        else mult = 1;
                     
                     }
                     damage = (int)((dist > fallOffStart ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace - dist) / fallOffDistace) : dmgPerPellet) * mult);
                     if (damage > 0)
                     {
                         enemy.takeDamage(damage, dmgType);
-                        ParticleSystem partSys = Instantiate(damage > 5? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
+                        ParticleSystem partSys = Instantiate(damage > 10? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                         partSys.Play();
-                        AudioSource aS = Instantiate(damage > 5? goodHit : midHit, hit.point, Quaternion.identity);
+                        AudioSource aS = Instantiate(damage > 10? goodHit : midHit, hit.point, Quaternion.identity);
                         aS.Play();
                         Destroy(aS.gameObject, aS.clip.length);
                         hitImage.color = damage > 5? critColor : hitColor;

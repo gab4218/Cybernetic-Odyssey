@@ -221,7 +221,7 @@ public class PolarBear : EnemyBase
         }
         else
         {
-            if (rushCollider.enabled) //Si la colision fue con cualquier otra cosa y esta haciendo Rush, detener Rush
+            if (rushCollider.enabled && !other.GetComponentInParent<EnemyBase>()) //Si la colision fue con cualquier otra cosa y esta haciendo Rush, detener Rush
             {
                 ParticleSystem ps = Instantiate(slamParticle, transform.position + rushCollider.center * 2, Quaternion.identity);
                 ps.gameObject.transform.up = -transform.forward;

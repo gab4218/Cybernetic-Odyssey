@@ -834,6 +834,27 @@ public class PlayerActions : MonoBehaviour
 
     }
     
+    public IEnumerator GetEMPd(float maxT)
+    {
+        foreach (int i in Inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
+        {
+            disableUpgrade(i);
+        }
+
+        float t = 0;
+        while (t < maxT)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        foreach (int i in Inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
+        {
+            enableUpgrade(i);
+        }
+
+    }
+
     private void Cheat()
     {
         inventory.addToInventory(0,100);

@@ -118,10 +118,11 @@ public class FinalBoss : EnemyBase
 
     //EMP
     [Header("EMP")]
-    [SerializeField] private ParticleSystem _empP;
-    [SerializeField] private float _empRange = 20f;
+    [SerializeField] private ParticleSystem _empPS;
+    [SerializeField] private float _empRange = 30f;
     [SerializeField] private float _empWindupTime = 3f;
     [SerializeField] private float _empDuration = 15f;
+    [SerializeField] private float _empStunTime = 1.25f;
     private Ray _empRay;
     private Coroutine _empCR;
 
@@ -166,8 +167,8 @@ public class FinalBoss : EnemyBase
         }
 
         Stun(_gunStunTime);
-        Invoke("AllowShoot", _gunCooldown);
         _canShoot = false;
+        Invoke("AllowShoot", _gunCooldown);
         Invoke("AllowAttack", _attackCooldown);
         _gunCR = null;
     }
@@ -206,7 +207,7 @@ public class FinalBoss : EnemyBase
 
 
 
-    //Barrage
+    //Barrage (done?)
     private void MoveBarrage()
     {
         if (Vector3.Distance(transform.position, playerTranform.position) > _barrageDistance)
@@ -218,12 +219,17 @@ public class FinalBoss : EnemyBase
         else if (!_inBarrageRange)
         {
             _inBarrageRange = true;
-            _barrageCR = StartCoroutine(StartBarrage());
         }
     }
 
     private IEnumerator StartBarrage()
     {
+        _inBarrageRange = false;
+        while(_inBarrageRange == false)
+        {
+            MoveBarrage();
+            yield return null;
+        }
         for (int i = 0; i < _barrageAttackQuantity; i++)
         {
             float t = 0;
@@ -237,6 +243,8 @@ public class FinalBoss : EnemyBase
         Stun(_barrageStunTime);
         _canPunchBarrage = false;
         Invoke("AllowBarrage", _barrageCooldown);
+        Invoke("AllowAttack", _attackCooldown);
+        _barrageCR = null;
     }
 
     private IEnumerator BarrageHit()
@@ -258,6 +266,44 @@ public class FinalBoss : EnemyBase
     
 
 
+    //EMP (done?)
+    private IEnumerator StartEMP()
+    {
+        float t = 0;
+        while (t < _empWindupTime)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        DoEMP();
+        _canEMP = false;
+        Stun(_empStunTime);
+        Invoke("AllowEMP", _empCooldown);
+        Invoke("AllowAttack", _attackCooldown);
+        _empCR = null;
+    }
+
+    private void DoEMP()
+    {
+        dir = playerTranform.position - transform.position;
+        _empRay = new Ray(transform.position, dir);
+        ParticleSystem ps = Instantiate(_empPS, transform.position, Quaternion.identity);
+        ps.Play();
+        if (Physics.Raycast(_empRay, out RaycastHit hit, _empRange))
+        {
+            if (hit.collider.TryGetComponent(out PlayerActions pa))
+            {
+                StartCoroutine(pa.GetEMPd(_empDuration));
+            }
+        }
+    }
+
+    private void AllowEMP()
+    {
+        _canEMP = true;
+    }
+
+
 
 
     private void AllowAttack()
@@ -273,10 +319,11 @@ public class FinalBoss : EnemyBase
         switch (_selectedAttack)
         {
             case 0:
-                if (_canShoot) _gunCR = StartCoroutine(ShootGun());
+                if (_canShoot && _gunCR == null) _gunCR = StartCoroutine(ShootGun());
                 break;
 
             case 1:
+                if (_canPunchBarrage && _barrageCR == null) _barrageCR = StartCoroutine(StartBarrage());
                 break;
 
             case 2:
@@ -292,6 +339,7 @@ public class FinalBoss : EnemyBase
                 break;
 
             case 6:
+                if(_canEMP && _empCR == null) _empCR = StartCoroutine(StartEMP());
                 break;
 
             case 7:

@@ -84,6 +84,18 @@ public class InventoryManager : MonoBehaviour
     }
     private void OnEnable()
     {
+        upgradeDropdown = GetComponent<TMPro.TMP_Dropdown>();
+        if (PlayerActions.isEMPd)
+        {
+            upgradeDropdown.interactable = false;
+        }
+        else
+        {
+            upgradeDropdown.interactable = true;
+        }
+
+
+
         isRunning = true;
     }
 

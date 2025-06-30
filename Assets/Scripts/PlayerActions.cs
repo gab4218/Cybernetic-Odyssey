@@ -111,6 +111,9 @@ public class PlayerActions : MonoBehaviour
     public AudioClip shotgun;
     public AudioClip flamethrower;
 
+    public static bool isEMPd = false;
+
+
     public enum damageType
     {
         None,
@@ -621,6 +624,7 @@ public class PlayerActions : MonoBehaviour
             }
             if (currentHP <= 0)
             {
+                isEMPd = false;
                 dead = true;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
@@ -841,6 +845,8 @@ public class PlayerActions : MonoBehaviour
             disableUpgrade(i);
         }
 
+        isEMPd = true;
+
         float t = 0;
         while (t < maxT)
         {
@@ -848,6 +854,7 @@ public class PlayerActions : MonoBehaviour
             yield return null;
         }
 
+        isEMPd = false;
         foreach (int i in Inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
         {
             enableUpgrade(i);

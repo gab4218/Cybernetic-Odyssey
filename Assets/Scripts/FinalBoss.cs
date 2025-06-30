@@ -55,6 +55,7 @@ public class FinalBoss : EnemyBase
     private Ray _gunRay;
     private Coroutine _gunCR;
 
+
     //barrage
     [Header("Barrage")]
     [SerializeField] private Collider _barrageCollider;
@@ -82,19 +83,24 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _flameStunTime = 2f;
     private Coroutine _flamethrowerCR;
 
+
     //punch
     [Header("Punch")]
     [SerializeField] private Collider _punchCollider;
     [SerializeField] private ParticleSystem _punchPS;
     [SerializeField] private LineRenderer _punchLR;
-    [SerializeField] private GameObject _punchGameObject;
+    [SerializeField] private Rigidbody _punchRB;
     [SerializeField] private Transform _punchStartTransform;
     [SerializeField] private int _punchDamage = 40;
     [SerializeField] private float _punchWindupTime = 1.5f;
-    [SerializeField] private float _punchShootSpeed = 20f;
-    [SerializeField] private float _punchRetractSpeed = 40f;
+    [SerializeField] private float _punchShakeTime = 0.5f;
+    [SerializeField] private float _punchShootSpeed = 5f;
+    [SerializeField] private float _punchRetractSpeed = 15f;
     [SerializeField] private float _punchStunTime = 2f;
+    [SerializeField] private float _punchGrabDelay = 0.5f;
     private Coroutine _punchCR;
+    public bool punchWorking = true;
+
 
     //dropkick
     [Header("Dropkick")]
@@ -105,6 +111,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _dropkickWindupTime = 2f;
     [SerializeField] private float _dropkickStunTime = 3f;
     private Coroutine _dropkickCR;
+
 
     //shield
     [Header("Shield")]
@@ -135,9 +142,11 @@ public class FinalBoss : EnemyBase
     [SerializeField] float _grenadeLaunchForce = 15f;
     private Coroutine _grenadeCR;
 
+    
 
 
-    //Gun (done?)
+    //Gun (done?) [0]
+    #region Gun
     private void AimGun()
     {
         _aimTransform.position = Vector3.Lerp(_aimTransform.position, playerTranform.position, 1 - Mathf.Pow(0.8f, Time.deltaTime));
@@ -204,10 +213,90 @@ public class FinalBoss : EnemyBase
     {
         _canShoot = true;
     }
+    #endregion
 
 
+    // Punch [2]
+    #region Punch
 
-    //Barrage (done?)
+    private void AimPunch()
+    {
+        _aimTransform.position = playerTranform.position;
+        findDirection();
+        transform.rotation = Quaternion.LookRotation(dir.normalized);
+    }
+
+    private IEnumerator StartPunch()
+    {
+        _canAttack = false;
+        _canFirePunch = false;
+        float t = 0;
+        while (t < _punchWindupTime)
+        {
+            AimPunch();
+            t += Time.deltaTime;
+            yield return null;
+        }
+        StartCoroutine(ShootPunch());
+        
+    }
+
+
+    private IEnumerator ShootPunch()
+    {
+        float t = 0;
+        Vector3 originalPos = _punchStartTransform.position;
+
+        while(t < _punchShakeTime)
+        {
+            t += Time.deltaTime;
+            _punchRB.transform.position = Random.insideUnitSphere / 5 + originalPos;
+            yield return null;
+        }
+        _punchRB.transform.position = originalPos;
+        t = 0;
+        LineRenderer lr = Instantiate(_punchLR, transform.position, Quaternion.identity);
+        lr.SetPosition(0, _punchStartTransform.position);
+        while (t < 1 && punchWorking)
+        {
+            _punchRB.MovePosition(Vector3.Lerp(originalPos, _aimTransform.position, t));
+            lr.SetPosition(1, _punchRB.transform.position);
+            t += Time.deltaTime * _punchShootSpeed;
+            yield return null;
+        }
+        _punchCollider.enabled = true;
+        yield return null;
+        _punchCollider.enabled = false;
+        t = 0;
+        while(t < _punchGrabDelay)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        Vector3 currentpos = _punchRB.position;
+
+        t = 0;
+
+        while (t < 1)
+        {
+            _punchRB.MovePosition(Vector3.Lerp(currentpos, originalPos, t));
+            lr.SetPosition(1, _punchRB.transform.position);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(lr.gameObject);
+
+
+    }
+
+
+    #endregion
+
+
+    //Barrage (done?) [4]
+    #region Barrage
     private void MoveBarrage()
     {
         if (Vector3.Distance(transform.position, playerTranform.position) > _barrageDistance)
@@ -221,7 +310,6 @@ public class FinalBoss : EnemyBase
             _inBarrageRange = true;
         }
     }
-
     private IEnumerator StartBarrage()
     {
         _inBarrageRange = false;
@@ -246,7 +334,6 @@ public class FinalBoss : EnemyBase
         Invoke("AllowAttack", _attackCooldown);
         _barrageCR = null;
     }
-
     private IEnumerator BarrageHit()
     {
         float t = 0;
@@ -258,15 +345,15 @@ public class FinalBoss : EnemyBase
         }
         _barrageCollider.enabled = false;
     }
-
     private void AllowBarrage()
     { 
         _canPunchBarrage = true;
     }
-    
+    #endregion
 
 
-    //EMP (done?)
+    //EMP (done?) [6]
+    #region EMP
     private IEnumerator StartEMP()
     {
         float t = 0;
@@ -282,7 +369,6 @@ public class FinalBoss : EnemyBase
         Invoke("AllowAttack", _attackCooldown);
         _empCR = null;
     }
-
     private void DoEMP()
     {
         dir = playerTranform.position - transform.position;
@@ -297,13 +383,11 @@ public class FinalBoss : EnemyBase
             }
         }
     }
-
     private void AllowEMP()
     {
         _canEMP = true;
     }
-
-
+    #endregion
 
 
     private void AllowAttack()

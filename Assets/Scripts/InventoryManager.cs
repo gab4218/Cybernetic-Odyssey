@@ -84,6 +84,18 @@ public class InventoryManager : MonoBehaviour
     }
     private void OnEnable()
     {
+        upgradeDropdown = GetComponent<TMPro.TMP_Dropdown>();
+        if (PlayerActions.isEMPd)
+        {
+            upgradeDropdown.interactable = false;
+        }
+        else
+        {
+            upgradeDropdown.interactable = true;
+        }
+
+
+
         isRunning = true;
     }
 
@@ -151,15 +163,15 @@ public class InventoryManager : MonoBehaviour
     {
         if (isChangedByPerson) //Chequear que el cambio fue hecho por una persona
         {
+            SoundSingleton.Instance.Boton();
 
-
-            if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
-            {
-                inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
-            }
             if (oldUpgrade > 0) //Si una mejora es deseleccionada, desactivarla
             {
                 inventory.disableUpgrade(oldUpgrade, id);
+            }
+            if (upgradeDropdown.value > 0) //Si una mejora es seleccionada, activarla
+            {
+                inventory.enableUpgrade(possibleOptions.IndexOf(upgradeDropdown.options[upgradeDropdown.value].text), id);
             }
 
 

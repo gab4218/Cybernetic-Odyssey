@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
@@ -42,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private LineRenderer grappleLinePF;
     [SerializeField] private Transform grapplePoint;
-
+    
     private float targetFOV;
 
     public bool isCrouching = false, allowedToSlide = false;
@@ -54,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
     Vector3 flatVelocity;
-    private bool isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canWalljump = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
+    private bool isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canRoundSprint = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
 
     private Rigidbody rb;
 
@@ -63,7 +64,9 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit slopeHit;
 
     private Coroutine slideCR, smoothSpeedCR, staminaCR;
-
+    public AudioSource audioSource;
+    public AudioClip walking;
+    public AudioClip running;
     
 
 
@@ -89,6 +92,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if (DialogueManager.instance.inDialogue)
             {
+                anim.SetFloat("xDir", 0);
+                anim.SetFloat("zDir", 0);
                 return;
             }
         }
@@ -150,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
-            if (Input.GetKeyDown(jumpKey) && WallDetect() && currentStamina >= 0.5f) WallJump();
+            //if (Input.GetKeyDown(jumpKey) && WallDetect() && currentStamina >= 0.5f) WallJump();
 
 
             checkSpeed();
@@ -171,7 +176,6 @@ public class PlayerMovement : MonoBehaviour
             staminaImg.fillAmount = currentStamina/maxStamina;
 
         }
-
     }
 
     private void FixedUpdate()
@@ -239,13 +243,14 @@ public class PlayerMovement : MonoBehaviour
         return Vector3.ProjectOnPlane(dir, slopeHit.normal).normalized;
     }
 
+    /*
     private bool WallDetect() //Detectar paredes para walljump
     {
         
         wallRay = new Ray(transform.position + Vector3.up, dir);
 
 
-        if (!grounded && canWalljump)
+        if (!grounded && canRoundSprint)
         {
             return Physics.Raycast(wallRay, groundRayLen*3);
         }
@@ -254,7 +259,7 @@ public class PlayerMovement : MonoBehaviour
             return false;
         }
     }
-
+    */
     private void Movement(Vector3 dir) //Mover
     {
 
@@ -369,7 +374,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void checkSprint()
     {
-        if (Input.GetKey(sprintKey) && !isSprinting && !isCrouching && zDir > 0 && currentStamina > 0 && !isSliding) //Si el jugador Sprintea, se esta moviendo para adelante y no esta agachado, sprintear
+        if (Input.GetKey(sprintKey) && !isSprinting && !isCrouching && (zDir > 0 || canRoundSprint) && currentStamina > 0 && !isSliding) //Si el jugador Sprintea, se esta moviendo para adelante y no esta agachado, sprintear
         {
             accelMult = sprintMult;
             isSprinting = true;
@@ -389,7 +394,7 @@ public class PlayerMovement : MonoBehaviour
             }
             targetFOV = FOV_Sprint;
         }
-        else if ((Input.GetKeyUp(sprintKey) || zDir < 1 || currentStamina <= 0) && isSprinting) //Si el jugador deja de sprintear o se le acaba la Stamina, dejar de sprintear
+        else if ((Input.GetKeyUp(sprintKey) || (zDir < 1 && !canRoundSprint)|| currentStamina <= 0) && isSprinting) //Si el jugador deja de sprintear o se le acaba la Stamina, dejar de sprintear
         {
             if (smoothSpeedCR != null)
             {
@@ -438,9 +443,9 @@ public class PlayerMovement : MonoBehaviour
         anim.SetTrigger("Jump");
     }
 
-    public void ChangeWalljump(bool newWalljump) //Habilitar o deshabilitar wall jump
+    public void ChangeSprint(bool newSprint) //Habilitar o deshabilitar wall jump
     {
-        canWalljump = newWalljump;
+        canRoundSprint = newSprint;
     }
 
     public void GrappleTo(Vector3 grapplePos) //Grappling
@@ -539,6 +544,7 @@ public class PlayerMovement : MonoBehaviour
             blend -= Time.deltaTime * 7;
             yield return null;
         }
+        
         Destroy(grappleLine.gameObject);
     }
 }

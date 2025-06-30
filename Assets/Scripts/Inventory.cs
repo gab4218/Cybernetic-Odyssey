@@ -13,6 +13,7 @@ public class Inventory : MonoBehaviour
     public TMP_Text[] matDisplay;
     public TMP_Text[] craftingMatDisplay;
     public static List<int> availableUpgrades = new List<int>();
+    //[SerializeField] List<int> aUpg;
     [SerializeField] private AudioClip craftSound;
     [SerializeField] private AudioSource sfxSource;
 
@@ -22,7 +23,7 @@ public class Inventory : MonoBehaviour
     public static int[] materialInventory = new int[3];
     public static bool hasShotgun = false;
     public static bool hasFlamethrower = false;
-    
+    //[SerializeField] int[] sSlots = new int[4], matInv = new int[3];
     
     
 
@@ -33,6 +34,9 @@ public class Inventory : MonoBehaviour
     }
     private void Update()
     {
+        //aUpg = availableUpgrades;
+        //sSlots = secondarySlots;
+        //matInv = materialInventory;
         displayMats(); //Mostrar materiales y verificar integridad
         CheckForDuplicates();
     }
@@ -58,6 +62,13 @@ public class Inventory : MonoBehaviour
         text.color = Color.white;
     }
 
+    public void UpgradeColors(Image prettyImage)
+    {
+        prettyImage.gameObject.SetActive(true);
+        prettyImage.color = Color.white;
+        StartCoroutine(BackNormal(prettyImage));
+    }
+
     public void unlockUpgrade(ItemCost upgrade) //Desbloquear mejora y remover costo
     {
         for (int i = 0; i < upgrade.cost.Length; i++)
@@ -70,6 +81,7 @@ public class Inventory : MonoBehaviour
         }
         sfxSource.clip = craftSound;
         sfxSource.Play();
+        
         upgrade.hasBeenCrafted = true;
         if (upgrade.upgradeType != 0)
         {
@@ -93,6 +105,18 @@ public class Inventory : MonoBehaviour
         
     }
 
+    private IEnumerator BackNormal(Image img)
+    {
+        float t = 0;
+        while (t < 0.5f)
+        {
+            img.color = Color.Lerp(Color.white, new Color(1, 1, 1, 0), t/0.5f);
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        img.gameObject.SetActive(false);
+
+    }
     public void enableUpgrade(int upgrade, int slot) //Habilitar mejora
     {
         secondarySlots[slot] = upgrade;

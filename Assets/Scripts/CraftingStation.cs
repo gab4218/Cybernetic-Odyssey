@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -23,6 +24,8 @@ public class CraftingStation : MonoBehaviour, IInteractable
 
     public void onInteract() //Al interactuar, 
     {
+        if (Inventory.hasShotgun) costs[6].hasBeenCrafted = true;
+        if (Inventory.hasFlamethrower) costs[7].hasBeenCrafted = true;
         Time.timeScale = 0;
         craftingMenu.SetActive(true);
         Cursor.visible = true;
@@ -46,6 +49,10 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 {
                     hasColors[j] = false;
                 }
+            }
+            if ((Inventory.secondarySlots.Contains(costs[i].upgradeType) || Inventory.availableUpgrades.Contains(costs[i].upgradeType)) && i < 6)
+            {
+                costs[i].hasBeenCrafted = true;
             }
             if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true && !costs[i].hasBeenCrafted)
             {

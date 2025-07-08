@@ -23,6 +23,7 @@ public class Inventory : MonoBehaviour
     public static int[] materialInventory = new int[3];
     public static bool hasShotgun = false;
     public static bool hasFlamethrower = false;
+    public static bool hasRocket = false;
     //[SerializeField] int[] sSlots = new int[4], matInv = new int[3];
     
     
@@ -97,11 +98,15 @@ public class Inventory : MonoBehaviour
                 case 1:
                     hasFlamethrower = true;
                     break;
+                case 2:
+                    hasRocket = true;
+                    break;
                 default:
                     break;
             }
             playerActions.unlockWeapon(upgrade.majorUpgradeType);
         }
+        upgrade.gameObject.SetActive(false);
         
     }
 

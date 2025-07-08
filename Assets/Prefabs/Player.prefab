@@ -575,6 +575,8 @@ MonoBehaviour:
   audioSource: {fileID: 1546638042453078054}
   walking: {fileID: 8300000, guid: 320883d4e5f54fd4a84821f9462274a8, type: 3}
   running: {fileID: 8300000, guid: 4e0f52c4923306947bd873be3cbcbd21, type: 3}
+  allowedDoubleJump: 0
+  overloadMult: 1
 --- !u!114 &3675656459257189364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -587,6 +589,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53160c9eeed5df542895dc73ecaa9734, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flamethrowerMats:
+  - {fileID: 2100000, guid: af10698ee2557d74fb90e374118c4e8c, type: 2}
+  - {fileID: 2100000, guid: 1c2fb40cd320f4442825d55e3230eba7, type: 2}
+  - {fileID: 2100000, guid: 7b79a99e09fc11d4b9701a09e4ca1545, type: 2}
   cameraTransform: {fileID: 0}
   inventoryPlaceholder: {fileID: 0}
   HPDisplay: {fileID: 0}
@@ -727,6 +733,7 @@ MonoBehaviour:
   pistolMesh: {fileID: 1446200243280803077, guid: fbe87beec45d7004a8f17b3aba473301, type: 3}
   shotgunMesh: {fileID: 4068373912626513877, guid: 0ed7f84d7ef0c4b4d9981163bb705c8b, type: 3}
   flamethrowerMesh: {fileID: -5579741352678751231, guid: 6211a51ffadd13d48bd74fc86157ca3a, type: 3}
+  rocketMesh: {fileID: -3758573805739257388, guid: c110615024218f4418c04d13ec9cdc03, type: 3}
   pistolUnlockIMG: {fileID: 0}
   shotgunUnlockIMG: {fileID: 0}
   flamethrowerUnlockIMG: {fileID: 0}
@@ -735,16 +742,105 @@ MonoBehaviour:
   - {fileID: 21300000, guid: dc5ad62bf5b178f4d839a94c4f4d389c, type: 3}
   - {fileID: 21300000, guid: d9b67be7cef47114eb71b05f449737a3, type: 3}
   overloadingColors:
-  - {r: 0.19339621, g: 0.8998334, b: 1, a: 1}
-  - {r: 1, g: 0.3974151, b: 0, a: 1}
-  - {r: 0, g: 1, b: 0.015195131, a: 1}
+  - serializedVersion: 2
+    key0: {r: 1, g: 0.84232986, b: 0, a: 1}
+    key1: {r: 1, g: 0, b: 0, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0.29411766}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 36237
+    ctime2: 57054
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 53585
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 3
+  - serializedVersion: 2
+    key0: {r: 0.6179246, g: 0.9381638, b: 1, a: 1}
+    key1: {r: 0, g: 0.054832935, b: 1, a: 1}
+    key2: {r: 1, g: 1, b: 1, a: 0.29411766}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 36237
+    ctime2: 57054
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 53585
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 3
+  - serializedVersion: 2
+    key0: {r: 0.49462765, g: 1, b: 0.4764151, a: 1}
+    key1: {r: 0, g: 0.6226415, b: 0.10175591, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0.29411766}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 36237
+    ctime2: 57054
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 53585
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 3
   flamethrowerFirePS: {fileID: 0}
   shotPS: {fileID: 6805266536167677760, guid: 0a40c5ef0d33c4a44b4ba245223807e6, type: 3}
   bulletHolePS: {fileID: 6648960303439227232, guid: df8ca23478106a64fbe2ecf01a732ce4, type: 3}
   gunAnimator: {fileID: 0}
-  handAnimator: {fileID: 0}
+  pistolHand: {fileID: 0}
+  shotgunHand: {fileID: 0}
+  flamethrowerHand: {fileID: 0}
   camContoller: {fileID: 0}
   damagedIMG: {fileID: 0}
+  grappleIndicator: {fileID: 0}
+  rocket: {fileID: 4795497577564567076, guid: 543d7ec76a3e0c944a4e57d7fd298c66, type: 3}
+  empIMG: {fileID: 0}
   shootKey: 323
   interactKey: 101
   inventoryKey: 9
@@ -763,7 +859,7 @@ MonoBehaviour:
   shotgunFallOffStart: 5
   shotgunFallOffMax: 15
   shotgunPelletCount: 5
-  shotgunPelletSpreadMax: 10
+  shotgunPelletSpreadMax: 3
   flamethrowerCollider: {fileID: 0}
   flamethrowerOverheatTime: 5
   flamethrowerOverheatLength: 25
@@ -792,11 +888,13 @@ MonoBehaviour:
   partMin: {fileID: 704876869660727204, guid: cb3fd86f1074f6e44a47b0281f0acc2f, type: 3}
   partMid: {fileID: 2307703672736081187, guid: ebb1b875768588b4d921799cbf3a71ae, type: 3}
   isCrouched: 0
-  canGambleCrouch: 0
+  differentFlames: 0
   audioSource: {fileID: 2097694590592451968}
   gun: {fileID: 8300000, guid: 26533ea5fcf52ed42bca3a2f29b57f48, type: 3}
   shotgun: {fileID: 8300000, guid: 1d12a46f2576f26449527bc41eca6178, type: 3}
   flamethrower: {fileID: 8300000, guid: 14c39d0108e1ab747affaa355a66c193, type: 3}
+  overloadMult: 1
+  dmgType: 2
 --- !u!54 &2977787141678710446
 Rigidbody:
   m_ObjectHideFlags: 0

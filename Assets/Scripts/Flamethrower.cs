@@ -6,10 +6,14 @@ public class Flamethrower : MonoBehaviour
 {
     [SerializeField] int flamethrowerDamage = 1;
     
-
+    PlayerActions playerActions;
     int t = 0;
     bool onEnemy;
     EnemyBase eb;
+    private void Start()
+    {
+        playerActions = FindObjectOfType<PlayerActions>();
+    }
     private void OnTriggerEnter(Collider other)
     {
         eb = other.gameObject.GetComponentInParent<EnemyBase>();
@@ -27,8 +31,7 @@ public class Flamethrower : MonoBehaviour
             {
                 if (eb != null)
                 {
-                    eb.takeDamage(flamethrowerDamage, PlayerActions.damageType.Fire);
-                    eb.WeakenArmor(PlayerActions.damageType.Fire);
+                    eb.takeDamage(flamethrowerDamage, playerActions.dmgType);
                 } 
             }
         }

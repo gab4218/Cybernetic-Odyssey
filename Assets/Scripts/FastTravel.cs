@@ -6,13 +6,14 @@ using UnityEngine.SceneManagement;
 
 public class FastTravel : MonoBehaviour, IInteractable
 {
-    [SerializeField] GameObject menu;
+    [SerializeField] GameObject menu, bossButton;
     private bool onMenu = false;
     //AsyncOperation async;
     //bool loadingDone;
 
     private void Start()
     {
+        if(bossButton != null && !ProgressManager.beatBear) bossButton.SetActive(false);
         menu.SetActive(false);
     }
 

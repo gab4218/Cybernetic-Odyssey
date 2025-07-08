@@ -58,6 +58,11 @@ public class CraftingStation : MonoBehaviour, IInteractable
             {
                 craftingButtons[i].interactable = true;
             }
+            else if (costs[i].hasBeenCrafted)
+            {
+                craftingButtons[i].interactable = false;
+                craftingButtons[i].gameObject.SetActive(false);
+            }
             else
             {
                 craftingButtons[i].interactable = false;
@@ -75,7 +80,8 @@ public class CraftingStation : MonoBehaviour, IInteractable
         for (int i = 0; i < craftingButtons.Length; i++)
         {
             costs[i] = craftingButtons[i].GetComponent<ItemCost>();
-            craftingButtons[i].interactable = false;  
+            craftingButtons[i].interactable = false;
+            if (costs[i].hasBeenCrafted) craftingButtons[i].gameObject.SetActive(false);
         }
     }
 
@@ -109,6 +115,11 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 if (hasColors[0] == true && hasColors[1] == true && hasColors[2] == true && !costs[i].hasBeenCrafted)
                 {
                     craftingButtons[i].interactable = true;
+                }
+                else if (costs[i].hasBeenCrafted)
+                {
+                    craftingButtons[i].interactable = false;
+                    craftingButtons[i].gameObject.SetActive(false);
                 }
                 else
                 {

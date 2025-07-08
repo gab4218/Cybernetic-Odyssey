@@ -67,8 +67,10 @@ public class PlayerMovement : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip walking;
     public AudioClip running;
-    
 
+    public bool allowedDoubleJump = false;
+    private bool canDoubleJump = false;
+    public float overloadMult = 1;
 
     private void Awake()
     {
@@ -151,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
             rb.useGravity = !onSlope;
 
 
-            if (Input.GetKeyDown(jumpKey) && grounded) //Salto
+            if (Input.GetKeyDown(jumpKey) && (grounded || canDoubleJump)) //Salto
             {
                 Jump();
             }
@@ -207,7 +209,12 @@ public class PlayerMovement : MonoBehaviour
         groundRay = new Ray(posOffset, -transform.up);
         grounded = Physics.Raycast(groundRay, groundRayLen, groundRayLayerMask);
         anim.SetBool("Grounded", grounded);
-        
+
+        if (allowedDoubleJump && grounded)
+        {
+            canDoubleJump = true;
+        }
+
         if (grounded && !isSprinting && walljumping)
         {
             walljumping = false;
@@ -266,7 +273,7 @@ public class PlayerMovement : MonoBehaviour
         if (onSlope)
         {
             
-            rb.AddForce(SlopeMoveDir() * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded? 1 : 0.25f), ForceMode.Force);
+            rb.AddForce(SlopeMoveDir() * overloadMult * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded? 1 : 0.25f), ForceMode.Force);
             if (rb.velocity.y > 0)
             {
                 rb.AddForce(Vector3.down * 10f, ForceMode.Force);
@@ -274,7 +281,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.AddForce(dir * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded ? 1 : 0.25f), ForceMode.Force);
+            rb.AddForce(dir * overloadMult * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded ? 1 : 0.25f), ForceMode.Force);
         }
 
     }
@@ -285,9 +292,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (onSlope && !jumping)
         {
-            if (rb.velocity.sqrMagnitude > maxSpeed * maxSpeed)
+            if (rb.velocity.sqrMagnitude > overloadMult * maxSpeed * maxSpeed)
             {
-                rb.velocity = rb.velocity.normalized * maxSpeed;
+                rb.velocity = rb.velocity.normalized * overloadMult * maxSpeed;
             }
         }
         else
@@ -297,9 +304,9 @@ public class PlayerMovement : MonoBehaviour
         
         
             //Chequear si la velocidad horizontal excede un limite y corregir
-            if (flatVelocity.sqrMagnitude > maxSpeed * maxSpeed)
+            if (flatVelocity.sqrMagnitude > overloadMult * maxSpeed * maxSpeed)
             {
-                flatVelocity = flatVelocity.normalized * maxSpeed;
+                flatVelocity = flatVelocity.normalized * overloadMult * maxSpeed;
                 rb.velocity = new Vector3(flatVelocity.x, rb.velocity.y, flatVelocity.z);
             }
             
@@ -420,11 +427,17 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         //Frenar todo movimiento vertical y aplicar fuerza de salto para que sea consistente
+        if (canDoubleJump && !grounded)
+        {
+            canDoubleJump = false;
+        }
         jumping = true;
         Invoke("StopJumping", 0.5f);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         anim.SetTrigger("Jump");
+
+
     }
 
     private void StopJumping()

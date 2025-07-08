@@ -32,6 +32,10 @@ public class Menu : MonoBehaviour
         Inventory.materialInventory = new int[3];
         Inventory.hasShotgun = false;
         Inventory.hasFlamethrower = false;
+        Inventory.hasRocket = false;
+        ProgressManager.gotBearRewards = false;
+        ProgressManager.beatBear = false;
+        ProgressManager.gotStartRewards = false;
     }
 
     public void Controls(string controls)

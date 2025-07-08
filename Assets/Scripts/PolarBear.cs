@@ -95,7 +95,7 @@ public class PolarBear : EnemyBase
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
-        
+        if (ProgressManager.beatBear) Destroy(gameObject);
         //Preparaciones generales
         
     }
@@ -166,12 +166,15 @@ public class PolarBear : EnemyBase
 
     protected override void OnDestroy()
     {
+        if (ProgressManager.beatBear)
+        {
+            return;
+        }
         if (!PlayerActions.dead)
         {
-            PlayerActions.won = true;
-            winText?.gameObject.SetActive(true);
             if (SoundSingleton.Instance != null)
             {
+                ProgressManager.beatBear = true;
                 SoundSingleton.Instance.OsoMuerte();
             }
         }

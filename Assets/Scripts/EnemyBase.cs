@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
+
 public abstract class EnemyBase : MonoBehaviour
 {
 
@@ -20,6 +20,8 @@ public abstract class EnemyBase : MonoBehaviour
     public int state;
     protected bool isAngered = false;
     protected bool canCalm = true;
+    public bool canParry = false;
+
     //Variables basicas modificables en el editor que un enemigo podria tener
     [SerializeField] protected int maxHP;
     [SerializeField] protected float speed;
@@ -37,6 +39,7 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected bool canSlow = true;
     [SerializeField] protected int armorHealth = 300; 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
+    [SerializeField] protected bool removeCollider = false;
     //Otras variables comunes de enemigo
     protected ParticleSystem currentFirePS, currentIcePS;
     protected Vector3[] randomMovementDimensions;
@@ -64,8 +67,13 @@ public abstract class EnemyBase : MonoBehaviour
     protected Coroutine calmCoroutine;
     protected Coroutine iceCoroutine;
     protected float originalSpeed;
+    public bool shielded = false;
 
 
+    public virtual void ShieldDamage(int dmg)
+    {
+        return;
+    }
 
     protected virtual void Start()
     {
@@ -76,22 +84,36 @@ public abstract class EnemyBase : MonoBehaviour
         playerTranform = player.transform;
         state = IDLE;
         navMeshAgent = GetComponent<NavMeshAgent>();
-        originalSpeed = navMeshAgent.speed;
+        if (navMeshAgent != null) originalSpeed = navMeshAgent.speed;
+        else originalSpeed = speed;
         
         if (ignoreCollidersGO != null)
         {
             ignoreColliders = ignoreCollidersGO.GetComponents<Collider>();
         }
 
-        if (strongCollidersGO != null)
-        {
-            strongColliders = strongCollidersGO.GetComponents<Collider>();
-        }
-
         if (weakCollidersGO != null)
         {
             weakColliders = weakCollidersGO.GetComponents<Collider>();
         }
+
+        if (strongCollidersGO != null)
+        {
+            strongColliders = strongCollidersGO.GetComponentsInChildren<Collider>();
+            if (weakColliders != null)
+            {
+                List<Collider> c = strongColliders.ToList();
+                if (c.Contains(weakColliders[0])) c.Remove(weakColliders[0]);
+                if (removeCollider && c.Contains(strongCollidersGO.GetComponent<Collider>()))
+                {
+                    c.Remove(strongCollidersGO.GetComponent<Collider>());
+                }
+
+
+                strongColliders = c.ToArray();
+            }
+        }
+
         if (isAerial)
         {
             randomMovementDimensions = new Vector3[]
@@ -112,7 +134,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        enemySpawner.enemyCount--;
+        if (enemySpawner != null) enemySpawner.enemyCount--;
     }
     protected virtual void detectPlayer() //Detectar jugador
     {
@@ -133,7 +155,7 @@ public abstract class EnemyBase : MonoBehaviour
         dir = playerTranform.position - transform.position;
         dir.y = 0;
         dir.Normalize();
-        if (navMeshAgent.enabled)
+        if (navMeshAgent != null && navMeshAgent.enabled)
         {
 
             navMeshAgent.destination = playerTranform.position;
@@ -263,13 +285,13 @@ public abstract class EnemyBase : MonoBehaviour
     {
         state = STUNNED;
         Invoke("Destun", stunTime);
-        navMeshAgent.isStopped = true;
+        if (navMeshAgent != null) navMeshAgent.isStopped = true;
     }
 
     private void Destun() //Usado para Invoke
     {
         state = IDLE;
-        navMeshAgent.isStopped = false;
+        if(navMeshAgent!=null) navMeshAgent.isStopped = false;
         
     }
 

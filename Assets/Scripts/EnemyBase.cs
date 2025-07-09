@@ -233,7 +233,7 @@ public abstract class EnemyBase : MonoBehaviour
         }
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
-            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
         if (currentHP <= 0) //Si muerto, destruir
         {

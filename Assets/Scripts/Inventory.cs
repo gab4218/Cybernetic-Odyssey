@@ -82,7 +82,7 @@ public class Inventory : MonoBehaviour
         }
         sfxSource.clip = craftSound;
         sfxSource.Play();
-        
+        Debug.Log("aaaa" + upgrade.upgradeType);
         upgrade.hasBeenCrafted = true;
         if (upgrade.upgradeType != 0)
         {

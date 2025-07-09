@@ -6,10 +6,14 @@ public class RocketCollisonDetection : MonoBehaviour
 {
     [SerializeField] Collider _explosion;
     [SerializeField] ParticleSystem _explosionPS;
+    [SerializeField] AudioSource _explosionAS;
     private void OnCollisionEnter(Collision collision)
     {
         _explosion.enabled = true;
         Instantiate(_explosionPS, transform.position, Quaternion.identity).Play();
+        AudioSource AS = Instantiate(_explosionAS, transform.position, transform.rotation);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
         Destroy(gameObject, 0.2f);
     }
 
@@ -21,7 +25,11 @@ public class RocketCollisonDetection : MonoBehaviour
 
             if(eb != null)
             {
-                if (!eb.shielded) eb.takeDamage(60, PlayerActions.damageType.Fire);
+                if (!eb.shielded)
+                {
+                    _explosion.enabled = false;
+                    eb.takeDamage(60, PlayerActions.damageType.Fire);
+                }
                 else eb.ShieldDamage(150);
             }
 

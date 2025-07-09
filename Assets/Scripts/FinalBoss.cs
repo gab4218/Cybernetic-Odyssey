@@ -36,11 +36,11 @@ public class FinalBoss : EnemyBase
     [Header("Cooldowns")]
 
     [SerializeField] private float _gunCooldown = 10f;
-    [SerializeField] private float _flamethrowerCooldown = 15f;
+    [SerializeField] private float _flamethrowerCooldown = 25f;
     [SerializeField] private float _firePunchCooldown = 10f;
     [SerializeField] private float _dropKickCooldown = 20f;
     [SerializeField] private float _barrageCooldown = 25f;
-    [SerializeField] private float _shieldCooldown = 30f;
+    [SerializeField] private float _shieldCooldown = 40f;
     [SerializeField] private float _empCooldown = 30f;
     [SerializeField] private float _attackCooldown = 5f;
     private bool _canAttack = true;
@@ -59,6 +59,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _gunDamageInterval = 0.1f;
     [SerializeField] private float _gunDuration = 3f;
     [SerializeField] private float _gunStunTime = 1.5f;
+    [SerializeField] private AudioSource _gunAS;
     private Ray _gunRay;
     private Coroutine _gunCR;
 
@@ -75,6 +76,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _barrageAttackDuration = 0.1f;
     [SerializeField] private float _barrageStunTime = 3f;
     [SerializeField] private float _barrageKnockback = 2;
+    [SerializeField] private AudioSource _spinAS;
     private Coroutine _barrageCR;
     private bool _inBarrageRange = false;
 
@@ -92,6 +94,8 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _flamethrowerHeight = 10f;
     [SerializeField] private float _flameStunTime = 2f;
     [SerializeField] private float _flamethrowerKnockback = 3;
+    
+    [SerializeField] private AudioSource _flamethrowerAS;
     private Coroutine _flamethrowerCR;
     private Transform _selectedFlameCheckpoint;
 
@@ -114,6 +118,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _punchStunTime = 2f;
     [SerializeField] private float _punchGrabDelay = 0.5f;
     [SerializeField] private float _punchKnockback = 3;
+    [SerializeField] private AudioSource _punchAS;
     private Coroutine _punchCR;
     public bool punchWorking = true;
 
@@ -127,6 +132,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _dropkickWindupTime = 2f;
     [SerializeField] private float _dropkickStunTime = 3f;
     [SerializeField] private float _dropkickKnockback = 4;
+    [SerializeField] private AudioSource _impactAS;
     private Coroutine _dropkickCR;
 
 
@@ -140,6 +146,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private int _shieldHP = 300;
     [SerializeField] private float _shieldTime = 5f;
     [SerializeField] private float _shieldStunTime = 2f;
+    [SerializeField] private AudioSource _shieldAS;
     private int _currentShieldHP;
     private Coroutine _shieldCR;
 
@@ -152,6 +159,8 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _empWindupTime = 3f;
     [SerializeField] private float _empDuration = 15f;
     [SerializeField] private float _empStunTime = 1.25f;
+    [SerializeField] private AudioSource _empStartAS;
+    [SerializeField] private AudioSource _empAS;
     private Ray _empRay;
     private Coroutine _empCR;
 
@@ -189,6 +198,9 @@ public class FinalBoss : EnemyBase
         _anim.SetBool("gun", true);
         float t = 0;
         ParticleSystem gps = Instantiate(_gunChargePS, _bulletSpawnPoint);
+        AudioSource AS = Instantiate(_gunAS, transform);
+        AS.Play();
+
         while (t < _gunStartupDelay)
         {
 
@@ -212,6 +224,7 @@ public class FinalBoss : EnemyBase
             StartCoroutine(Shoot());
         }
         //Destroy(gps.gameObject);
+        Destroy(AS.gameObject);
         _anim.SetBool("gun", false);
         Stun(_gunStunTime);
         _canShoot = false;
@@ -295,8 +308,9 @@ public class FinalBoss : EnemyBase
         float t = 0;
         Vector3 startPos = transform.position;
         Vector3 endPos = transform.position;
-        
 
+        AudioSource AS = Instantiate(_flamethrowerAS);
+        AS.Play();
         if (Physics.Raycast(new Ray(startPos, transform.up), _flamethrowerHeight + _punchHeight))
         {
             while (Vector3.Distance(transform.position, _middleTransform.position) > 1f)
@@ -327,11 +341,13 @@ public class FinalBoss : EnemyBase
         while (t < _flameWindup)
         {
             t += Time.deltaTime;
+            _punchRB.transform.position = _punchStartTransform.position;
+            _punchRB.transform.rotation = _punchStartTransform.rotation;
             yield return null;
         }
 
 
-        ParticleSystem ps = Instantiate(_flamePS, _bulletSpawnPoint);
+        ParticleSystem ps = Instantiate(_flamePS, _bulletSpawnPoint.position, Quaternion.LookRotation(-transform.up));
         
         FindFlameCheckpoint();
         _flameCollider.enabled = true;
@@ -340,6 +356,7 @@ public class FinalBoss : EnemyBase
         while(t < _flameDuration)
         {
             MoveFlamethrower();
+            ps.transform.position = _bulletSpawnPoint.position;
             t += Time.deltaTime;
             yield return null;
         }
@@ -350,6 +367,7 @@ public class FinalBoss : EnemyBase
             {
                 dir = _middleTransform.position - transform.position;
                 dir.Normalize();
+                ps.transform.position = _bulletSpawnPoint.position;
                 rb.velocity = dir * _barrageSpeed;
                 yield return null;
             }
@@ -360,6 +378,7 @@ public class FinalBoss : EnemyBase
         pse.enabled = false;
         Destroy(ps.gameObject, 4f);
         _flameCollider.enabled = false;
+        Destroy(AS.gameObject);
 
         _canFlamethrow = false;
         Stun(_flameStunTime);
@@ -431,7 +450,9 @@ public class FinalBoss : EnemyBase
         float t = 0;
         Vector3 originalPos = _punchStartTransform.position;
         Destroy(Instantiate(_punchChargePS, _punchStartTransform), _punchShakeTime);
-        while(t < _punchShakeTime)
+        AudioSource AS = Instantiate(_punchAS);
+        AS.Play();
+        while (t < _punchShakeTime)
         {
             t += Time.deltaTime;
             _punchRB.transform.position = Random.insideUnitSphere / 5 + originalPos;
@@ -451,7 +472,10 @@ public class FinalBoss : EnemyBase
             t += Time.deltaTime * _punchShootSpeed/2;
             yield return null;
         }
-
+        Destroy(AS.gameObject);
+        AS = Instantiate(_impactAS);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
         _punchCollider.enabled = true;
         Instantiate(_punchPS, _punchCollider.transform.position, Quaternion.identity).Play();
         yield return new WaitForFixedUpdate();
@@ -544,7 +568,9 @@ public class FinalBoss : EnemyBase
         }
         _dropkickWorking = false;
         _anim.SetBool("dropkick", false);
-
+        AudioSource AS = Instantiate(_impactAS);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
         _dropkickDmgCollider.enabled = true;
         yield return new WaitForFixedUpdate();
         _dropkickDmgCollider.enabled = false;
@@ -589,7 +615,10 @@ public class FinalBoss : EnemyBase
         Debug.Log("spin");
         _inBarrageRange = false;
         ParticleSystem ps = Instantiate(_barragePS, transform);
-        while(_inBarrageRange == false)
+        AudioSource AS = Instantiate(_spinAS);
+        AS.Play();
+        
+        while (_inBarrageRange == false)
         {
             MoveBarrage();
             _punchRB.transform.position = _punchStartTransform.position;
@@ -614,7 +643,7 @@ public class FinalBoss : EnemyBase
         Stun(_barrageStunTime);
         Destroy(ps.gameObject);
         _canPunchBarrage = false;
-
+        Destroy(AS.gameObject);
 
 
         Invoke("AllowBarrage", _barrageCooldown);
@@ -708,6 +737,7 @@ public class FinalBoss : EnemyBase
     }
     #endregion
 
+
     //EMP (done?) [6]
     #region EMP
     private IEnumerator StartEMP()
@@ -717,6 +747,9 @@ public class FinalBoss : EnemyBase
         Debug.Log("Emp");
         ParticleSystem ps = Instantiate(_empChargePS, transform.position, Quaternion.identity);
         _anim.SetTrigger("emp");
+        AudioSource AS = Instantiate(_empStartAS, transform.position, Quaternion.identity);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
         while (t < _empWindupTime)
         {
             t += Time.deltaTime;
@@ -726,6 +759,7 @@ public class FinalBoss : EnemyBase
         }
         _anim.SetTrigger("empboom");
         DoEMP();
+        Destroy(AS.gameObject);
         _canEMP = false;
         Destroy(ps.gameObject);
         Stun(_empStunTime);
@@ -739,6 +773,9 @@ public class FinalBoss : EnemyBase
         _empRay = new Ray(transform.position, dir);
         ParticleSystem ps = Instantiate(_empPS, transform.position, Quaternion.identity);
         ps.Play();
+        AudioSource AS = Instantiate(_empAS);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
         if (Physics.Raycast(_empRay, out RaycastHit hit, _empRange))
         {
             PlayerActions p = hit.collider.GetComponentInParent<PlayerActions>();
@@ -758,6 +795,9 @@ public class FinalBoss : EnemyBase
     public override void ShieldDamage(int dmg)
     {
         _currentShieldHP -= dmg;
+        AudioSource AS = Instantiate(_shieldAS);
+        AS.Play();
+        Destroy(AS.gameObject, AS.clip.length);
     }
 
 

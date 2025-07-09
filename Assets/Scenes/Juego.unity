@@ -2143,7 +2143,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -286.99997, y: -17.299988}
+  m_AnchoredPosition: {x: -407.49994, y: -29.800032}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &226640797
@@ -2569,6 +2569,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 273317367}
   m_CullTransparentMesh: 1
+--- !u!1 &294146753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 294146754}
+  - component: {fileID: 294146756}
+  - component: {fileID: 294146755}
+  m_Layer: 5
+  m_Name: RocketUnlockImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &294146754
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294146753}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: -0.2993186, y: 0.29931864, z: 0.29931864}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 990324090}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 505.9999, y: 104.000046}
+  m_SizeDelta: {x: 837, y: 216}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &294146755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294146753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: ae86357a916f8634e99668205e660e26, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &294146756
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294146753}
+  m_CullTransparentMesh: 1
 --- !u!64 &303737355
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2625,7 +2700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 88.5, y: -35.499985}
+  m_AnchoredPosition: {x: -32, y: -48}
   m_SizeDelta: {x: 521, y: 484}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &318305084
@@ -4014,7 +4089,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -238, y: -173}
+  m_AnchoredPosition: {x: -358.49997, y: -185.50005}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &432370494
@@ -5599,7 +5674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -106, y: 108}
+  m_AnchoredPosition: {x: 255, y: 108}
   m_SizeDelta: {x: 221.6489, y: 93.971}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &584045835
@@ -7294,7 +7369,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 463.10004, y: -112.19998}
+  m_AnchoredPosition: {x: 342.60007, y: -124.70003}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &708466714
@@ -10503,6 +10578,7 @@ RectTransform:
   - {fileID: 1394816178}
   - {fileID: 1882578556}
   - {fileID: 584045834}
+  - {fileID: 294146754}
   m_Father: {fileID: 1698831116}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -175572,7 +175648,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 455.30002, y: 19.600016}
+  m_AnchoredPosition: {x: 334.80005, y: 7.099971}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1880898062
@@ -175748,7 +175824,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -332, y: 104}
+  m_AnchoredPosition: {x: -276, y: 104}
   m_SizeDelta: {x: 1156, y: 512}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1882578557
@@ -182232,6 +182308,10 @@ PrefabInstance:
       propertyPath: pistolUnlockIMG
       value: 
       objectReference: {fileID: 1394816179}
+    - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
+      propertyPath: rocketUnlockIMG
+      value: 
+      objectReference: {fileID: 294146755}
     - target: {fileID: 3675656459257189364, guid: a7f4ed12d8897e249a0a2d29a427f7e3, type: 3}
       propertyPath: flamethrowerHand
       value: 

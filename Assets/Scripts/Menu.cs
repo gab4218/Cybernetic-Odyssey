@@ -36,6 +36,7 @@ public class Menu : MonoBehaviour
         ProgressManager.gotBearRewards = false;
         ProgressManager.beatBear = false;
         ProgressManager.gotStartRewards = false;
+        ProgressManager.talkedToMilitary = false;
     }
 
     public void Controls(string controls)

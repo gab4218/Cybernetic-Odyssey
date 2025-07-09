@@ -8,26 +8,45 @@ public class DialogueAgent : MonoBehaviour, IInteractable
     [SerializeField] private string[] bearDialogue;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private GameObject bearReward, startReward;
+    [SerializeField] private bool bearGuy = false;
+    [SerializeField] private bool militaryGuy = false;
+    [SerializeField] private FastTravel ft;
     
     public void onInteract()
     {
-        if (ProgressManager.beatBear)
+        if (bearGuy)
         {
-            DialogueManager.instance.setDialogues(bearDialogue, audioSource);
-            if (!ProgressManager.gotBearRewards)
+            if (ProgressManager.beatBear)
             {
-                bearReward.SetActive(true);
-                ProgressManager.gotBearRewards = true;
+                DialogueManager.instance.setDialogues(bearDialogue, audioSource);
+                if (!ProgressManager.gotBearRewards)
+                {
+                    bearReward.SetActive(true);
+                    ProgressManager.gotBearRewards = true;
+                }
+            }
+            else
+            {
+                DialogueManager.instance.setDialogues(dialogue, audioSource);
+                if (!ProgressManager.gotStartRewards)
+                {
+                    startReward.SetActive(true);
+                    ProgressManager.gotStartRewards = true;
+                }
             }
         }
-        else
+        else if(militaryGuy)
         {
-            if (!ProgressManager.gotStartRewards)
+            if (ProgressManager.beatBear)
             {
-                startReward.SetActive(true);
-                ProgressManager.gotStartRewards = true;
+                DialogueManager.instance.setDialogues(bearDialogue, audioSource);
+                ft.UnlockBoss();
             }
-            DialogueManager.instance.setDialogues(dialogue, audioSource);
+            else
+            {
+                DialogueManager.instance.setDialogues(dialogue, audioSource);
+            }
+
         }
     }
 }

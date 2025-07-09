@@ -18,9 +18,12 @@ public class ItemCost : MonoBehaviour
             {
                 hasBeenCrafted = true;
             }
-            if (Inventory.hasFlamethrower && majorUpgradeType == 1) hasBeenCrafted = true;
-            else if (Inventory.hasShotgun && majorUpgradeType == 0) hasBeenCrafted = true;
-            else if (Inventory.hasRocket && majorUpgradeType == 2) hasBeenCrafted = true;
+            if (upgradeType == 0)
+            {
+                if (Inventory.hasFlamethrower && majorUpgradeType == 1) hasBeenCrafted = true;
+                else if (Inventory.hasShotgun && majorUpgradeType == 0) hasBeenCrafted = true;
+                else if (Inventory.hasRocket && majorUpgradeType == 2) hasBeenCrafted = true;
+            }
         }
     }
 }

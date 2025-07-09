@@ -31,7 +31,8 @@ public class Flamethrower : MonoBehaviour
             {
                 if (eb != null)
                 {
-                    eb.takeDamage(flamethrowerDamage, playerActions.dmgType);
+                    if (eb.shielded) eb.ShieldDamage(flamethrowerDamage);
+                    else eb.takeDamage(flamethrowerDamage, playerActions.dmgType);
                 } 
             }
         }

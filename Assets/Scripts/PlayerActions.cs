@@ -34,7 +34,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Gradient[] bulletColors;
     [SerializeField] MeshFilter gunMeshFilter;
     [SerializeField] Mesh pistolMesh, shotgunMesh, flamethrowerMesh, rocketMesh;
-    [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG;
+    [SerializeField] Image pistolUnlockIMG, shotgunUnlockIMG, flamethrowerUnlockIMG, rocketUnlockIMG;
     [SerializeField] Sprite[] selectedOverloads;
     [SerializeField] Gradient[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
@@ -548,7 +548,7 @@ public class PlayerActions : MonoBehaviour
                         else mult = 1;
                     
                     }
-                    damage = (int)((dist > fallOffStart * 2 ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace * 2 - dist) / (fallOffDistace * 2)) : dmgPerPellet) * mult * overloadMult);
+                    damage = (int)((dist > fallOffStart * rangeMult ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace * rangeMult - dist) / (fallOffDistace * rangeMult)) : dmgPerPellet) * mult * overloadMult);
                     if (!enemy.shielded)
                     {
                         if (damage > 0)
@@ -575,7 +575,7 @@ public class PlayerActions : MonoBehaviour
                     {
                         if (damage > 0)
                         {
-                            enemy.ShieldDamage(damage/2);
+                            enemy.ShieldDamage(damage);
                             ParticleSystem partSys = Instantiate(damage > 10 ? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                             partSys.Play();
                             AudioSource aS = Instantiate(damage > 10 ? goodHit : midHit, hit.point, Quaternion.identity);
@@ -762,6 +762,7 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 2:
                 hasRocket = true;
+                rocketUnlockIMG.color = Color.white;
                 break;
             default:
                 break;

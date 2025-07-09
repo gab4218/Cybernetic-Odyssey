@@ -13,8 +13,14 @@ public class FastTravel : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        if(bossButton != null && !ProgressManager.beatBear) bossButton.SetActive(false);
         menu.SetActive(false);
+        if (bossButton != null && !ProgressManager.talkedToMilitary) bossButton.SetActive(false);
+    }
+
+    public void UnlockBoss()
+    {
+        if (bossButton != null && ProgressManager.beatBear) bossButton.SetActive(true);
+        ProgressManager.talkedToMilitary = true;
     }
 
     private void Update()

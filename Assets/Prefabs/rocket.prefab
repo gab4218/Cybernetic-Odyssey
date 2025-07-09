@@ -146,6 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosion: {fileID: 4884615919031336107}
   _explosionPS: {fileID: 2918498673123971216, guid: e179afd256017f047a0421fc22480350, type: 3}
+  _explosionAS: {fileID: 1575289815180384972, guid: 0fe14f6dcf6eda348999e6c0f500d686, type: 3}
 --- !u!54 &-4379620125066974612
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -26,6 +26,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
     {
         if (Inventory.hasShotgun) costs[6].hasBeenCrafted = true;
         if (Inventory.hasFlamethrower) costs[7].hasBeenCrafted = true;
+        if (Inventory.hasRocket) costs[9].hasBeenCrafted = true;
         Time.timeScale = 0;
         craftingMenu.SetActive(true);
         Cursor.visible = true;
@@ -50,7 +51,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
                     hasColors[j] = false;
                 }
             }
-            if ((Inventory.secondarySlots.Contains(costs[i].upgradeType) || Inventory.availableUpgrades.Contains(costs[i].upgradeType)) && i < 6)
+            if ((Inventory.secondarySlots.Contains(costs[i].upgradeType) || Inventory.availableUpgrades.Contains(costs[i].upgradeType)) && costs[i].upgradeType != 0)
             {
                 costs[i].hasBeenCrafted = true;
             }
@@ -81,7 +82,11 @@ public class CraftingStation : MonoBehaviour, IInteractable
         {
             costs[i] = craftingButtons[i].GetComponent<ItemCost>();
             craftingButtons[i].interactable = false;
-            if (costs[i].hasBeenCrafted) craftingButtons[i].gameObject.SetActive(false);
+            if (costs[i].hasBeenCrafted)
+            {
+                craftingButtons[i].gameObject.SetActive(false);
+                Debug.Log(costs[i].hasBeenCrafted + " bye " + i);
+            }
         }
     }
 
@@ -120,6 +125,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
                 {
                     craftingButtons[i].interactable = false;
                     craftingButtons[i].gameObject.SetActive(false);
+                    Debug.Log(costs[i].hasBeenCrafted + " bye " + i);
                 }
                 else
                 {

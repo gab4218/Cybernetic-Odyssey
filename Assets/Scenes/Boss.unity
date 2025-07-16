@@ -12580,6 +12580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1024666967}
   - component: {fileID: 1024666966}
+  - component: {fileID: 1024666968}
   m_Layer: 6
   m_Name: weak
   m_TagString: Untagged
@@ -12623,6 +12624,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3226673610122346885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1024666968
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024666965}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 4026564727
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.51, y: 2.53, z: 1.17}
+  m_Center: {x: 0, y: -1.85, z: -0.29}
 --- !u!1 &1028669555
 GameObject:
   m_ObjectHideFlags: 0
@@ -15810,8 +15832,8 @@ MonoBehaviour:
   canParry: 0
   maxHP: 1000
   speed: 6
-  detectionDistance: 50
-  escapeDistance: 100
+  detectionDistance: 60
+  escapeDistance: 999
   calmTime: 99
   positionThreshold: 0.5
   randomMovementRadius: 0
@@ -15831,11 +15853,9 @@ MonoBehaviour:
   currentHP: 1000
   ignoreColliders:
   - {fileID: 697427732}
-  weakColliders:
-  - {fileID: 1024666966}
-  - {fileID: 9179896508834433498}
+  weakColliders: []
   strongColliders:
-  - {fileID: 9179896508834433498}
+  - {fileID: 0}
   enemySpawner: {fileID: 0}
   shielded: 0
   _attackQuantity: 7
@@ -15866,7 +15886,7 @@ MonoBehaviour:
   _barrageCollider: {fileID: 1153735534}
   _barragePS: {fileID: 2476778848681285046, guid: 6af8e377412c5524ca9dccc9906aa45f, type: 3}
   _barrageAttackQuantity: 5
-  _barrageHitDamage: 20
+  _barrageHitDamage: 5
   _barrageDistance: 3
   _barrageSpeed: 20
   _barrageAttackInterval: 1
@@ -15883,7 +15903,7 @@ MonoBehaviour:
   - {fileID: 239034225}
   - {fileID: 2009941354}
   - {fileID: 1213155370}
-  _fireDamage: 40
+  _fireDamage: 20
   _flameWindup: 1
   _flameSpeed: 20
   _flameDuration: 5
@@ -15912,7 +15932,7 @@ MonoBehaviour:
   punchWorking: 1
   _dropkickDmgCollider: {fileID: 1153735536}
   _dropkickPS: {fileID: 554407078824296162, guid: bf1a293d857cbce4c815ac6d3e887943, type: 3}
-  _dropkickDamage: 75
+  _dropkickDamage: 50
   _dropkickSpeed: 30
   _dropkickWindupTime: 2
   _dropkickStunTime: 3
@@ -15943,8 +15963,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1153735530}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -58.05, y: 39.26, z: -71.95}
+  m_LocalRotation: {x: -0, y: 0.72460884, z: -0, w: 0.68916047}
+  m_LocalPosition: {x: -4.7, y: 12.5, z: -51.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15952,7 +15972,7 @@ Transform:
   - {fileID: 697427733}
   - {fileID: 527168232}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 92.873, z: 0}
 --- !u!135 &1153735534
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -34008,7 +34028,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9179896508834433497}
-  - component: {fileID: 9179896508834433498}
   m_Layer: 6
   m_Name: Root_M
   m_TagString: Untagged
@@ -45502,27 +45521,6 @@ Transform:
   - {fileID: 110161444040097392}
   m_Father: {fileID: 673681200259247425}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: -81.99999}
---- !u!65 &9179896508834433498
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4155954567867604060}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 4026564727
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.6692836, y: 1.3083736, z: 1.7381719}
-  m_Center: {x: -0.67542124, y: 0.15833251, z: 0}
 --- !u!33 &9186036583060837373
 MeshFilter:
   m_ObjectHideFlags: 0

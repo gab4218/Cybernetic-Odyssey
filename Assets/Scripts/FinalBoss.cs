@@ -9,6 +9,8 @@ public class FinalBoss : EnemyBase
 {
 
 
+    private bool _detected = false;
+
     //attacks
     private bool _canShoot = true; // value == 0
     private bool _canFlamethrow = true; // value == 1
@@ -17,15 +19,14 @@ public class FinalBoss : EnemyBase
     private bool _canPunchBarrage = true; // value == 4
     private bool _canShield = true; // value == 5
     private bool _canEMP = true; // value == 6
-   
+
     //yuh
     private int _selectedAttack;
     private Collider[] _myColliders;
-    
+
     [Header("Final Boss things")]
 
     [Header("General")]
-    [SerializeField] private int _attackQuantity = 7;
     [SerializeField] private Transform _aimTransform;
     [SerializeField] private Transform _bulletSpawnPoint;
     [SerializeField] private Transform _middleTransform;
@@ -86,7 +87,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private Collider _flameCollider;
     [SerializeField] private ParticleSystem _flamePS;
     [SerializeField] private Transform[] _fireCheckpoints;
-    [SerializeField] private int _fireDamage = 5;
+    [SerializeField] private int _fireDamage = 25;
     [SerializeField] private float _flameWindup = 1;
     [SerializeField] private float _flameSpeed = 7f;
     [SerializeField] private float _flameDuration = 5f;
@@ -94,7 +95,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _flamethrowerHeight = 10f;
     [SerializeField] private float _flameStunTime = 2f;
     [SerializeField] private float _flamethrowerKnockback = 3;
-    
+
     [SerializeField] private AudioSource _flamethrowerAS;
     private Coroutine _flamethrowerCR;
     private Transform _selectedFlameCheckpoint;
@@ -127,7 +128,7 @@ public class FinalBoss : EnemyBase
     [Header("Dropkick")]
     [SerializeField] private Collider _dropkickDmgCollider;
     [SerializeField] private ParticleSystem _dropkickPS;
-    [SerializeField] private int _dropkickDamage = 75;
+    [SerializeField] private int _dropkickDamage = 50;
     [SerializeField] private float _dropkickSpeed = 30f;
     [SerializeField] private float _dropkickWindupTime = 2f;
     [SerializeField] private float _dropkickStunTime = 3f;
@@ -208,7 +209,7 @@ public class FinalBoss : EnemyBase
             yield return null;
             AimGun();
         }
-        
+
 
         t = 0;
         while (t < _gunDuration)
@@ -237,7 +238,7 @@ public class FinalBoss : EnemyBase
         Vector3 aimDir = _aimTransform.position - _bulletSpawnPoint.position;
         _gunRay = new Ray(_bulletSpawnPoint.position, aimDir);
         RaycastHit hit;
-        ParticleSystem ps = Instantiate(_shotPS, _bulletSpawnPoint);
+        ParticleSystem ps = Instantiate(_shotPS, _bulletSpawnPoint.position, Quaternion.LookRotation(aimDir));
         if (Physics.Raycast(_gunRay, out hit, 100f, _mask))
         {
             TrailRenderer tr = Instantiate(_bulletTR, _bulletSpawnPoint.position, Quaternion.identity);
@@ -255,13 +256,13 @@ public class FinalBoss : EnemyBase
             {
                 PlayerActions pa = hit1.collider.GetComponentInParent<PlayerActions>();
 
-                if (pa!=null)
+                if (pa != null)
                 {
                     pa.takeDamage(_gunDamagePerHit);
                 }
             }
         }
-        
+
     }
     private void AllowShoot()
     {
@@ -274,7 +275,7 @@ public class FinalBoss : EnemyBase
     #region Flamethrower
     private void FindFlameCheckpoint()
     {
-        int r = Random.Range(0,_fireCheckpoints.Length);
+        int r = Random.Range(0, _fireCheckpoints.Length);
         if (_fireCheckpoints[r] != _selectedFlameCheckpoint)
         {
             _selectedFlameCheckpoint = _fireCheckpoints[r];
@@ -311,32 +312,16 @@ public class FinalBoss : EnemyBase
 
         AudioSource AS = Instantiate(_flamethrowerAS);
         AS.Play();
-        if (Physics.Raycast(new Ray(startPos, transform.up), _flamethrowerHeight + _punchHeight))
+        while (Vector3.Distance(transform.position, _middleTransform.position) > 1f)
         {
-            while (Vector3.Distance(transform.position, _middleTransform.position) > 1f)
-            {
                 dir = _middleTransform.position - transform.position;
                 dir.Normalize();
                 _punchRB.transform.position = _punchStartTransform.position;
                 _punchRB.transform.rotation = _punchStartTransform.rotation;
                 rb.velocity = dir * _barrageSpeed;
                 yield return null;
-            }
         }
 
-        startPos = transform.position;
-        endPos = transform.position + transform.up * _flamethrowerHeight;
-
-        while (t < _flameWindup/2)
-        {
-            transform.position = Vector3.Lerp(startPos, endPos, t / (_flameWindup/2));
-            _punchRB.transform.position = _punchStartTransform.position;
-            _punchRB.transform.rotation = _punchStartTransform.rotation;
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.position = endPos;
         _anim.SetBool("flamethrower", true);
         while (t < _flameWindup)
         {
@@ -348,12 +333,12 @@ public class FinalBoss : EnemyBase
 
 
         ParticleSystem ps = Instantiate(_flamePS, _bulletSpawnPoint.position, Quaternion.LookRotation(-transform.up));
-        
+
         FindFlameCheckpoint();
         _flameCollider.enabled = true;
         t = 0;
 
-        while(t < _flameDuration)
+        while (t < _flameDuration)
         {
             MoveFlamethrower();
             ps.transform.position = _bulletSpawnPoint.position;
@@ -361,7 +346,7 @@ public class FinalBoss : EnemyBase
             yield return null;
         }
 
-        if (Physics.Raycast(new Ray(startPos, -transform.up), _flamethrowerHeight/2))
+        if (Physics.Raycast(new Ray(startPos, -transform.up), _flamethrowerHeight / 2))
         {
             while (Vector3.Distance(transform.position, _middleTransform.position) > 1f)
             {
@@ -385,7 +370,7 @@ public class FinalBoss : EnemyBase
         Invoke("AllowFlame", _flamethrowerCooldown);
         Invoke("AllowAttack", _attackCooldown);
         _flamethrowerCR = null;
-        
+
     }
     private void AllowFlame()
     {
@@ -429,10 +414,10 @@ public class FinalBoss : EnemyBase
             _punchRB.transform.position = _punchStartTransform.position;
             _punchRB.transform.rotation = _punchStartTransform.rotation;
             yield return null;
-        } 
+        }
 
         t = 0;
-        
+
         while (t < _punchWindupTime)
         {
             AimPunch();
@@ -442,7 +427,7 @@ public class FinalBoss : EnemyBase
             yield return null;
         }
         _punchCR = StartCoroutine(ShootPunch());
-        
+
     }
     private IEnumerator ShootPunch()
     {
@@ -469,7 +454,7 @@ public class FinalBoss : EnemyBase
         {
             _punchRB.MovePosition(Vector3.Lerp(originalPos, _aimTransform.position, t));
             lr.SetPosition(1, _punchRB.transform.position);
-            t += Time.deltaTime * _punchShootSpeed/2;
+            t += Time.deltaTime * _punchShootSpeed / 2;
             yield return null;
         }
         Destroy(AS.gameObject);
@@ -482,7 +467,8 @@ public class FinalBoss : EnemyBase
         _punchCollider.enabled = false;
         t = 0;
 
-        while(t < _punchGrabDelay)
+        _anim.SetBool("punch", false);
+        while (t < _punchGrabDelay)
         {
             t += Time.deltaTime;
             yield return null;
@@ -492,13 +478,12 @@ public class FinalBoss : EnemyBase
 
         t = 0;
 
-        _anim.SetBool("punch", false);
         while (t < 1)
         {
             _punchRB.MovePosition(Vector3.Lerp(currentpos, originalPos, t));
 
             lr.SetPosition(1, _punchRB.transform.position);
-            t += Time.deltaTime * _punchRetractSpeed/10;
+            t += Time.deltaTime * _punchRetractSpeed / 10;
             yield return null;
         }
         _canFirePunch = false;
@@ -526,18 +511,18 @@ public class FinalBoss : EnemyBase
         float t = 0;
         Vector3 startPos = transform.position;
 
-        dir = _middleTransform.position - transform.position;
-        dir.Normalize();
-        dir.y = 0;
-        while (t < 1) 
+        while (Vector3.Distance(transform.position, _middleTransform.position) > 1f)
         {
+            dir = _middleTransform.position - transform.position;
+            dir.Normalize();
+            transform.forward = new Vector3(dir.x, 0, dir.z);
             _punchRB.transform.position = _punchStartTransform.position;
             _punchRB.transform.rotation = _punchStartTransform.rotation;
-            transform.forward = Vector3.Lerp(transform.forward, dir, 1 - Mathf.Pow(0.1f, Time.deltaTime));
-            rb.MovePosition(Vector3.Lerp(startPos, _middleTransform.position, t));
-            t += Time.deltaTime/2;
+            rb.velocity = dir * _barrageSpeed;
             yield return null;
         }
+        rb.velocity = Vector3.zero;
+
         _anim.SetBool("dropkick", true);
         t = 0;
 
@@ -563,7 +548,7 @@ public class FinalBoss : EnemyBase
             _punchRB.transform.position = _punchStartTransform.position;
             _punchRB.transform.rotation = _punchStartTransform.rotation;
             rb.MovePosition(Vector3.Lerp(startPos, _aimTransform.position, t));
-            t += Time.deltaTime * _dropkickSpeed/2;
+            t += Time.deltaTime * _dropkickSpeed / 3f;
             yield return null;
         }
         _dropkickWorking = false;
@@ -576,7 +561,7 @@ public class FinalBoss : EnemyBase
         _dropkickDmgCollider.enabled = false;
 
         Instantiate(_dropkickPS, transform.position, Quaternion.identity).Play();
-        
+
         Stun(_dropkickStunTime);
         _canDropKick = false;
         Invoke("AllowAttack", _attackCooldown);
@@ -617,7 +602,7 @@ public class FinalBoss : EnemyBase
         ParticleSystem ps = Instantiate(_barragePS, transform);
         AudioSource AS = Instantiate(_spinAS);
         AS.Play();
-        
+
         while (_inBarrageRange == false)
         {
             MoveBarrage();
@@ -626,6 +611,9 @@ public class FinalBoss : EnemyBase
             yield return null;
         }
         _anim.SetBool("spin", true);
+
+        _barrageCollider.enabled = true;
+
         for (int i = 0; i < _barrageAttackQuantity; i++)
         {
             float t = 0;
@@ -638,6 +626,8 @@ public class FinalBoss : EnemyBase
             }
             StartCoroutine(BarrageHit());
         }
+        _barrageCollider.enabled = false;
+
 
         _anim.SetBool("spin", false);
         Stun(_barrageStunTime);
@@ -653,7 +643,6 @@ public class FinalBoss : EnemyBase
     private IEnumerator BarrageHit()
     {
         float t = 0;
-        _barrageCollider.enabled = true;
         _inBarrageRange = false;
         while (t < _barrageAttackDuration)
         {
@@ -661,10 +650,15 @@ public class FinalBoss : EnemyBase
             t += Time.deltaTime;
             yield return null;
         }
-        _barrageCollider.enabled = false;
     }
+
+    private void AllowMoveBarrage()
+    {
+        _inBarrageRange = false;
+    }
+
     private void AllowBarrage()
-    { 
+    {
         _canPunchBarrage = true;
     }
     #endregion
@@ -701,7 +695,7 @@ public class FinalBoss : EnemyBase
         while (t < _shieldTime && _currentShieldHP > 0)
         {
             t += Time.deltaTime;
-            _shieldMR.material.color = Color.Lerp(new Color(0.3f, 1, 1, 0.5f), new Color(1, 0, 0, 0.5f), 1f - _currentShieldHP * 1f/_shieldHP);
+            _shieldMR.material.color = Color.Lerp(new Color(0.3f, 1, 1, 0.5f), new Color(1, 0, 0, 0.5f), 1f - _currentShieldHP * 1f / _shieldHP);
             _punchRB.transform.position = _punchStartTransform.position;
             _punchRB.transform.rotation = _punchStartTransform.rotation;
             yield return null;
@@ -712,15 +706,15 @@ public class FinalBoss : EnemyBase
         shielded = false;
         if (_currentShieldHP > 0)
         {
-            _anim.SetTrigger("badshield");
             _anim.SetBool("shield", false);
             currentHP += (_healingAmount + currentHP > maxHP) ? (maxHP - currentHP) : _healingAmount;
             Instantiate(_shieldHealPS, transform.position, Quaternion.identity).Play();
-            Stun(_shieldStunTime/2);
+            Stun(_shieldStunTime / 2);
         }
         else
         {
-            _anim.SetBool("shield", false);
+            _anim.SetTrigger("badshield");
+            Invoke("GetUpShield", _shieldStunTime);
             Instantiate(_shieldBreakPS, transform.position, Quaternion.identity).Play();
             Stun(_shieldStunTime);
         }
@@ -728,9 +722,16 @@ public class FinalBoss : EnemyBase
         _canShield = false;
         Invoke("AllowShield", _shieldCooldown);
         Invoke("AllowAttack", _attackCooldown);
+        
         _shieldCR = null;
 
     }
+
+    private void GetUpShield()
+    {
+        _anim.SetBool("shield", false);
+    }
+
     private void AllowShield()
     {
         _canShield = true;
@@ -743,12 +744,14 @@ public class FinalBoss : EnemyBase
     private IEnumerator StartEMP()
     {
         _canAttack = false;
+
         float t = 0;
         Debug.Log("Emp");
         ParticleSystem ps = Instantiate(_empChargePS, transform.position, Quaternion.identity);
         _anim.SetTrigger("emp");
         AudioSource AS = Instantiate(_empStartAS, transform.position, Quaternion.identity);
         AS.Play();
+
         Destroy(AS.gameObject, AS.clip.length);
         while (t < _empWindupTime)
         {
@@ -758,6 +761,7 @@ public class FinalBoss : EnemyBase
             yield return null;
         }
         _anim.SetTrigger("empboom");
+        yield return new WaitForSeconds(0.5f);
         DoEMP();
         Destroy(AS.gameObject);
         _canEMP = false;
@@ -850,7 +854,7 @@ public class FinalBoss : EnemyBase
                 break;
 
             case 5:
-                if(_canShield && _shieldCR == null) _shieldCR = StartCoroutine(StartShield());
+                if(_canShield && _shieldCR == null && currentHP < maxHP) _shieldCR = StartCoroutine(StartShield());
                 else state = IDLE;
                 break;
 
@@ -867,6 +871,11 @@ public class FinalBoss : EnemyBase
 
     private void Update()
     {
+        if (!_detected)
+        {
+            if (Vector3.Distance(transform.position, playerTranform.position) < detectionDistance) _detected = true;
+            return;
+        }
         if(state == SEEKING || state == IDLE)
         {
             findDirection();
@@ -888,12 +897,12 @@ public class FinalBoss : EnemyBase
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        Rigidbody pRB = other.GetComponentInParent<Rigidbody>();
 
         if (other.GetComponentInParent<PlayerActions>())
         {
+            Rigidbody pRB = other.GetComponentInParent<Rigidbody>();
             if (_barrageCollider.enabled)
             {
                 player.takeDamage(_barrageHitDamage);

@@ -168,6 +168,7 @@ public class PolarBear : EnemyBase
     {
         if (ProgressManager.beatBear)
         {
+            if (HPDisplay != null) HPDisplay.gameObject.SetActive(false);
             return;
         }
         if (!PlayerActions.dead)
@@ -177,6 +178,7 @@ public class PolarBear : EnemyBase
                 ProgressManager.beatBear = true;
                 SoundSingleton.Instance.OsoMuerte();
             }
+            if(HPDisplay != null) HPDisplay.gameObject.SetActive(false);
         }
     }
 

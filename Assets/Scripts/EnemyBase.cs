@@ -103,7 +103,10 @@ public abstract class EnemyBase : MonoBehaviour
             if (weakColliders != null)
             {
                 List<Collider> c = strongColliders.ToList();
-                if (c.Contains(weakColliders[0])) c.Remove(weakColliders[0]);
+                foreach (Collider col in weakColliders)
+                {
+                    if (c.Contains(col)) c.Remove(col);
+                }
                 if (removeCollider && c.Contains(strongCollidersGO.GetComponent<Collider>()))
                 {
                     c.Remove(strongCollidersGO.GetComponent<Collider>());
@@ -307,7 +310,7 @@ public abstract class EnemyBase : MonoBehaviour
                 currentHP -= fireDamage;
                 if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
                 {
-                    HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+                    HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
                 }
                 if (currentHP <= 0) //Si muerto, destruir
                 {

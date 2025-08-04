@@ -45,6 +45,7 @@ public class DialogueManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             inDialogue = false;
             audioSource.Stop();
+            audioSource.GetComponent<DialogueAgent>().lookinAtYa = false;
         }
     }
 

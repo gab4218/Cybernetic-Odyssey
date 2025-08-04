@@ -12,6 +12,7 @@ public class ItemCost : MonoBehaviour
     public int majorUpgradeType;
     private void Update()
     {
+        if (Pause.paused) return;
         if (Time.timeScale == 0)
         {
             if (Inventory.availableUpgrades.Contains(upgradeType))
@@ -23,6 +24,8 @@ public class ItemCost : MonoBehaviour
                 if (Inventory.hasFlamethrower && majorUpgradeType == 1) hasBeenCrafted = true;
                 else if (Inventory.hasShotgun && majorUpgradeType == 0) hasBeenCrafted = true;
                 else if (Inventory.hasRocket && majorUpgradeType == 2) hasBeenCrafted = true;
+                else if (Inventory.hasMelee && majorUpgradeType == 3) hasBeenCrafted = true;
+                else if (Inventory.hasRifle && majorUpgradeType == 4) hasBeenCrafted = true;
             }
         }
     }

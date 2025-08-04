@@ -10,7 +10,6 @@ public class ExplodingBall : EnemyBase
     [SerializeField] private float explosionDelay; //cuanto tarda en explotar
     [SerializeField] private int explosionDamage; //damage de la explosion
     [SerializeField] private SphereCollider explosionCollider; //explosion
-    [SerializeField] private GameObject[] crystals;
     private float delayCurrent; //guarda timer actual
     private bool canMove; //si se puede mover
     private bool timerOff; //si el timer no corre
@@ -36,6 +35,7 @@ public class ExplodingBall : EnemyBase
 
     void Update()
     {
+        if (Pause.paused) return;
         detectPlayer(); //busca player
         if (state == SEEKING)
         {
@@ -57,6 +57,7 @@ public class ExplodingBall : EnemyBase
 
     private void FixedUpdate()
     {
+        if (Pause.paused) return;
         if (state == ATTACKING)
         {
             canMove = false; //frena para epxlotar
@@ -107,6 +108,12 @@ public class ExplodingBall : EnemyBase
 
     public override void takeDamage(int dmg, PlayerActions.damageType dmgType)
     {
+        if (invincible) return;
+        else
+        {
+            invincible = true;
+            Invoke("WaitDamage", 0.1f);
+        }
         currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid ? 1.5f : 1)); //Restar HP acorde al tipo de damage recibido
         if (dmgType == PlayerActions.damageType.Fire)
         {

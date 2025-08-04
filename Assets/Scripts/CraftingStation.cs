@@ -27,6 +27,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
         if (Inventory.hasShotgun) costs[6].hasBeenCrafted = true;
         if (Inventory.hasFlamethrower) costs[7].hasBeenCrafted = true;
         if (Inventory.hasRocket) costs[9].hasBeenCrafted = true;
+        if (Inventory.hasRifle) costs[13].hasBeenCrafted = true;
         Time.timeScale = 0;
         craftingMenu.SetActive(true);
         Cursor.visible = true;
@@ -92,6 +93,7 @@ public class CraftingStation : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (Pause.paused) return;
         if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Escape)) && isCrafting)
         {
             closeMenu();

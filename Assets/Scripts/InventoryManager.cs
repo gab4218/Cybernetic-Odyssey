@@ -101,6 +101,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
+        if (Pause.paused) return;
         if (Time.timeScale == 0 && isRunning) //Si se abre el menu, actualizar opciones
         {
             isRunning = false;

@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] float cameraSensitivityY = 1;
 
     float xRotation, yRotation, mouseX, mouseY;
-
+    public static bool inCutscene = false;
 
 
     private void Awake()
@@ -24,6 +24,11 @@ public class CameraController : MonoBehaviour
     }
     private void Update()
     {
+        if (Pause.paused) return;
+        if (inCutscene)
+        {
+            return;
+        }
         transform.position = POVTransform.position;
         if (DialogueManager.instance != null)
         {

@@ -33,10 +33,23 @@ public class Menu : MonoBehaviour
         Inventory.hasShotgun = false;
         Inventory.hasFlamethrower = false;
         Inventory.hasRocket = false;
+        Inventory.hasMelee = false;
+        Inventory.hasRifle = false;
+        Inventory.expanded = false;
         ProgressManager.gotBearRewards = false;
         ProgressManager.beatBear = false;
         ProgressManager.gotStartRewards = false;
         ProgressManager.talkedToMilitary = false;
+        ProgressManager.beatSalamander = false;
+        ProgressManager.gotSalamanderRewards = false;
+        ProgressManager.beatSpider = false;
+        ProgressManager.gotSpiderRewards = false;
+        ProgressManager.refoughtBear = false;
+        ProgressManager.refoughtSalamander = false;
+        ProgressManager.refoughtSpider = false;
+        ProgressManager.gotBearRefight = false;
+        ProgressManager.gotSalamanderRefight = false;
+        ProgressManager.gotSpiderRefight = false;
     }
 
     public void Controls(string controls)

@@ -21,6 +21,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected bool isAngered = false;
     protected bool canCalm = true;
     public bool canParry = false;
+    public bool invincible = false;
 
     //Variables basicas modificables en el editor que un enemigo podria tener
     [SerializeField] protected int maxHP;
@@ -40,6 +41,8 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] protected int armorHealth = 300; 
     [SerializeField] protected TMP_Text HPDisplay; //Para debug
     [SerializeField] protected bool removeCollider = false;
+    [SerializeField] protected GameObject[] crystals;
+    [SerializeField] protected bool drops = true;
     //Otras variables comunes de enemigo
     protected ParticleSystem currentFirePS, currentIcePS;
     protected Vector3[] randomMovementDimensions;
@@ -194,9 +197,16 @@ public abstract class EnemyBase : MonoBehaviour
     }
 
 
+    protected void WaitDamage()
+    {
+        invincible = false;
+    }
 
     public virtual void takeDamage(int dmg, PlayerActions.damageType dmgType)
     {
+        invincible = true;
+        Invoke("WaitDamage", 0.1f);
+        
         currentHP -= (int)(dmg * (dmgType == PlayerActions.damageType.Acid ? 1.5f : 1)); //Restar HP acorde al tipo de damage recibido
         if (dmgType == PlayerActions.damageType.Fire)
         {
@@ -228,7 +238,11 @@ public abstract class EnemyBase : MonoBehaviour
                 {
                     StopCoroutine(iceCoroutine);
                 }
-                navMeshAgent.speed = originalSpeed * slowMult;
+                if (navMeshAgent != null)
+                {
+                    navMeshAgent.speed = originalSpeed * slowMult;
+                }
+                speed = originalSpeed * slowMult;
                 iceCoroutine = StartCoroutine(IceTimer());
                 slowed = true;
 
@@ -243,6 +257,14 @@ public abstract class EnemyBase : MonoBehaviour
             if (iceCoroutine != null) StopCoroutine(iceCoroutine);
             if (fireCoroutine != null) StopCoroutine(fireCoroutine);
             if (calmCoroutine != null) StopCoroutine(calmCoroutine);
+            if (drops)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    Instantiate(crystals[Random.Range(0, crystals.Length)], transform.position + Random.insideUnitSphere, Quaternion.LookRotation(Vector3.up));
+                }
+            }
+
             Destroy(gameObject);
         }
         
@@ -332,10 +354,26 @@ public abstract class EnemyBase : MonoBehaviour
         {
             t += Time.deltaTime;
             currentIcePS.gameObject.transform.position = transform.position;
+            if (t % fireFrequency < Time.deltaTime)
+            {
+                currentHP --;
+                if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+                {
+                    HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+                }
+                if (currentHP <= 0) //Si muerto, destruir
+                {
+                    Destroy(gameObject);
+                }
+            }
             yield return null;
         }
         slowed = false;
-        navMeshAgent.speed = originalSpeed;
+        if (navMeshAgent != null)
+        {
+            navMeshAgent.speed = originalSpeed;
+        }
+        speed = originalSpeed;
         Destroy(currentIcePS.gameObject);
         currentIcePS = null;
         yield break;

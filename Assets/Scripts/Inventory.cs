@@ -9,35 +9,94 @@ using UnityEngine.UI;
 public class Inventory : MonoBehaviour
 {
 
-    
+    public TMP_Text moneyDisplay;
     public TMP_Text[] matDisplay;
     public TMP_Text[] craftingMatDisplay;
     public static List<int> availableUpgrades = new List<int>();
     //[SerializeField] List<int> aUpg;
     [SerializeField] private AudioClip craftSound;
     [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private GameObject expandedInventory;
+    [SerializeField] private GameObject regularInventory;
 
     //Variables de crafteo e inventario
     PlayerActions playerActions;
-    public static int[] secondarySlots = new int[4];
+    public static int money = 0;
+    public static int[] secondarySlots = new int[5];
     public static int[] materialInventory = new int[3];
     public static bool hasShotgun = false;
     public static bool hasFlamethrower = false;
     public static bool hasRocket = false;
+    public static bool hasMelee = false;
+    public static bool hasRifle = false;
+    public static bool expanded = false;
+    
     //[SerializeField] int[] sSlots = new int[4], matInv = new int[3];
     
     
+
+    public void AddMoney(int mon)
+    {
+        money += mon;
+        if (moneyDisplay != null) moneyDisplay.text = money.ToString();
+    }
+
+    public void Buy(BuyStuff b)
+    {
+        money -= b.price;
+        if (moneyDisplay != null) moneyDisplay.text = money.ToString();
+
+        if (b.price <= money)
+        {
+            b.canBuy = true;
+        }
+        else
+        {
+            b.canBuy = false;
+        }
+
+        switch (b.thing)
+        {
+            case 0:
+            case 1:
+            case 2:
+                materialInventory[b.thing] += 5;
+                break;
+            case 3:
+                hasMelee = true;
+                playerActions.unlockWeapon(3);
+                b.hasBeenBought = true;
+                break;
+            case 4:
+                availableUpgrades.Add(10);
+                b.hasBeenBought = true;
+                break;
+            case 5:
+                availableUpgrades.Add(13);
+                b.hasBeenBought = true;
+                break;
+            case 6:
+                //expanded = true;
+                break;
+            default:
+                Debug.Log("You dun fucked up gng");
+                break;
+        }
+    }
 
     private void Awake()
     {
         //Preparaciones
         playerActions = FindObjectOfType<PlayerActions>();
+        //expandedInventory.SetActive(expanded);
     }
     private void Update()
     {
         //aUpg = availableUpgrades;
         //sSlots = secondarySlots;
         //matInv = materialInventory;
+        if (Pause.paused) return;
+        moneyDisplay.text = money.ToString();
         displayMats(); //Mostrar materiales y verificar integridad
         CheckForDuplicates();
     }
@@ -100,6 +159,9 @@ public class Inventory : MonoBehaviour
                     break;
                 case 2:
                     hasRocket = true;
+                    break;
+                case 4:
+                    hasRifle = true;
                     break;
                 default:
                     break;

@@ -20,6 +20,7 @@ public class GrabItem : MonoBehaviour
 
     private void Update()
     {
+        if (Pause.paused) return;
         if (Vector3.Distance(inventory.transform.position, transform.position) < pickupAreaSize)
         {
             transform.position = Vector3.Lerp(transform.position, inventory.transform.position, 1 - Mathf.Pow(0.2f, Time.deltaTime * 2));

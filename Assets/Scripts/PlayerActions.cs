@@ -14,7 +14,7 @@ public class PlayerActions : MonoBehaviour
 
     public static bool dead = false;
     public static bool won = false;
-
+    private bool grabbed = false;
     [Header("UI")] //Variables de UI y feedback visual
     [SerializeField] Material[] flamethrowerMats;
     [SerializeField] Transform cameraTransform;
@@ -39,7 +39,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] Gradient[] overloadingColors;
     [SerializeField] ParticleSystem flamethrowerFirePS, shotPS, bulletHolePS;
     [SerializeField] Animator gunAnimator;
-    [SerializeField] GameObject pistolHand, shotgunHand, flamethrowerHand;
+    [SerializeField] GameObject pistolHand, shotgunHand, flamethrowerHand, rifleHand, clawHand;
     [SerializeField] CameraController camContoller;
     [SerializeField] Image damagedIMG;
     [SerializeField] Image grappleIndicator;
@@ -78,8 +78,23 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] LayerMask bounds;
     [SerializeField] private AudioSource badHit, midHit, goodHit, missHit, damagedSound, healSound, grappleSound;
     [SerializeField] private TMP_Text interactText;
-    
+    [SerializeField] private int slamDamage = 25;
+    [SerializeField] private int parryHealing = 10;
+    [SerializeField] private int meleeDamage = 70;
+    [SerializeField] private float meleeCooldown = 0.4f;
+    [SerializeField] private Collider meleeCollider;
+    [SerializeField] private Mesh meleeMesh;
+    [SerializeField] private AudioClip meleeClip;
+    [SerializeField] private Mesh rifleMesh;
+    [SerializeField] private float rifleCooldown = 0.15f;
+    [SerializeField] float rifleFallOffStart = 20f;
+    [SerializeField] float rifleFallOffMax = 50f;
+    [SerializeField] float slowDmgMult = 1.5f;
+    [SerializeField] float slowDmgSpeedDiv = 0.75f;
+    [SerializeField] float addedKnockback = 1.25f;
+
     //Otras variables
+    private Coroutine rifleCR;
     private float fallOffStart = 10f;
     private float fallOffDistace = 40f;
     float readyWeaponTime = 0.33f;
@@ -94,13 +109,20 @@ public class PlayerActions : MonoBehaviour
     private float rangeMult = 1;
     private bool canGrapple = false;
     private bool canHeal = false;
+    private bool canParry = false;
     private Animator anim;
     private bool hasShotgun = false;
     private bool hasRocket = false;
     private bool hasFlamethrower = false;
+    private bool hasMelee = false;
+    private bool hasRifle = false;
     private bool isAllowedToOverload = false;
     private bool isAllowedToHeal = false;
     private bool canOverload = true;
+    private bool canSlam = false;
+    private bool allCrits = false;
+    private bool slowDmg = false;
+    private bool knockerBacker = false;
     private List<bool> canHealMats = new List<bool>{ false, false, false };
     private bool haltHeal = false;
     private bool canFlamethrow = true;
@@ -117,7 +139,7 @@ public class PlayerActions : MonoBehaviour
     public AudioClip gun;
     public AudioClip shotgun;
     public AudioClip flamethrower;
-
+    public AudioClip rifle;
     public static bool isEMPd = false;
 
 
@@ -178,6 +200,18 @@ public class PlayerActions : MonoBehaviour
             unlockWeapon(2);
         }
 
+        if (Inventory.hasMelee)
+        {
+            hasMelee = true;
+            unlockWeapon(3);
+        }
+
+        if (Inventory.hasRifle)
+        {
+            hasRifle = true;
+            unlockWeapon(4);
+        }
+
         interactText.gameObject.SetActive(false);
         //Preparaciones
 
@@ -191,6 +225,8 @@ public class PlayerActions : MonoBehaviour
     }
     private void Update()
     {
+        if (Pause.paused) return;
+        if (CameraController.inCutscene) return;
         if (DialogueManager.instance != null)
         {
             if (DialogueManager.instance.inDialogue)
@@ -198,165 +234,8 @@ public class PlayerActions : MonoBehaviour
                 return;
             }
         }
-
-        if (Input.GetKeyDown(inventoryKey)) //Inventario
-        {
-            if (inventoryPlaceholder.activeSelf && Time.timeScale == 0)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                inventoryPlaceholder.SetActive(false);
-                Time.timeScale = 1.0f;
-            }
-            else if (Time.timeScale > 0)
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-                inventoryPlaceholder.SetActive(true);
-                Time.timeScale = 0.0f;
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf) //Salir de inventario
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            inventoryPlaceholder.SetActive(false);
-            Time.timeScale = 1.0f;
-        }
-
-        if (Time.timeScale == 0) return;
-        if (differentFlames && canOverload && selectedWeapon == 2)
-        {
-
-            if (Input.mouseScrollDelta.y > 0 && canChangeOverload)
-            {
-                selectedOverload = (selectedOverload + 1) % 3;
-                overheatIMG.material = flamethrowerMats[selectedOverload];
-                canChangeOverload = false;
-                StartCoroutine(WaitOverloadChange());
-             
-            }
-            else if (Input.mouseScrollDelta.y < 0 && canChangeOverload)
-            {
-                selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
-                overheatIMG.material = flamethrowerMats[selectedOverload];
-                canChangeOverload = false;
-                StartCoroutine(WaitOverloadChange());
-                
-            }
-        }
-        else if (selectedWeapon == 2)
-        {
-            overloadCooldownIMG.color = new Color(0.45f,0.5f,0.6f, 0f);
-        }
-        
-        isCrouched = playerMovement.isCrouching;
-
-        facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
-
         HPDisplay.fillAmount = currentHP * 1f / maxHP; //Mostrar HP
-
-        if (Input.GetKeyDown(Key1) && !Input.GetKey(KeyCode.Mouse0)) //Armas
-        {
-            selectedWeapon = 0;
-            fallOffDistace = pistolFallOffMax;
-            fallOffStart = pistolFallOffStart;
-            readyWeaponTime = pistolCooldown;
-            gunMeshFilter.mesh = pistolMesh;
-            pistolHand.SetActive(true);
-            shotgunHand.SetActive(false);
-            flamethrowerHand.SetActive(false);
-        }
-        if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
-        {
-            selectedWeapon = 1;
-            fallOffDistace = shotgunFallOffMax;
-            fallOffStart = shotgunFallOffStart;
-            readyWeaponTime = shotgunCooldown;
-            gunMeshFilter.mesh = shotgunMesh;
-            pistolHand.SetActive(false);
-            shotgunHand.SetActive(true);
-            flamethrowerHand.SetActive(false);
-        }
-        if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
-        {
-            selectedWeapon = 2;
-            gunMeshFilter.mesh = flamethrowerMesh;
-            overloadIMG.gameObject.SetActive(false);
-            pistolHand.SetActive(false);
-            shotgunHand.SetActive(false);
-            flamethrowerHand.SetActive(true);
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha4) && hasRocket && !Input.GetKey(KeyCode.Mouse0))
-        {
-            selectedWeapon = 3;
-            gunMeshFilter.mesh = rocketMesh;
-            pistolHand.SetActive(false);
-            shotgunHand.SetActive(false);
-            flamethrowerHand.SetActive(false);
-        }
-
-
-        if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal && !isAllowedToHeal)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                canHealMats[i] = inventory.hasMaterials(i, 1);
-            }
-            if (canHealMats.Contains(true))
-            {
-                inventory.removeFromInventory(canHealMats.IndexOf(true), 1);
-                currentHP = Mathf.Min(currentHP + 50, maxHP);
-                AudioSource aS = Instantiate(healSound, transform.position, Quaternion.identity);
-                aS.Play();
-                Destroy(aS.gameObject, aS.clip.length);
-            }
-        }
-       
-        if (Input.GetKeyDown(cheatKey) && cheatTransform != null)
-        {
-            Cheat();
-        }
-
-        if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R) && selectedWeapon != 2)
-        {
-            canOverload = false;
-            overloadMult = 1.25f;
-            playerMovement.overloadMult = overloadMult;
-            overloadIMG.gameObject.SetActive(true);
-            StartCoroutine(WaitOverload());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
-        {
-            dead = true;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-
-        if (Input.GetKeyDown(grappleKey) && playerMovement.GetGrappleState())
-        {
-            playerMovement.StopGrapple();
-        }
-
-        if (canGrapple) //Grapple
-        {
-            if (Physics.Raycast(facingRay, grappleDistance, bounds))
-            {
-                grappleIndicator.gameObject.SetActive(true);
-            }
-            else
-            {
-                grappleIndicator.gameObject.SetActive(false);
-            }
-            if (Input.GetKeyDown(grappleKey)) ShootGrapple();
-        }
-
-        if (transform.position.y < -20) //Morir si Out Of Bounds
-        {
-            OOBDie();
-        }
-
-        if (Input.GetKeyDown(shootKey) && canShoot) //Disparar
+        if (Input.GetKeyDown(shootKey) && canShoot && Time.timeScale > 0) //Disparar
         {
             switch (selectedWeapon)
             {
@@ -421,12 +300,23 @@ public class PlayerActions : MonoBehaviour
 
                     break;
                 case 3:
-                    if(Physics.Raycast(facingRay))
+                    if (Physics.Raycast(facingRay))
                     {
                         FireRocket();
-                        readyWeaponTime = 3;
                         Invoke("readyWeapon", readyWeaponTime);
                     }
+                    break;
+                case 4:
+                    MeleeAttack();
+                    gunAnimator.SetTrigger("melee");
+                    canShoot = false;
+                    audioSource.pitch = Random.Range(0.8f, 1.2f);
+                    audioSource.PlayOneShot(meleeClip, 1);
+                    Invoke("readyWeapon", readyWeaponTime);
+                    break;
+                case 5:
+                    if(rifleCR == null)
+                    rifleCR = StartCoroutine(ShootRifle());
                     break;
                 default:
                     shoot(facingRay);
@@ -445,9 +335,14 @@ public class PlayerActions : MonoBehaviour
                 audioSource.loop = false;
                 audioSource.Stop();
             }
+            else if (selectedWeapon == 5)
+            {
+                StopCoroutine(rifleCR);
+                rifleCR = null;
+            }
         }
-        hitImage.color = Color.Lerp(hitImage.color, new Color(hitImage.color.r, hitImage.color.g, hitImage.color.b, 0), 1 - Mathf.Pow(0.05f,Time.deltaTime));
-        if (flamethrowerCollider.enabled && canFlamethrow)
+        hitImage.color = Color.Lerp(hitImage.color, new Color(hitImage.color.r, hitImage.color.g, hitImage.color.b, 0), 1 - Mathf.Pow(0.05f, Time.deltaTime));
+        if (flamethrowerCollider.enabled && canFlamethrow && Time.timeScale > 0)
         {
             if (flamethrowerCurrentTime < flamethrowerOverheatTime)
             {
@@ -469,20 +364,233 @@ public class PlayerActions : MonoBehaviour
                 overheatCR = StartCoroutine(FlamethrowerOverheatOver());
             }
         }
-        else if(flamethrowerCurrentTime > 0)
+        else if (flamethrowerCurrentTime > 0 && Time.timeScale > 0)
         {
             flamethrowerCurrentTime -= Time.deltaTime / 3;
         }
-        else
+        else if (Time.timeScale > 0)
         {
             flamethrowerCurrentTime = 0;
         }
 
-        if (overheatIMG.gameObject.activeSelf && canFlamethrow)
+        if (canSlam)
+        {
+
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {
+                if (!playerMovement.grounded && !playerMovement.slamming)
+                {
+                    Slam();
+                }
+            }
+        }
+
+        facingRay = new Ray(cameraTransform.position, cameraTransform.forward); //Crear rayo en direccion a donde mira el jugador
+        if (overheatIMG.gameObject.activeSelf && canFlamethrow && Time.timeScale > 0)
         {
             overheatIMG.fillAmount = (flamethrowerOverheatTime - flamethrowerCurrentTime) / flamethrowerOverheatTime;
             overheatIMG.color = Color.Lerp(Color.white, Color.red, flamethrowerCurrentTime / flamethrowerOverheatTime);
         }
+        
+        if (grabbed)
+        {
+            return;
+        }
+
+
+        if (Input.GetKeyDown(inventoryKey)) //Inventario
+        {
+            if (inventoryPlaceholder.activeSelf && Time.timeScale == 0)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                inventoryPlaceholder.SetActive(false);
+                Time.timeScale = 1.0f;
+            }
+            else if (Time.timeScale > 0)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                inventoryPlaceholder.SetActive(true);
+                Time.timeScale = 0.0f;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape) && inventoryPlaceholder.activeSelf) //Salir de inventario
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            inventoryPlaceholder.SetActive(false);
+            Time.timeScale = 1.0f;
+        }
+
+        if (Time.timeScale == 0) return;
+        if (differentFlames && selectedWeapon == 2)
+        {
+
+            if (Input.mouseScrollDelta.y > 0 && canChangeOverload)
+            {
+                selectedOverload = (selectedOverload + 1) % 3;
+                overheatIMG.material = flamethrowerMats[selectedOverload];
+                canChangeOverload = false;
+                StartCoroutine(WaitOverloadChange());
+             
+            }
+            else if (Input.mouseScrollDelta.y < 0 && canChangeOverload)
+            {
+                selectedOverload = selectedOverload == 0? 2 : (selectedOverload - 1);
+                overheatIMG.material = flamethrowerMats[selectedOverload];
+                canChangeOverload = false;
+                StartCoroutine(WaitOverloadChange());
+                
+            }
+        }
+        else if (selectedWeapon == 2)
+        {
+            overloadCooldownIMG.color = new Color(0.45f,0.5f,0.6f, 0f);
+        }
+        
+        isCrouched = playerMovement.isCrouching;
+
+
+        Vector3 v = cameraTransform.forward;
+        v.y = 0;
+        transform.forward = v.normalized;
+        
+
+        if (Input.GetKeyDown(Key1) && !Input.GetKey(KeyCode.Mouse0)) //Armas
+        {
+            selectedWeapon = 0;
+            fallOffDistace = pistolFallOffMax;
+            fallOffStart = pistolFallOffStart;
+            readyWeaponTime = pistolCooldown / (slowDmg? slowDmgSpeedDiv : 1f);
+            gunMeshFilter.mesh = pistolMesh;
+            pistolHand.SetActive(true);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(false);
+            rifleHand.SetActive(false);
+            clawHand.SetActive(false);
+        }
+        if(Input.GetKeyDown(Key2) && hasShotgun && !Input.GetKey(KeyCode.Mouse0))
+        {
+            selectedWeapon = 1;
+            fallOffDistace = shotgunFallOffMax;
+            fallOffStart = shotgunFallOffStart;
+            readyWeaponTime = shotgunCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            gunMeshFilter.mesh = shotgunMesh;
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(true);
+            flamethrowerHand.SetActive(false);
+            rifleHand.SetActive(false);
+            clawHand.SetActive(false);
+        }
+        if (Input.GetKeyDown(Key3) && hasFlamethrower && !Input.GetKey(KeyCode.Mouse0))
+        {
+            selectedWeapon = 2;
+            gunMeshFilter.mesh = flamethrowerMesh;
+            overloadIMG.gameObject.SetActive(false);
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(true);
+            rifleHand.SetActive(false);
+            clawHand.SetActive(false);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha4) && hasRocket && !Input.GetKey(KeyCode.Mouse0))
+        {
+            selectedWeapon = 3;
+            gunMeshFilter.mesh = rocketMesh;
+            readyWeaponTime = 3f / (slowDmg ? slowDmgSpeedDiv : 1f);
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(false);
+            rifleHand.SetActive(false);
+            clawHand.SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5) && hasMelee && !Input.GetKey(KeyCode.Mouse0))
+        {
+            selectedWeapon = 4;
+            gunMeshFilter.mesh = meleeMesh;
+            readyWeaponTime = meleeCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            pistolHand.SetActive(false);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(false);
+            rifleHand.SetActive(false);
+            clawHand.SetActive(true);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6) && hasRifle && !Input.GetKey(KeyCode.Mouse0))
+        {
+            selectedWeapon = 5;
+            gunMeshFilter.mesh = rifleMesh;
+            readyWeaponTime = rifleCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            fallOffDistace = rifleFallOffMax;
+            fallOffStart = rifleFallOffStart;
+            pistolHand.SetActive(false);
+            rifleHand.SetActive(true);
+            shotgunHand.SetActive(false);
+            flamethrowerHand.SetActive(false);
+            clawHand.SetActive(false);
+        }
+
+
+        if (Input.GetKeyDown(healKey) && currentHP < maxHP && canHeal && !isAllowedToHeal)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                canHealMats[i] = inventory.hasMaterials(i, 1);
+            }
+            if (canHealMats.Contains(true))
+            {
+                inventory.removeFromInventory(canHealMats.IndexOf(true), 1);
+                currentHP = Mathf.Min(currentHP + 50, maxHP);
+                AudioSource aS = Instantiate(healSound, transform.position, Quaternion.identity);
+                aS.Play();
+                Destroy(aS.gameObject, aS.clip.length);
+            }
+        }
+       
+        if (Input.GetKeyDown(cheatKey) && cheatTransform != null)
+        {
+            Cheat();
+        }
+
+        if (isAllowedToOverload && canOverload && Input.GetKeyDown(KeyCode.R) && selectedWeapon != 2)
+        {
+            canOverload = false;
+            overloadMult = 1.25f;
+            playerMovement.overloadMult = overloadMult;
+            overloadIMG.gameObject.SetActive(true);
+            StartCoroutine(WaitOverload());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha0)) //DELETE LATER (reiniciar escena para debug)
+        {
+            dead = true;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        if (Input.GetKeyDown(grappleKey) && playerMovement.GetGrappleState())
+        {
+            playerMovement.StopGrapple();
+        }
+
+        if (canGrapple) //Grapple
+        {
+            if (Physics.Raycast(facingRay, grappleDistance, bounds))
+            {
+                grappleIndicator.gameObject.SetActive(true);
+            }
+            else
+            {
+                grappleIndicator.gameObject.SetActive(false);
+            }
+            if (Input.GetKeyDown(grappleKey)) ShootGrapple();
+        }
+
+        if (transform.position.y < -20) //Morir si Out Of Bounds
+        {
+            OOBDie();
+        }
+
+        
 
 
         if (Physics.Raycast(facingRay, out RaycastHit hit, interactDistance) && hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
@@ -503,6 +611,37 @@ public class PlayerActions : MonoBehaviour
     }
 
 
+    private IEnumerator ShootRifle()
+    {
+        while (true)
+        {
+            shoot(facingRay);
+            ParticleSystem ps1 = Instantiate(shotPS, bulletSpawn);
+            ps1.Play();
+            gunAnimator.SetTrigger("shot");
+            audioSource.pitch = Random.Range(0.8f, 1.2f);
+            audioSource.PlayOneShot(rifle, 1);
+            float t = 0;
+            while (t < readyWeaponTime)
+            {
+                t += Time.deltaTime;
+                yield return null;
+            }
+        }
+    }
+
+
+    public void MeleeAttack()
+    {
+        meleeCollider.enabled = true;
+        Invoke("MeleeDisable", 0.1f);
+    }
+
+    private void MeleeDisable()
+    {
+        meleeCollider.enabled = false;
+    }
+
     private void DeOverload()
     {
         overloadMult = 1;
@@ -520,7 +659,7 @@ public class PlayerActions : MonoBehaviour
             trail.colorGradient = bulletColors[(int)damageType.None];
             StartCoroutine(SpawnTrail(trail, hit));
             canShoot = false;
-            Invoke("readyWeapon", readyWeaponTime / overloadMult);
+            Invoke("readyWeapon", (readyWeaponTime) / overloadMult);
             EnemyBase enemy = hit.collider.gameObject.GetComponentInParent<EnemyBase>();
 
 
@@ -533,7 +672,8 @@ public class PlayerActions : MonoBehaviour
                     float mult = 1;
                     if (enemy.weakColliders.Contains(hit.collider))
                     {
-                        mult = enemy.weakPointMult;
+                        if (selectedWeapon == 5) mult = 1;
+                        else mult = enemy.weakPointMult * (allCrits? 1.5f : 1);
                     
                     }
                     else if (enemy.strongColliders.Contains(hit.collider))
@@ -545,21 +685,35 @@ public class PlayerActions : MonoBehaviour
                     else
                     {
                         if (selectedWeapon == 0) mult = 1.25f;
-                        else mult = 1;
+                        else 
+                        {
+                            if (allCrits && selectedWeapon != 5 && enemy.weakColliders != null)
+                            {
+                                mult = 0;
+                            }
+                            else
+                            {
+                                mult = 1;
+                            }
+                        }
                     
                     }
-                    damage = (int)((dist > fallOffStart * rangeMult ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace * rangeMult - dist) / (fallOffDistace * rangeMult)) : dmgPerPellet) * mult * overloadMult);
+                    mult *= slowDmg? slowDmgMult : 1;
+                    damage = (int)(((dist > fallOffStart * rangeMult) ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace * rangeMult - dist) / (fallOffDistace * rangeMult)) : dmgPerPellet) * mult * overloadMult);
                     if (!enemy.shielded)
                     {
                         if (damage > 0)
                         {
                             enemy.takeDamage(damage, damageType.None);
-                            ParticleSystem partSys = Instantiate(damage > 10 ? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
+                            ParticleSystem partSys = Instantiate(mult > 1.5f ? partMax : partMid, hit.point, Quaternion.LookRotation(hit.normal));
                             partSys.Play();
                             AudioSource aS = Instantiate(damage > 10 ? goodHit : midHit, hit.point, Quaternion.identity);
                             aS.Play();
                             Destroy(aS.gameObject, aS.clip.length);
                             hitImage.color = damage > 5 ? critColor : hitColor;
+
+                            if (knockerBacker) enemy.GetComponent<Rigidbody>().AddForce(addedKnockback * facingRay.direction.normalized, ForceMode.Impulse);
+
                         }
                         else
                         {
@@ -606,6 +760,29 @@ public class PlayerActions : MonoBehaviour
                 Destroy(aS.gameObject, aS.clip.length);
             }
         }
+    }
+
+
+    public void GetGrabbed()
+    {
+        grabbed = true;
+        playerMovement.grabbed = true;
+    }
+
+    public void Ungrab()
+    {
+        grabbed = false;
+        playerMovement.grabbed = false;
+    }
+
+    public void Slow(float slowFactor)
+    {
+        playerMovement.Slow(slowFactor);
+    }
+
+    public void RegularSpeed(float slowFactor)
+    {
+        playerMovement.RegularSpeed(slowFactor);
     }
 
     private void shootShotgun()
@@ -663,6 +840,72 @@ public class PlayerActions : MonoBehaviour
         crosshair.color = Color.white;
     }
 
+    private void Slam()
+    {
+        playerMovement.Slam();
+        canGetHit = false;
+        
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (playerMovement.slamCollider == null || meleeCollider == null) return;
+        if (playerMovement.slamCollider.enabled)
+        {
+            EnemyBase eb = other.GetComponentInParent<EnemyBase>();
+            Invoke("DamageAgain", 0.2f);
+            if (eb != null)
+            {
+                if (eb.ignoreColliders.Contains(other)) return;
+
+                if (!eb.shielded)
+                {
+                    if (eb.invincible) return;
+                    eb.takeDamage(slamDamage, damageType.None);
+                    Vector3 d = other.transform.position - transform.position;
+                    d.y = 0;
+                    d.Normalize();
+                    eb.GetComponent<Rigidbody>().AddForce(0.5f * d, ForceMode.Impulse);
+                }
+                else eb.ShieldDamage(slamDamage);
+            }
+        }
+        else if (meleeCollider.enabled)
+        {
+            EnemyBase eb = other.GetComponentInParent<EnemyBase>();
+
+            if (eb != null)
+            {
+                if (eb.ignoreColliders.Contains(other)) return;
+
+                if (!eb.shielded)
+                {
+                    eb.takeDamage(meleeDamage, damageType.None);
+                    float mul = knockerBacker ? 2 : 1;
+                    eb.GetComponent<Rigidbody>().AddForce(mul * facingRay.direction.normalized, ForceMode.Impulse);
+                    if (canParry)
+                    {
+                        if (eb.canParry)
+                        {
+                            canGetHit = false;
+                            Invoke("DamageAgain", 0.2f);
+                            currentHP += (currentHP + parryHealing) > maxHP ? (maxHP - currentHP) : parryHealing;
+                            camContoller.Shake(0.15f, 0.1f);
+                            StartCoroutine(QuickPause(0.1f));
+                        }
+                    }
+                }
+                else eb.ShieldDamage(meleeDamage);
+            }
+        }
+    }
+
+    private IEnumerator QuickPause(float t)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(t);
+        Time.timeScale = 1;
+    }
 
     public void takeDamage(int dmg) //Recibir damage
     {
@@ -680,7 +923,8 @@ public class PlayerActions : MonoBehaviour
             haltHeal = true;
 
             StartCoroutine(camContoller.Shake(0.25f, 0.2f));
-            
+
+
             if (healCR != null)
             {
                 StopCoroutine(healCR);
@@ -705,6 +949,11 @@ public class PlayerActions : MonoBehaviour
         haltHeal = false;
         canGetHit = true;
         checkHealCR = StartCoroutine(CheckHeal());
+    }
+
+    private void DamageAgain()
+    {
+        canGetHit = true;
     }
 
     public void enableUpgrade(int upgrade) //Activar efecto de mejora
@@ -742,6 +991,42 @@ public class PlayerActions : MonoBehaviour
             case 8:
                 rangeMult = 2;
                 break;
+            case 9:
+                canSlam = true;
+                break;
+            case 10:
+                canParry = true;
+                break;
+            case 11:
+                allCrits = true;
+                break;
+            case 12:
+                slowDmg = true;
+                switch (selectedWeapon)
+                {
+                    case 0:
+                        readyWeaponTime = pistolCooldown / slowDmgSpeedDiv;
+                        break;
+                    case 1:
+                        readyWeaponTime = shotgunCooldown / slowDmgSpeedDiv;
+                        break;
+                    case 3:
+                        readyWeaponTime = 3 / slowDmgSpeedDiv;
+                        break;
+                    case 4:
+                        readyWeaponTime = meleeCooldown / slowDmgSpeedDiv;
+                        break;
+                    case 5:
+                        readyWeaponTime = rifleCooldown / slowDmgSpeedDiv;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            case 13:
+                knockerBacker = true;
+                break;
             default:
                 break;
         }
@@ -763,6 +1048,12 @@ public class PlayerActions : MonoBehaviour
             case 2:
                 hasRocket = true;
                 rocketUnlockIMG.color = Color.white;
+                break;
+            case 3:
+                hasMelee = true;
+                break;
+            case 4:
+                hasRifle = true;
                 break;
             default:
                 break;
@@ -811,6 +1102,41 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 8:
                 rangeMult = 1;
+                break;
+            case 9:
+                canSlam = false;
+                break;
+            case 10:
+                canParry = false;
+                break;
+            case 11:
+                allCrits = false;
+                break;
+            case 12:
+                slowDmg = false;
+                switch (selectedWeapon)
+                {
+                    case 0:
+                        readyWeaponTime = pistolCooldown;
+                        break;
+                    case 1:
+                        readyWeaponTime = shotgunCooldown;
+                        break;
+                    case 3:
+                        readyWeaponTime = 3;
+                        break;
+                    case 4:
+                        readyWeaponTime = meleeCooldown;
+                        break;
+                    case 5:
+                        readyWeaponTime = rifleCooldown;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 13:
+                knockerBacker = false;
                 break;
             default:
                 break;

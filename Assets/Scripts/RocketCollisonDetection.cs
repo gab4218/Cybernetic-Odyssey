@@ -27,7 +27,6 @@ public class RocketCollisonDetection : MonoBehaviour
             {
                 if (!eb.shielded)
                 {
-                    _explosion.enabled = false;
                     eb.takeDamage(60, PlayerActions.damageType.Fire);
                 }
                 else eb.ShieldDamage(150);

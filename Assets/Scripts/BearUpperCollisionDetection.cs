@@ -9,10 +9,18 @@ public class BearUpperCollisionDetection : MonoBehaviour
     void Start()
     {
         pb = GetComponentInParent<PolarBear>();
+        if (!ProgressManager.beatBear)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter(Collider other) //Si se detecta una colision en el trigger de arriba y la colision es con el jugador, el oso hace Ball
     {
+        if (!ProgressManager.beatBear)
+        {
+            return;
+        }
         PlayerActions pAct = other.GetComponentInParent<PlayerActions>();
         if (pAct!=null)
         {

@@ -501,6 +501,8 @@ GameObject:
   - component: {fileID: 3675656459257189364}
   - component: {fileID: 2977787141678710446}
   - component: {fileID: 1058994343694560215}
+  - component: {fileID: 527262161614154215}
+  - component: {fileID: 2233781265965041149}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -542,6 +544,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e8b8f3af8bb71438be5e1053cd3ecd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grabbed: 0
+  slamCollider: {fileID: 527262161614154215}
+  slamPS: {fileID: 554407078824296162, guid: bf1a293d857cbce4c815ac6d3e887943, type: 3}
   jumpKey: 32
   sprintKey: 304
   crouchKey: 306
@@ -562,6 +567,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1073741888
   maxSlopeAngle: 60
+  slamSpeed: 15
   staminaImg: {fileID: 0}
   cams:
   - {fileID: 0}
@@ -572,6 +578,8 @@ MonoBehaviour:
   grapplePoint: {fileID: 6593229390381334881}
   isCrouching: 0
   allowedToSlide: 0
+  grounded: 1
+  slamming: 0
   audioSource: {fileID: 1546638042453078054}
   walking: {fileID: 8300000, guid: 320883d4e5f54fd4a84821f9462274a8, type: 3}
   running: {fileID: 8300000, guid: 4e0f52c4923306947bd873be3cbcbd21, type: 3}
@@ -737,6 +745,7 @@ MonoBehaviour:
   pistolUnlockIMG: {fileID: 0}
   shotgunUnlockIMG: {fileID: 0}
   flamethrowerUnlockIMG: {fileID: 0}
+  rocketUnlockIMG: {fileID: 0}
   selectedOverloads:
   - {fileID: 21300000, guid: a81e6f4a1687bfc49872262a5756d41c, type: 3}
   - {fileID: 21300000, guid: dc5ad62bf5b178f4d839a94c4f4d389c, type: 3}
@@ -836,6 +845,8 @@ MonoBehaviour:
   pistolHand: {fileID: 0}
   shotgunHand: {fileID: 0}
   flamethrowerHand: {fileID: 0}
+  rifleHand: {fileID: 0}
+  clawHand: {fileID: 0}
   camContoller: {fileID: 0}
   damagedIMG: {fileID: 0}
   grappleIndicator: {fileID: 0}
@@ -882,6 +893,20 @@ MonoBehaviour:
   healSound: {fileID: 1575289815180384972, guid: 2bed2f51165daea47acc836b389e4b09, type: 3}
   grappleSound: {fileID: 1575289815180384972, guid: 4f2f58930c72b90428ba6cfa6616ebea, type: 3}
   interactText: {fileID: 0}
+  slamDamage: 25
+  parryHealing: 10
+  meleeDamage: 70
+  meleeCooldown: 0.4
+  meleeCollider: {fileID: 2233781265965041149}
+  meleeMesh: {fileID: -5597002278806442958, guid: ff7b0e433d39a754fb944693489c510e, type: 3}
+  meleeClip: {fileID: 8300000, guid: 2ca304d79629f474496cb8c0db4615ee, type: 3}
+  rifleMesh: {fileID: 7629811779324647873, guid: eade001393222e94ca059b30fe79a812, type: 3}
+  rifleCooldown: 0.25
+  rifleFallOffStart: 20
+  rifleFallOffMax: 50
+  slowDmgMult: 1.5
+  slowDmgSpeedDiv: 0.75
+  addedKnockback: 0.5
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
   partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}
@@ -893,6 +918,7 @@ MonoBehaviour:
   gun: {fileID: 8300000, guid: 26533ea5fcf52ed42bca3a2f29b57f48, type: 3}
   shotgun: {fileID: 8300000, guid: 1d12a46f2576f26449527bc41eca6178, type: 3}
   flamethrower: {fileID: 8300000, guid: 14c39d0108e1ab747affaa355a66c193, type: 3}
+  rifle: {fileID: 8300000, guid: 1d12a46f2576f26449527bc41eca6178, type: 3}
   overloadMult: 1
   dmgType: 2
 --- !u!54 &2977787141678710446
@@ -934,6 +960,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf1cd66ce8613b4ba9b709ee98742ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moneyDisplay: {fileID: 0}
   matDisplay:
   - {fileID: 0}
   - {fileID: 0}
@@ -944,6 +971,50 @@ MonoBehaviour:
   - {fileID: 0}
   craftSound: {fileID: 8300000, guid: 180d45a4377441b478c04b4d4a0bdd28, type: 3}
   sfxSource: {fileID: 0}
+  expandedInventory: {fileID: 0}
+  regularInventory: {fileID: 0}
+--- !u!65 &527262161614154215
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972117821290462744}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 1879081023
+  m_LayerOverridePriority: 10
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 5.2021885, y: 1, z: 5.2220225}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!65 &2233781265965041149
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972117821290462744}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 4026564671
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 2.18291, y: 2.8556786, z: 2.683197}
+  m_Center: {x: 1.8293506e-15, y: 0.9278393, z: 0.6865677}
 --- !u!1 &2014876763128716355
 GameObject:
   m_ObjectHideFlags: 0

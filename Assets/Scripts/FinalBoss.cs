@@ -43,7 +43,7 @@ public class FinalBoss : EnemyBase
     [SerializeField] private float _barrageCooldown = 25f;
     [SerializeField] private float _shieldCooldown = 40f;
     [SerializeField] private float _empCooldown = 30f;
-    [SerializeField] private float _attackCooldown = 5f;
+    [SerializeField] private float _attackCooldown = 3f;
     private bool _canAttack = true;
 
 
@@ -871,6 +871,8 @@ public class FinalBoss : EnemyBase
 
     private void Update()
     {
+        if (Pause.paused) return;
+        if (CameraController.inCutscene) return;
         if (!_detected)
         {
             if (Vector3.Distance(transform.position, playerTranform.position) < detectionDistance) _detected = true;

@@ -1536,6 +1536,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
+  canParry: 0
+  invincible: 0
   maxHP: 500
   speed: 5
   detectionDistance: 20
@@ -1553,6 +1555,12 @@ MonoBehaviour:
   canSlow: 1
   armorHealth: 0
   HPDisplay: {fileID: 0}
+  removeCollider: 0
+  crystals:
+  - {fileID: 5308614640226936730, guid: df156861ddbd10c4bb5aa8a4c0713094, type: 3}
+  - {fileID: 5308614640226936730, guid: af1947fde31c7974b9c5ac4a4983bd11, type: 3}
+  - {fileID: 5308614640226936730, guid: ae20f6ae16e7ab24382ca00814f14894, type: 3}
+  drops: 1
   weakPointMult: 3
   strongPointMult: 0.25
   currentHP: 0
@@ -1560,6 +1568,7 @@ MonoBehaviour:
   weakColliders: []
   strongColliders: []
   enemySpawner: {fileID: 0}
+  shielded: 0
   slamRange: 8
   slamDamage: 50
   slamKnockback: 10

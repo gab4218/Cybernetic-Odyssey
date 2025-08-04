@@ -78,6 +78,16 @@ public class PolarBear : EnemyBase
     {
         //Repetir acciones de EnemyBase.Start
         base.Start();
+        if (ProgressManager.beatBear)
+        {
+            //BORRAR
+            Destroy(gameObject);
+            maxHP = (int)(maxHP * 1.5f);
+            currentHP = maxHP;
+            clawDamage = (int) (1.2f * clawDamage);
+            slamDamage = (int) (1.2f * slamDamage);
+            rushDamage = (int) (1.2f * rushDamage);
+        }
         anim = GetComponentInChildren<Animator>();
         slamCollider.enabled = false;
         clawCollider.enabled = false;
@@ -95,7 +105,7 @@ public class PolarBear : EnemyBase
         {
             HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
-        if (ProgressManager.beatBear) Destroy(gameObject);
+        //if (ProgressManager.beatBear) Destroy(gameObject);
         //Preparaciones generales
         
     }
@@ -103,6 +113,8 @@ public class PolarBear : EnemyBase
 
     private void Update()
     {
+        if (Pause.paused) return;
+        if (CameraController.inCutscene) return;
         detectPlayer(); 
         
         if (state == SEEKING) //Si se persigue al jugador, atacarlo cuando sea posible 
@@ -134,7 +146,6 @@ public class PolarBear : EnemyBase
                 anim.SetBool("Walking", false);
                 navMeshAgent.enabled = false;
             }
-
 
         }
         else if(state == IDLE) //Si no sigue al jugador, moverse a una posicion random
@@ -169,6 +180,7 @@ public class PolarBear : EnemyBase
         if (ProgressManager.beatBear)
         {
             if (HPDisplay != null) HPDisplay.gameObject.SetActive(false);
+            ProgressManager.refoughtBear = true;
             return;
         }
         if (!PlayerActions.dead)
@@ -192,6 +204,7 @@ public class PolarBear : EnemyBase
             state = IDLE; 
             if (slamCollider.enabled) 
             {
+                canParry = false;
                 pAct.takeDamage(slamDamage);
                 if (pRB != null)
                 {
@@ -201,6 +214,7 @@ public class PolarBear : EnemyBase
             }
             if (clawCollider.enabled) 
             {
+                canParry = false;
                 pAct.takeDamage(clawDamage);
                 if (pRB != null)
                 {
@@ -210,6 +224,8 @@ public class PolarBear : EnemyBase
             }
             if (rushCollider.enabled) 
             {
+                canParry = false;
+
                 pAct.takeDamage(rushDamage);
                 if (pRB != null)
                 {
@@ -239,6 +255,8 @@ public class PolarBear : EnemyBase
 
     private void FixedUpdate()
     {
+        if (Pause.paused) return;
+        if (CameraController.inCutscene) return;
         if (state == RUSHING) //Si hace Rush, moverse como Rush
         {
             moveRush();
@@ -284,6 +302,7 @@ public class PolarBear : EnemyBase
         clawCollider.enabled = true;
         AudioSource aS = Instantiate(clawSound, transform.position, Quaternion.identity);
         aS.pitch = Random.Range(0.8f, 1.2f);
+        canParry = true;
         aS.Play();
         Destroy(aS.gameObject, aS.clip.length);
     }
@@ -291,6 +310,7 @@ public class PolarBear : EnemyBase
     public void clawReset() 
     {
         clawCollider.enabled = false;
+        canParry = false;
         Stun(0.2f);
         Invoke("clawReload", 1.5f);
     }
@@ -308,6 +328,7 @@ public class PolarBear : EnemyBase
         currentRushParticle = Instantiate(rushChargeParticle, transform.position, Quaternion.LookRotation(transform.up));
         state = RUSHING;
         canMoveRush = false;
+        canParry = true;
         AudioSource aS = Instantiate(rushSound, transform);
         aS.Play();
         Destroy(aS.gameObject, aS.clip.length);
@@ -349,8 +370,10 @@ public class PolarBear : EnemyBase
         navMeshAgent.enabled = true;
         Destroy(currentRushParticle.gameObject);
         anim.SetTrigger("Crash");
-        currentCrashPS = Instantiate(crashParticleSystem, crashPartTransform.position, Quaternion.identity);
-        Invoke("DeleteCrashPS", rushStunTime);
+        canParry = false;
+        currentCrashPS = Instantiate(crashParticleSystem, crashPartTransform);
+        Destroy(currentCrashPS.gameObject, rushStunTime);
+        //Invoke("DeleteCrashPS", rushStunTime);
         Stun(rushStunTime);
         if (rushCR != null)
         {
@@ -377,19 +400,18 @@ public class PolarBear : EnemyBase
         {
             
             canBall = false;
-            Invoke("DoBall", Random.Range(ballDelayMin, ballDelayMax));
+            DoBall();
         }
     }
     
     private void DoBall() //Para Invoke, usado para volver Oso a Ball
     {
-        ballMesh.SetActive(true);
-        bearMesh.SetActive(false);
+        
         state = BALL;
-        //foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
-        //{
-        //    bc.enabled = false;
-        //}
+        foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
+        {
+            bc.enabled = false;
+        }
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true;
         navMeshAgent.isStopped = true;
@@ -402,18 +424,18 @@ public class PolarBear : EnemyBase
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.rotation = Quaternion.identity; 
         transform.rotation = Quaternion.identity; //Hacer rotacion Default
-        ballMesh.SetActive(false);
-        bearMesh.SetActive(true);
+        
         state = SEEKING;
         Invoke("AllowBall", ballWaitTime);
         navMeshAgent.isStopped = false;
-        //foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
-        //{
-        //    if (!bc.isTrigger)
-        //    {
-        //        bc.enabled = true;
-        //    }
-        //}
+
+        foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
+        {
+            if (!bc.isTrigger)
+            {
+                bc.enabled = true;
+            }
+        }
         ballCollider.enabled = false;
     }
 

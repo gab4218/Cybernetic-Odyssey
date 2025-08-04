@@ -6,25 +6,38 @@ using UnityEngine.SceneManagement;
 
 public class FastTravel : MonoBehaviour, IInteractable
 {
-    [SerializeField] GameObject menu, bossButton;
+    [SerializeField] GameObject menu, bossButton, lavaButton, acidButton;
     private bool onMenu = false;
     //AsyncOperation async;
     //bool loadingDone;
 
     private void Start()
     {
-        menu.SetActive(false);
         if (bossButton != null && !ProgressManager.talkedToMilitary) bossButton.SetActive(false);
+        if (acidButton != null && !ProgressManager.beatSalamander) acidButton.SetActive(false);
+        if (lavaButton != null && !ProgressManager.beatBear) lavaButton.SetActive(false);
+        menu.SetActive(false);
     }
 
     public void UnlockBoss()
     {
-        if (bossButton != null && ProgressManager.beatBear) bossButton.SetActive(true);
+        if (bossButton != null && ProgressManager.beatSpider) bossButton.SetActive(true);
         ProgressManager.talkedToMilitary = true;
+    }
+
+    public void UnlockLava()
+    {
+        if (lavaButton != null && ProgressManager.beatBear) lavaButton.SetActive(true);
+    }
+
+    public void UnlockAcid()
+    {
+        if (acidButton != null && ProgressManager.beatSalamander) acidButton.SetActive(true);
     }
 
     private void Update()
     {
+        if (Pause.paused) return;
         if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Escape)) && onMenu)
         {
             if (menu.activeSelf)

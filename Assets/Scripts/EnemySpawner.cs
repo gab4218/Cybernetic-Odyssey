@@ -25,6 +25,7 @@ public class EnemySpawner : MonoBehaviour
     
     void Update()
     {
+        if (Pause.paused) return;
         if (enemyCount < maxEnemyCount)
         {
             Invoke("SpawnEnemy", spawnDelay);

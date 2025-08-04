@@ -12,6 +12,10 @@ public class PlayerMovement : MonoBehaviour
 
     
     private Animator anim;
+    public bool grabbed = false;
+    public Collider slamCollider;
+    private float generalMult = 1;
+    [SerializeField] ParticleSystem slamPS;
     [Header("Inputs")]
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
@@ -33,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float grapplingForce = 3000f;
     [SerializeField] private LayerMask groundRayLayerMask = 30;
     [SerializeField] private float maxSlopeAngle = 45f;
-
+    [SerializeField] private float slamSpeed = 15f;
     
 
     [Header("UI")]
@@ -55,7 +59,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 dir = Vector3.zero;
     Vector3 flatVelocity;
-    private bool isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canRoundSprint = false, walljumping = false, isGrappling = false, grounded = true, forceStopGrapple = false, onSlope = false, jumping = false;
+    private bool isSprinting = false, resting = false, isSliding = false, forceStopSlide = true, canRoundSprint = false, walljumping = false, isGrappling = false, forceStopGrapple = false, onSlope = false, jumping = false;
+
+    public bool grounded = true, slamming = false;
 
     private Rigidbody rb;
 
@@ -87,9 +93,22 @@ public class PlayerMovement : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX;
     }
 
+    public void Slow(float slowFactor)
+    {
+        generalMult /= slowFactor;
+    }
+
+    public void RegularSpeed(float slowFactor)
+    {
+        generalMult *= slowFactor;
+    }
+
+
     private void Update()
     {
+        if (Pause.paused) return;
         if (Time.timeScale == 0) return; //Si esta pausado
+        if (CameraController.inCutscene) return;
         if (DialogueManager.instance != null)
         {
             if (DialogueManager.instance.inDialogue)
@@ -99,11 +118,27 @@ public class PlayerMovement : MonoBehaviour
                 return;
             }
         }
+        if (grabbed)
+        {
+            return;
+        }
+        if (slamming)
+        {
+            groundDetect();
+            if (grounded)
+            {
+                Instantiate(slamPS, transform.position, Quaternion.identity).Play();
+                slamming = false;
+                slamCollider.enabled = true;
+                Invoke("Unslam", 0.1f);
+            }
+            return;
+        }
         foreach (var cam in cams)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, 1 - Mathf.Pow(0.5f, Time.deltaTime * 8));
         }
-
+        
         groundDetect();
 
         if (isGrappling) //Si esta grappling, moverse al punto de grapple e ignorar input
@@ -180,8 +215,22 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    public void Slam()
+    {
+        rb.velocity = -Vector3.up * slamSpeed;
+        slamming = true;
+    }
+
+    private void Unslam()
+    {
+        slamCollider.enabled = false;
+    }
+
     private void FixedUpdate()
     {
+        if (Pause.paused) return;
+        if (CameraController.inCutscene) return;
         if (DialogueManager.instance != null)
         {
             if (DialogueManager.instance.inDialogue)
@@ -189,6 +238,12 @@ public class PlayerMovement : MonoBehaviour
                 return;
             }
         }
+        if (grabbed)
+        {
+            return;
+        }
+        if (slamming) return;
+
         //Si el jugador se esta moviendo, moverlo
         if (dir.sqrMagnitude != 0 && !isGrappling)
         {
@@ -273,7 +328,7 @@ public class PlayerMovement : MonoBehaviour
         if (onSlope)
         {
             
-            rb.AddForce(SlopeMoveDir() * overloadMult * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded? 1 : 0.25f), ForceMode.Force);
+            rb.AddForce(SlopeMoveDir() * overloadMult * accelerationForce * generalMult * Time.fixedDeltaTime * accelMult * 2 * (grounded? 1 : 0.25f), ForceMode.Force);
             if (rb.velocity.y > 0)
             {
                 rb.AddForce(Vector3.down * 10f, ForceMode.Force);
@@ -281,7 +336,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.AddForce(dir * overloadMult * accelerationForce * Time.fixedDeltaTime * accelMult * 2 * (grounded ? 1 : 0.25f), ForceMode.Force);
+            rb.AddForce(dir * overloadMult * accelerationForce * generalMult * Time.fixedDeltaTime * accelMult * 2 * (grounded ? 1 : 0.25f), ForceMode.Force);
         }
 
     }
@@ -292,9 +347,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (onSlope && !jumping)
         {
-            if (rb.velocity.sqrMagnitude > overloadMult * maxSpeed * maxSpeed)
+            if (rb.velocity.magnitude > overloadMult * maxSpeed * generalMult)
             {
-                rb.velocity = rb.velocity.normalized * overloadMult * maxSpeed;
+                rb.velocity = rb.velocity.normalized * overloadMult * maxSpeed * generalMult;
             }
         }
         else
@@ -304,9 +359,9 @@ public class PlayerMovement : MonoBehaviour
         
         
             //Chequear si la velocidad horizontal excede un limite y corregir
-            if (flatVelocity.sqrMagnitude > overloadMult * maxSpeed * maxSpeed)
+            if (flatVelocity.magnitude > overloadMult *  maxSpeed * generalMult)
             {
-                flatVelocity = flatVelocity.normalized * overloadMult * maxSpeed;
+                flatVelocity = flatVelocity.normalized * overloadMult * maxSpeed * generalMult;
                 rb.velocity = new Vector3(flatVelocity.x, rb.velocity.y, flatVelocity.z);
             }
             

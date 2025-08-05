@@ -83,6 +83,10 @@ public abstract class EnemyBase : MonoBehaviour
         //Preparaciones
         rb = GetComponentInChildren<Rigidbody>();
         currentHP = maxHP;
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+        {
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+        }
         player = FindObjectOfType<PlayerActions>();
         playerTranform = player.transform;
         state = IDLE;

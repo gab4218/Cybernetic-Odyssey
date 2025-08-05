@@ -25,6 +25,7 @@ public class RocketCollisonDetection : MonoBehaviour
 
             if(eb != null)
             {
+                if (eb.invincible) return;
                 if (!eb.shielded)
                 {
                     eb.takeDamage(60, PlayerActions.damageType.Fire);

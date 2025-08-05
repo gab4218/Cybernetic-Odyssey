@@ -81,7 +81,7 @@ public class PolarBear : EnemyBase
         if (ProgressManager.beatBear)
         {
             //BORRAR
-            Destroy(gameObject);
+            //Destroy(gameObject);
             maxHP = (int)(maxHP * 1.5f);
             currentHP = maxHP;
             clawDamage = (int) (1.2f * clawDamage);
@@ -103,7 +103,7 @@ public class PolarBear : EnemyBase
         //HPDisplay = GameObject.FindWithTag("BearHP").GetComponent<TMPro.TMP_Text>();
         if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
         {
-            HPDisplay.text = $"Bear HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
         }
         //if (ProgressManager.beatBear) Destroy(gameObject);
         //Preparaciones generales
@@ -115,6 +115,7 @@ public class PolarBear : EnemyBase
     {
         if (Pause.paused) return;
         if (CameraController.inCutscene) return;
+        if (state == BALL) return;
         detectPlayer(); 
         
         if (state == SEEKING) //Si se persigue al jugador, atacarlo cuando sea posible 
@@ -396,9 +397,10 @@ public class PolarBear : EnemyBase
 
     public void StartBall() //Iniciar Ball
     {
+        if (state != SEEKING && state != IDLE && state != STUNNED) return;
         if (canBall)
         {
-            
+            Debug.Log("ball");
             canBall = false;
             DoBall();
         }
@@ -408,6 +410,7 @@ public class PolarBear : EnemyBase
     {
         
         state = BALL;
+        anim.SetBool("ball", true);
         foreach (BoxCollider bc in bearColliders) //Desabilitar todos los colliders
         {
             bc.enabled = false;
@@ -415,19 +418,21 @@ public class PolarBear : EnemyBase
         rb.constraints = RigidbodyConstraints.None; //Desbloquear rotacion de la bola
         ballCollider.enabled = true;
         navMeshAgent.isStopped = true;
-        rb.AddForce(-transform.forward * ballImpulse, ForceMode.Impulse); //Empujar
+        rb.AddForce(-transform.forward * ballImpulse,ForceMode.Impulse); //Empujar
+        
         Invoke("EndBall", 1f);
     }
     
     private void EndBall() //Para Invoke, volver a base de Ball
     {
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.rotation = Quaternion.identity; 
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
         transform.rotation = Quaternion.identity; //Hacer rotacion Default
-        
-        state = SEEKING;
-        Invoke("AllowBall", ballWaitTime);
+
+        anim.SetBool("ball", false);
         navMeshAgent.isStopped = false;
+        Invoke("AllowBall", ballWaitTime);
+        state = SEEKING;
 
         foreach (BoxCollider bc in bearColliders) //Activar todos los colliders no trigger
         {

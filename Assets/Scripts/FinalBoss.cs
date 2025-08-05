@@ -16,7 +16,7 @@ public class FinalBoss : EnemyBase
     private bool _canFlamethrow = true; // value == 1
     private bool _canFirePunch = true; // value == 2
     private bool _canDropKick = true; // value == 3
-    private bool _canPunchBarrage = true; // value == 4
+    [SerializeField] private bool _canPunchBarrage = true; // value == 4
     private bool _canShield = true; // value == 5
     private bool _canEMP = true; // value == 6
 
@@ -177,6 +177,10 @@ public class FinalBoss : EnemyBase
         _shieldMR.enabled = false;
         _myColliders = GetComponents<Collider>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+        {
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+        }
         state = IDLE;
     }
 
@@ -599,9 +603,7 @@ public class FinalBoss : EnemyBase
     {
         Debug.Log("spin");
         _inBarrageRange = false;
-        ParticleSystem ps = Instantiate(_barragePS, transform);
-        AudioSource AS = Instantiate(_spinAS);
-        AS.Play();
+        
 
         while (_inBarrageRange == false)
         {
@@ -611,7 +613,9 @@ public class FinalBoss : EnemyBase
             yield return null;
         }
         _anim.SetBool("spin", true);
-
+        ParticleSystem ps = Instantiate(_barragePS, transform);
+        AudioSource AS = Instantiate(_spinAS);
+        AS.Play();
         _barrageCollider.enabled = true;
 
         for (int i = 0; i < _barrageAttackQuantity; i++)

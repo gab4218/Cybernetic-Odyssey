@@ -60,7 +60,9 @@ public class EnemyTail : EnemyBase
             currentHP = maxHP;
             _flingDamage = (int)(1.2f * _flingDamage);
             _lungeDamage = (int)(1.2f * _lungeDamage);
-            navMeshAgent.enabled = true;
+            GetComponent<NavMeshAgent>().enabled = true;
+            base.Start();
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
         }
     }
 
@@ -69,6 +71,7 @@ public class EnemyTail : EnemyBase
     private void StartLunge()
     {
         _anim.SetTrigger("lunge");
+        Debug.Log("lunge");
         state = ATTACKING;
         _canAttack = false;
         navMeshAgent.isStopped = true;
@@ -80,14 +83,17 @@ public class EnemyTail : EnemyBase
         dir = player.transform.position - transform.position;
         dir.y = 0;
         dir.Normalize();
-        rb.velocity = dir * _lungeSpeed;
-        rb.AddForce(Vector3.up * 5f);
+        
+        rb.velocity = dir * _lungeSpeed + Vector3.up;
+        
         _lunging = true;
     }
 
     public void EndLunge()
     {
         _lungeCollider.enabled = false;
+        _lunging = false;
+        rb.velocity = Vector3.zero;
         Stun(_lungeStunTime);
         Invoke("AllowAttack", _attackCooldown);
         Invoke("AllowLunge", _lungeCooldown);
@@ -103,6 +109,7 @@ public class EnemyTail : EnemyBase
     #region Fling
     private void StartFling()
     {
+        Debug.Log("fling");
         _anim.SetTrigger("fling");
         state = ATTACKING;
         _canAttack = false;
@@ -139,7 +146,15 @@ public class EnemyTail : EnemyBase
         _burrowing = true;
         _anim.SetBool("walking", true);
         _selectedLake = _lakes[Random.Range(0, _lakes.Length)];
+        foreach (Transform t in _lakes)
+        {
+            if (Vector3.Distance(transform.position, t.position) < Vector3.Distance(transform.position, _selectedLake.position))
+            {
+                _selectedLake = t;
+            }
+        }
         setDestination(_selectedLake.position);
+        Debug.Log("burrow");
     }
 
     private void ReachedBurrow()
@@ -152,6 +167,11 @@ public class EnemyTail : EnemyBase
 
     public void Burrow()
     {
+        Transform t = _selectedLake;
+        while (t == _selectedLake)
+        {
+            _selectedLake = _lakes[Random.Range(0, _lakes.Length)];
+        }
         transform.position = _selectedLake.position;
         Stun(_burrowInbetweenTime);
         Invoke("AllowAttack", _attackCooldown);
@@ -162,7 +182,7 @@ public class EnemyTail : EnemyBase
     {
         for (int i = 0; i < _fireballQuantity; i++)
         {
-            Rigidbody r = Instantiate(_fireballRB);
+            Rigidbody r = Instantiate(_fireballRB, _selectedLake.transform.position + Vector3.up * 2, Quaternion.identity);
             Vector3 d = Random.onUnitSphere;
             d.y = 0;
             d.Normalize();
@@ -170,6 +190,8 @@ public class EnemyTail : EnemyBase
             r.AddForce(Vector3.up * 5f, ForceMode.Impulse);
         }
     }
+
+    
 
     private void AllowBurrow()
     {
@@ -245,6 +267,7 @@ public class EnemyTail : EnemyBase
     {
         if (_lunging)
         {
+            Debug.Log("lungehit");
             _lungeCollider.enabled = true;
             ParticleSystem p = Instantiate(_lungePS, transform.position, Quaternion.identity);
             p.Play();

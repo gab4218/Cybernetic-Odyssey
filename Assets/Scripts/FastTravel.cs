@@ -8,6 +8,7 @@ public class FastTravel : MonoBehaviour, IInteractable
 {
     [SerializeField] GameObject menu, bossButton, lavaButton, acidButton;
     private bool onMenu = false;
+    private string _targetScene;
     //AsyncOperation async;
     //bool loadingDone;
 
@@ -83,11 +84,18 @@ public class FastTravel : MonoBehaviour, IInteractable
         SoundSingleton.Instance.Boton();
     }
 
+
+    public void LoadScene()
+    {
+        AsyncLoadManager.instance.LoadScene(_targetScene);
+        PlayerActions.dead = true;
+    }
+
     public void GoToScene(string scene)
     {
         SoundSingleton.Instance.Viaje();
-        AsyncLoadManager.instance.LoadScene(scene);
+        Cutscener.instance.EnterLeaveCutscene();
         Time.timeScale = 1;
-        PlayerActions.dead = true;
+        _targetScene = scene;
     }
 }

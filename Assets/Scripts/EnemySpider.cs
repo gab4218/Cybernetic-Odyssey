@@ -101,12 +101,27 @@ public class EnemySpider : EnemyBase
         _aiming = false;
         Rigidbody r = Instantiate(_acidRB, _acidSpawn.position, Quaternion.identity);
         Vector3 d = player.transform.position - transform.position;
-        d.y = 0;
+        d.Normalize();
+        r.velocity = d  * Vector3.Distance(transform.position, player.transform.position);
+        if (ProgressManager.beatSpider)
+        {
+            r = Instantiate(_acidRB, _acidSpawn.position, Quaternion.identity);
+            d = player.transform.position - transform.position;
+            d.Normalize();
+            d += Random.insideUnitSphere/2f;
+            d.Normalize();
+            r.velocity = d * Vector3.Distance(transform.position, player.transform.position);
+
+            r = Instantiate(_acidRB, _acidSpawn.position, Quaternion.identity);
+            d = player.transform.position - transform.position;
+            d.Normalize();
+            d += Random.insideUnitSphere/2f;
+            d.Normalize();
+            r.velocity = d * Vector3.Distance(transform.position, player.transform.position);
+        }
         AudioSource aS = Instantiate(_hissSound, transform.position, Quaternion.identity);
         aS.Play();
         Destroy(aS.gameObject, aS.clip.length);
-        d.Normalize();
-        r.velocity = d  * Vector3.Distance(transform.position, player.transform.position);
        // r.AddForce(Vector3.up * 3f, ForceMode.Impulse);
     }
 
@@ -346,7 +361,8 @@ public class EnemySpider : EnemyBase
                 yield return null;
             }
             Rigidbody r = Instantiate(_spiderlingRB, _spawnTransform.position, Quaternion.identity);
-            Vector3 d = player.transform.position - transform.position + Random.insideUnitSphere;
+            Vector3 d = player.transform.position - transform.position;
+            d = d.normalized + Random.insideUnitSphere;
             r.velocity = d.normalized * _spawnThrowSpeed * Vector3.Distance(transform.position, player.transform.position) + Vector3.up * 2f;
         }
         _spawnCR = null;
@@ -430,9 +446,13 @@ public class EnemySpider : EnemyBase
         _randomPos = _checkpoints[Random.Range(0, _checkpoints.Length)].position;
         if (ProgressManager.beatSpider)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
             maxHP = (int)(maxHP * 1.5f);
             currentHP = maxHP;
+            if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+            {
+                HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+            }
             _biteDamage = (int)(1.2f * _biteDamage);
             _venomDamage = (int)(1.2f * _venomDamage);
         }

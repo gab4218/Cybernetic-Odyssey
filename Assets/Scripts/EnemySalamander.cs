@@ -11,11 +11,8 @@ public class EnemySalamander : EnemyBase
 
     [Header("General Stuff")]
     [SerializeField] private EnemyTail _tail;
-    [SerializeField] private Transform _tailTransform;
     [SerializeField] private Transform _tailBoneTransform;
-    [SerializeField] private SkinnedMeshRenderer _tailGeoSMR;
-    [SerializeField] private Transform _tailGeoDestination;
-    [SerializeField] private Transform[] _newTailBones;
+    [SerializeField] private Transform[] _disppearMeshes;
     [SerializeField] private Animator _anim;
     [SerializeField] private int _tailLossHP = 300;
     [SerializeField] private float _attackCooldown = 5f;
@@ -75,14 +72,20 @@ public class EnemySalamander : EnemyBase
         base.Start();
         if (ProgressManager.beatSalamander)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
             maxHP = (int)(maxHP * 1.5f);
             currentHP = maxHP;
+            if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+            {
+                HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+            }
+            _tailLossHP = (int)(1.5f * _tailLossHP);
             _biteTickDamage = (int)(1.2f * _biteTickDamage);
             _whipDamage = (int)(1.2f * _whipDamage);
         }
+        //ReleaseTail();
     }
-
+    
 
     #region Bite
 
@@ -359,12 +362,16 @@ public class EnemySalamander : EnemyBase
     {
         Vector3 v = _tailBoneTransform.position;
         v.y = transform.position.y;
+        _tail.gameObject.SetActive(true);
         _tail.transform.position = v;
-        _tailBoneTransform.parent = _tailTransform;
-        _tailGeoSMR.transform.parent = _tailGeoDestination;
-        _tailGeoSMR.bones = _newTailBones;
-        _tailGeoSMR.rootBone = _newTailBones[0];
+        _tailBoneTransform.gameObject.SetActive(false);
+        foreach (Transform t in _disppearMeshes)
+        {
+            t.gameObject.SetActive(false);
+        }
         _tail.enabled = true;
+        
+        
     }
 
 
@@ -380,7 +387,7 @@ public class EnemySalamander : EnemyBase
                 }
                 break;
             case 1:
-                if (Vector3.Distance(transform.position, player.transform.position) <= _tailWhipDistance && _canWhip)
+                if (Vector3.Distance(transform.position, player.transform.position) <= _tailWhipDistance && _canWhip && _hasTail)
                 {
                     Whip();
                 }

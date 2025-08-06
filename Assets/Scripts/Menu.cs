@@ -50,6 +50,9 @@ public class Menu : MonoBehaviour
         ProgressManager.gotBearRefight = false;
         ProgressManager.gotSalamanderRefight = false;
         ProgressManager.gotSpiderRefight = false;
+        ProgressManager.gotMilitaryButton = false;
+        ProgressManager.gotSalButton = false;
+        ProgressManager.gotSpiderButton = false;
     }
 
     public void Controls(string controls)

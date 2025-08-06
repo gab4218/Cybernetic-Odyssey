@@ -65,7 +65,7 @@ public class CameraController : MonoBehaviour
         {
             float randomx = Random.Range(0, intensity), randomy = Random.Range(0, intensity);
             Camera.main.transform.localPosition = new Vector3(randomx, randomy, 0);
-            length -= Time.deltaTime;
+            length -= Time.unscaledDeltaTime;
             yield return null;
         }
         Camera.main.transform.localPosition = Vector3.zero;

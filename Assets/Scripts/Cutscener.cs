@@ -8,6 +8,7 @@ public class Cutscener : MonoBehaviour
     private Vector3 _startPos;
     private Quaternion _startRotation;
     private float _startFOV;
+    private AudioListener _listener;
     [SerializeField] private Animation _cameraAnim;
     [SerializeField] private Animation _anim;
     [SerializeField] private AnimationClip _cameraDefault;
@@ -25,6 +26,7 @@ public class Cutscener : MonoBehaviour
         {
             instance = this;
         }
+        _listener = FindObjectOfType<AudioListener>();
         _startFOV = Camera.main.fieldOfView;
         _startPos = Camera.main.transform.parent.position;
         _startRotation = Camera.main.transform.parent.rotation;
@@ -41,6 +43,8 @@ public class Cutscener : MonoBehaviour
         Camera.main.transform.parent.position = _startPos;
         Camera.main.transform.parent.rotation = _startRotation;
         Camera.main.fieldOfView = _startFOV / 2f;
+        _listener.enabled = false;
+        Camera.main.GetComponent<AudioListener>().enabled = false;
         _anim.clip = _thisLeave;
         _anim.Play();
         _cameraAnim.clip = _cameraLeave;

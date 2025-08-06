@@ -11,8 +11,8 @@ public class DialogueAgent : MonoBehaviour, IInteractable
     [SerializeField] private string[] refightDialogue;
     [SerializeField] private string[] refightRewardDialogue;
     [SerializeField] private AudioSource audioSource, pickupSource;
-    [SerializeField] private GameObject reward, startReward, refightReward;
-    [SerializeField] private int moneyReward = 30;
+    [SerializeField] private GameObject reward, startReward, storyThing;
+    [SerializeField] private int moneyReward = 30, refightMoney = 40;
     [SerializeField] private FastTravel ft;
     [SerializeField] private Animator anim;
     [SerializeField] private Shop shop;
@@ -31,14 +31,57 @@ public class DialogueAgent : MonoBehaviour, IInteractable
     private void Update()
     {
         if (Pause.paused) return;
-        if (anim == null) return;
+        switch (type)
+        {
+            case AgentType.bear:
+                if (!ProgressManager.gotBearRewards)
+                {
+                    storyThing.SetActive(true);
+                }
+                else
+                {
+                    storyThing.SetActive(false);
+                }
+                break;
+            case AgentType.salamander:
+                if (!ProgressManager.gotSalamanderRewards && ProgressManager.gotBearRewards)
+                {
+                    storyThing.SetActive(true);
+                }
+                else
+                {
+                    storyThing.SetActive(false);
+                }
+                break;
+            case AgentType.spider:
+                if (!ProgressManager.gotSpiderRewards && ProgressManager.gotSalamanderRewards)
+                {
+                    storyThing.SetActive(true);
+                }
+                else
+                {
+                    storyThing.SetActive(false);
+                }
+                break;
+            case AgentType.military:
+                if (ProgressManager.gotSpiderRewards)
+                {
+                    storyThing.SetActive(true);
+                }
+                else
+                {
+                    storyThing.SetActive(false);
+                }
+                break;
+        }
 
+        if (anim == null) return;
         if (lookinAtYa)
         {
             Vector3 dir = player.transform.position - transform.position;
             dir.y = 0;
             dir.Normalize();
-            transform.forward = Vector3.Lerp(transform.forward, dir, Mathf.Pow(0.1f, Time.deltaTime));
+            transform.right = Vector3.Lerp(transform.right, -dir, 1 - Mathf.Pow(0.1f, Time.deltaTime));
         }
         else
         {
@@ -46,14 +89,15 @@ public class DialogueAgent : MonoBehaviour, IInteractable
             {
                 anim.speed = 1;
             }
-            else if(anim.speed != 0)
+            else if(anim.speed == 0)
             {
-                if (Vector3.Distance(transform.forward, _originalForward) > Mathf.Epsilon)
+                if (Vector3.Distance(transform.right, _originalForward) > 0.1f)
                 {
-                    transform.forward = Vector3.Lerp(transform.forward, _originalForward, Mathf.Pow(0.1f, Time.deltaTime));
+                    transform.right = Vector3.Lerp(transform.right, _originalForward, 1 - Mathf.Pow(0.1f, Time.deltaTime));
                 }
                 else
                 {
+                    transform.right = _originalForward;
                     _doneLooking = true;
                 }
             }
@@ -64,7 +108,7 @@ public class DialogueAgent : MonoBehaviour, IInteractable
     {
         if (walker)
         {
-            _originalForward = transform.forward;
+            _originalForward = transform.right;
             anim.speed = 0;
             lookinAtYa = true;
             _doneLooking = false;
@@ -87,22 +131,20 @@ public class DialogueAgent : MonoBehaviour, IInteractable
                     }
                     else
                     {
-                        DialogueManager.instance.setDialogues(defaultDialogue, audioSource);
+                        if (!ProgressManager.refoughtBear)
+                        {
+                            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
+                        }
+                        else
+                        {
+                            if (!ProgressManager.gotBearRefight)
+                            {
+                                DialogueManager.instance.setDialogues(refightRewardDialogue, audioSource);
+                                Inventory.money += refightMoney;
+                                ProgressManager.refoughtBear = false;
+                            }
+                        }
                     }
-                    //else
-                    //{
-                    //    if (!ProgressManager.refoughtBear)
-                    //    {
-                    //        DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //    }
-                    //    else
-                    //    {
-                    //        if (!ProgressManager.gotBearRefight)
-                    //        {
-                    //            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //        }
-                    //    }
-                    //}
                 }
                 else
                 {
@@ -130,22 +172,20 @@ public class DialogueAgent : MonoBehaviour, IInteractable
                     }
                     else
                     {
-                        DialogueManager.instance.setDialogues(defaultDialogue, audioSource);
+                        if (!ProgressManager.refoughtSalamander)
+                        {
+                            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
+                        }
+                        else
+                        {
+                            if (!ProgressManager.gotSalamanderRefight)
+                            {
+                                DialogueManager.instance.setDialogues(refightRewardDialogue, audioSource);
+                                Inventory.money += refightMoney;
+                                ProgressManager.refoughtSalamander = false;
+                            }
+                        }
                     }
-                    //else
-                    //{
-                    //    if (!ProgressManager.refoughtSalamander)
-                    //    {
-                    //        DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //    }
-                    //    else
-                    //    {
-                    //        if (!ProgressManager.gotSalamanderRefight)
-                    //        {
-                    //            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //        }
-                    //    }
-                    //}
                 }
                 else
                 {
@@ -175,22 +215,20 @@ public class DialogueAgent : MonoBehaviour, IInteractable
                     }
                     else
                     {
-                        DialogueManager.instance.setDialogues(defaultDialogue, audioSource);
+                        if (!ProgressManager.refoughtSpider)
+                        {
+                            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
+                        }
+                        else
+                        {
+                            if (!ProgressManager.gotSpiderRefight)
+                            {
+                                DialogueManager.instance.setDialogues(refightRewardDialogue, audioSource);
+                                Inventory.money += refightMoney;
+                                ProgressManager.refoughtSpider = false;
+                            }
+                        }
                     }
-                    //else
-                    //{
-                    //    if (!ProgressManager.refoughtSpider)
-                    //    {
-                    //        DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //    }
-                    //    else
-                    //    {
-                    //        if (!ProgressManager.gotSpiderRefight)
-                    //        {
-                    //            DialogueManager.instance.setDialogues(refightDialogue, audioSource);
-                    //        }
-                    //    }
-                    //}
                 }
                 else
                 {
@@ -218,6 +256,9 @@ public class DialogueAgent : MonoBehaviour, IInteractable
                 break;
             case AgentType.shop:
                 shop.EnableMenu();
+                break;
+            case AgentType.filler:
+                DialogueManager.instance.setDialogues(dialogue, audioSource);
                 break;
             default:
                 break;

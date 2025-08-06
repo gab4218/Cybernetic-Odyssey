@@ -85,12 +85,13 @@ public class EnemyTail : EnemyBase
         dir.Normalize();
         
         rb.velocity = dir * _lungeSpeed + Vector3.up;
-        
+        canParry = true;
         _lunging = true;
     }
 
     public void EndLunge()
     {
+        canParry = false;
         _lungeCollider.enabled = false;
         _lunging = false;
         rb.velocity = Vector3.zero;
@@ -119,10 +120,12 @@ public class EnemyTail : EnemyBase
     public void DoFling()
     {
         _flingCollider.enabled = true;
+        canParry = true;
     }
 
     public void EndFling()
     {
+        canParry = false;
         _flingCollider.enabled = false;
         Stun(_flingStunTime);
         Invoke("AllowAttack", _attackCooldown);

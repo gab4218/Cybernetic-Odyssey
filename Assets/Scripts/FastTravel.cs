@@ -14,9 +14,9 @@ public class FastTravel : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        if (bossButton != null && !ProgressManager.talkedToMilitary) bossButton.SetActive(false);
-        if (acidButton != null && !ProgressManager.beatSalamander) acidButton.SetActive(false);
-        if (lavaButton != null && !ProgressManager.beatBear) lavaButton.SetActive(false);
+        if (bossButton != null && !ProgressManager.gotMilitaryButton) bossButton.SetActive(false);
+        if (acidButton != null && !ProgressManager.gotSpiderButton) acidButton.SetActive(false);
+        if (lavaButton != null && !ProgressManager.gotSalButton) lavaButton.SetActive(false);
         menu.SetActive(false);
     }
 
@@ -24,16 +24,19 @@ public class FastTravel : MonoBehaviour, IInteractable
     {
         if (bossButton != null && ProgressManager.beatSpider) bossButton.SetActive(true);
         ProgressManager.talkedToMilitary = true;
+        ProgressManager.gotMilitaryButton = true;
     }
 
     public void UnlockLava()
     {
         if (lavaButton != null && ProgressManager.beatBear) lavaButton.SetActive(true);
+        ProgressManager.gotSalButton = true;
     }
 
     public void UnlockAcid()
     {
         if (acidButton != null && ProgressManager.beatSalamander) acidButton.SetActive(true);
+        ProgressManager.gotSpiderButton = true;
     }
 
     private void Update()

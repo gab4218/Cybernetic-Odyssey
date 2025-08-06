@@ -32,7 +32,7 @@ public class Flamethrower : MonoBehaviour
                 if (eb != null)
                 {
                     if (eb.shielded) eb.ShieldDamage(flamethrowerDamage);
-                    else eb.takeDamage(flamethrowerDamage, playerActions.dmgType);
+                    else eb.takeDamage((int)(flamethrowerDamage * (playerActions.dmgType == PlayerActions.damageType.Acid? 2 : 1)), playerActions.dmgType);
                 } 
             }
         }

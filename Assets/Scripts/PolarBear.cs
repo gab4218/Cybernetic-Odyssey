@@ -87,6 +87,7 @@ public class PolarBear : EnemyBase
             clawDamage = (int) (1.2f * clawDamage);
             slamDamage = (int) (1.2f * slamDamage);
             rushDamage = (int) (1.2f * rushDamage);
+            drops = false;
         }
         anim = GetComponentInChildren<Animator>();
         slamCollider.enabled = false;
@@ -205,7 +206,7 @@ public class PolarBear : EnemyBase
             state = IDLE; 
             if (slamCollider.enabled) 
             {
-                canParry = false;
+                
                 pAct.takeDamage(slamDamage);
                 if (pRB != null)
                 {
@@ -215,7 +216,7 @@ public class PolarBear : EnemyBase
             }
             if (clawCollider.enabled) 
             {
-                canParry = false;
+                
                 pAct.takeDamage(clawDamage);
                 if (pRB != null)
                 {
@@ -225,7 +226,7 @@ public class PolarBear : EnemyBase
             }
             if (rushCollider.enabled) 
             {
-                canParry = false;
+                
 
                 pAct.takeDamage(rushDamage);
                 if (pRB != null)

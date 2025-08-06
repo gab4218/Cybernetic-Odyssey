@@ -547,6 +547,7 @@ public class FinalBoss : EnemyBase
         t = 0;
         _dropkickWorking = true;
         startPos = transform.position;
+        canParry = true;
         while (t < 1 && _dropkickWorking)
         {
             _punchRB.transform.position = _punchStartTransform.position;
@@ -562,6 +563,7 @@ public class FinalBoss : EnemyBase
         Destroy(AS.gameObject, AS.clip.length);
         _dropkickDmgCollider.enabled = true;
         yield return new WaitForFixedUpdate();
+        canParry = false;
         _dropkickDmgCollider.enabled = false;
 
         Instantiate(_dropkickPS, transform.position, Quaternion.identity).Play();
@@ -617,7 +619,7 @@ public class FinalBoss : EnemyBase
         AudioSource AS = Instantiate(_spinAS);
         AS.Play();
         _barrageCollider.enabled = true;
-
+        canParry = true;
         for (int i = 0; i < _barrageAttackQuantity; i++)
         {
             float t = 0;
@@ -630,6 +632,7 @@ public class FinalBoss : EnemyBase
             }
             StartCoroutine(BarrageHit());
         }
+        canParry = false;
         _barrageCollider.enabled = false;
 
 
@@ -648,6 +651,7 @@ public class FinalBoss : EnemyBase
     {
         float t = 0;
         _inBarrageRange = false;
+        
         while (t < _barrageAttackDuration)
         {
             if (!_inBarrageRange) MoveBarrage();
@@ -813,10 +817,7 @@ public class FinalBoss : EnemyBase
     {
         if (!PlayerActions.dead)
         {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-            Time.timeScale = 1;
-            SceneManager.LoadScene("win");
+            SceneManager.LoadScene("EndGame");
         }
     }
     private void AllowAttack()
@@ -889,7 +890,7 @@ public class FinalBoss : EnemyBase
             transform.forward = Vector3.Lerp(transform.forward, dir, Mathf.Pow(0.1f, Time.deltaTime));
             _punchRB.transform.position = _punchStartTransform.position;
             _punchRB.transform.rotation = _punchStartTransform.rotation;
-            HPDisplay.text = currentHP + "/" + maxHP;
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
             if (Random.Range(0, 100) < 5 && _canAttack)
             {
                 SelectAttack();

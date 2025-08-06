@@ -894,9 +894,9 @@ MonoBehaviour:
   grappleSound: {fileID: 1575289815180384972, guid: 4f2f58930c72b90428ba6cfa6616ebea, type: 3}
   interactText: {fileID: 0}
   slamDamage: 25
-  parryHealing: 10
-  meleeDamage: 70
-  meleeCooldown: 0.4
+  parryHealing: 25
+  meleeDamage: 40
+  meleeCooldown: 0.5
   meleeCollider: {fileID: 2233781265965041149}
   meleeMesh: {fileID: -5597002278806442958, guid: ff7b0e433d39a754fb944693489c510e, type: 3}
   meleeClip: {fileID: 8300000, guid: 2ca304d79629f474496cb8c0db4615ee, type: 3}
@@ -907,6 +907,7 @@ MonoBehaviour:
   slowDmgMult: 1.5
   slowDmgSpeedDiv: 0.75
   addedKnockback: 0.5
+  parryScreen: {fileID: 0}
   currentHP: 0
   lastPosition: {x: 0, y: 0, z: 0}
   partMax: {fileID: 8480068155208967460, guid: b78a482566c4fdc4481bb972de021b15, type: 3}

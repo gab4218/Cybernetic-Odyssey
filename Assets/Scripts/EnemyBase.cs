@@ -261,7 +261,7 @@ public abstract class EnemyBase : MonoBehaviour
             if (iceCoroutine != null) StopCoroutine(iceCoroutine);
             if (fireCoroutine != null) StopCoroutine(fireCoroutine);
             if (calmCoroutine != null) StopCoroutine(calmCoroutine);
-            if (drops)
+            if (drops && currentHP >= -10)
             {
                 for (int i = 0; i < 12; i++)
                 {
@@ -340,6 +340,7 @@ public abstract class EnemyBase : MonoBehaviour
                 }
                 if (currentHP <= 0) //Si muerto, destruir
                 {
+                    HPDisplay.gameObject.SetActive(false);
                     Destroy(gameObject);
                 }
             }
@@ -367,6 +368,7 @@ public abstract class EnemyBase : MonoBehaviour
                 }
                 if (currentHP <= 0) //Si muerto, destruir
                 {
+                    HPDisplay.gameObject.SetActive(false);
                     Destroy(gameObject);
                 }
             }

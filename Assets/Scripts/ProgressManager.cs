@@ -19,5 +19,8 @@ public class ProgressManager : MonoBehaviour
     public static bool gotBearRefight = false;
     public static bool gotSalamanderRefight = false;
     public static bool gotSpiderRefight = false;
+    public static bool gotSalButton = false;
+    public static bool gotSpiderButton = false;
+    public static bool gotMilitaryButton = false;
     
 }

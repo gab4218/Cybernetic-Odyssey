@@ -444,15 +444,16 @@ public class EnemySpider : EnemyBase
         base.Start();
         navMeshAgent.updateUpAxis = true;
         _randomPos = _checkpoints[Random.Range(0, _checkpoints.Length)].position;
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+        {
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+        }
         if (ProgressManager.beatSpider)
         {
             //Destroy(gameObject);
             maxHP = (int)(maxHP * 1.5f);
             currentHP = maxHP;
-            if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
-            {
-                HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
-            }
+            drops = false;
             _biteDamage = (int)(1.2f * _biteDamage);
             _venomDamage = (int)(1.2f * _venomDamage);
         }
@@ -510,7 +511,7 @@ public class EnemySpider : EnemyBase
                 {
                     _venomCR = StartCoroutine(Poison(_venomDuration));
                 }
-                canParry = false;
+                //canParry = false;
                 player.takeDamage(_biteDamage);
             }
         }

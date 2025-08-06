@@ -70,15 +70,16 @@ public class EnemySalamander : EnemyBase
     protected override void Start()
     {
         base.Start();
+        if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
+        {
+            HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
+        }
         if (ProgressManager.beatSalamander)
         {
             //Destroy(gameObject);
             maxHP = (int)(maxHP * 1.5f);
             currentHP = maxHP;
-            if (HPDisplay != null) //Si se puede mostrar HP, mostrarla
-            {
-                HPDisplay.text = $"Boss HP: {Mathf.Max(currentHP, 0)}/{maxHP}";
-            }
+            drops = false;
             _tailLossHP = (int)(1.5f * _tailLossHP);
             _biteTickDamage = (int)(1.2f * _biteTickDamage);
             _whipDamage = (int)(1.2f * _whipDamage);
@@ -100,6 +101,7 @@ public class EnemySalamander : EnemyBase
 
     public void WallBite()
     {
+        if (_biteTailColliders == null) return;
         foreach (Collider c in _biteTailColliders)
         {
             c.enabled = true;
@@ -108,6 +110,7 @@ public class EnemySalamander : EnemyBase
 
     public void EndWallBite()
     {
+        if (_biteTailColliders == null) return;
         foreach (Collider c in _biteTailColliders)
         {
             c.enabled = false;
@@ -430,7 +433,7 @@ public class EnemySalamander : EnemyBase
             {
                 player.GetGrabbed();
                 _biteCR = StartCoroutine(GrabPlayer());
-                canParry = false;
+                
             }
         }
         else if (_whipCollider.enabled)
@@ -441,7 +444,7 @@ public class EnemySalamander : EnemyBase
                 Rigidbody pRB = player.GetComponent<Rigidbody>();
                 pRB.velocity = Vector3.zero;
                 pRB.AddForce(dir.normalized *_whipKnockback + Vector3.up * 2, ForceMode.Impulse);
-                canParry = false;
+                
             }
         }
     }

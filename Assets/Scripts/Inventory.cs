@@ -76,7 +76,8 @@ public class Inventory : MonoBehaviour
                 b.hasBeenBought = true;
                 break;
             case 6:
-                //expanded = true;
+                availableUpgrades.Add(14);
+                b.hasBeenBought = true;
                 break;
             default:
                 Debug.Log("You dun fucked up gng");

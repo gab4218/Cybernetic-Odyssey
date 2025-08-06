@@ -48,13 +48,17 @@ public class Shop : MonoBehaviour
             {
                 foreach (int f in Inventory.secondarySlots)
                 {
-                    if ((bs.thing == 4 && f == 10) || (bs.thing == 5 && f == 13)) bs.hasBeenBought = true;
+                    if ((bs.thing == 4 && f == 10) || (bs.thing == 5 && f == 13) || (bs.thing == 6 && f == 14)) bs.hasBeenBought = true;
                 }
                 if (bs.thing == 4 && Inventory.availableUpgrades.Contains(10))
                 {
                     bs.hasBeenBought = true;
                 } 
                 else if (bs.thing == 5 && Inventory.availableUpgrades.Contains(13))
+                {
+                    bs.hasBeenBought = true;
+                }
+                else if (bs.thing == 6 && Inventory.availableUpgrades.Contains(14))
                 {
                     bs.hasBeenBought = true;
                 }

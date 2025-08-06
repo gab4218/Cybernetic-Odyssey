@@ -79,7 +79,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] private AudioSource badHit, midHit, goodHit, missHit, damagedSound, healSound, grappleSound;
     [SerializeField] private TMP_Text interactText;
     [SerializeField] private int slamDamage = 25;
-    [SerializeField] private int parryHealing = 10;
+    [SerializeField] private int parryHealing = 20;
     [SerializeField] private int meleeDamage = 70;
     [SerializeField] private float meleeCooldown = 0.4f;
     [SerializeField] private Collider meleeCollider;
@@ -92,6 +92,7 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float slowDmgMult = 1.5f;
     [SerializeField] float slowDmgSpeedDiv = 0.75f;
     [SerializeField] float addedKnockback = 1.25f;
+    [SerializeField] private GameObject parryScreen;
 
     //Otras variables
     private Coroutine rifleCR;
@@ -122,6 +123,7 @@ public class PlayerActions : MonoBehaviour
     private bool canSlam = false;
     private bool allCrits = false;
     private bool slowDmg = false;
+    private bool fastDmg = false;
     private bool knockerBacker = false;
     private List<bool> canHealMats = new List<bool>{ false, false, false };
     private bool haltHeal = false;
@@ -159,6 +161,7 @@ public class PlayerActions : MonoBehaviour
     int selectedOverload = 0;
     private void Start()
     {
+        if (parryScreen != null) parryScreen.SetActive(false);
         won = false;
         grappleIndicator.gameObject.SetActive(false);
         dead = false;
@@ -178,6 +181,10 @@ public class PlayerActions : MonoBehaviour
         flamethrowerFire = flamethrowerFirePS.emission;
         flamethrowerFire.enabled = false;
         damagedIMG.color = new Color (damagedIMG.color.r, damagedIMG.color.g, damagedIMG.color.b, 0);
+        flamethrowerUnlockIMG?.gameObject.SetActive(false);
+        pistolUnlockIMG?.gameObject.SetActive(false);
+        rocketUnlockIMG?.gameObject.SetActive(false);
+        shotgunUnlockIMG?.gameObject.SetActive(false);
         uiBGIMG.sprite = UIarray[0];
         foreach (int i in Inventory.getEnabledUpgrades()) //Habilitar todas las mejoras activadas al iniciar
         {
@@ -303,6 +310,7 @@ public class PlayerActions : MonoBehaviour
                     if (Physics.Raycast(facingRay))
                     {
                         FireRocket();
+                        gunAnimator.SetTrigger("shot");
                         Invoke("readyWeapon", readyWeaponTime);
                     }
                     break;
@@ -463,6 +471,7 @@ public class PlayerActions : MonoBehaviour
             fallOffDistace = pistolFallOffMax;
             fallOffStart = pistolFallOffStart;
             readyWeaponTime = pistolCooldown / (slowDmg? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = readyWeaponTime * (fastDmg ? slowDmgSpeedDiv : 1f);
             gunMeshFilter.mesh = pistolMesh;
             pistolHand.SetActive(true);
             shotgunHand.SetActive(false);
@@ -476,6 +485,7 @@ public class PlayerActions : MonoBehaviour
             fallOffDistace = shotgunFallOffMax;
             fallOffStart = shotgunFallOffStart;
             readyWeaponTime = shotgunCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = readyWeaponTime * (fastDmg ? slowDmgSpeedDiv : 1f);
             gunMeshFilter.mesh = shotgunMesh;
             pistolHand.SetActive(false);
             shotgunHand.SetActive(true);
@@ -498,7 +508,8 @@ public class PlayerActions : MonoBehaviour
         {
             selectedWeapon = 3;
             gunMeshFilter.mesh = rocketMesh;
-            readyWeaponTime = 3f / (slowDmg ? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = 1.5f / (slowDmg ? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = readyWeaponTime * (fastDmg ? slowDmgSpeedDiv : 1f);
             pistolHand.SetActive(false);
             shotgunHand.SetActive(false);
             flamethrowerHand.SetActive(false);
@@ -510,6 +521,7 @@ public class PlayerActions : MonoBehaviour
             selectedWeapon = 4;
             gunMeshFilter.mesh = meleeMesh;
             readyWeaponTime = meleeCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = readyWeaponTime * (fastDmg ? slowDmgSpeedDiv : 1f);
             pistolHand.SetActive(false);
             shotgunHand.SetActive(false);
             flamethrowerHand.SetActive(false);
@@ -521,6 +533,7 @@ public class PlayerActions : MonoBehaviour
             selectedWeapon = 5;
             gunMeshFilter.mesh = rifleMesh;
             readyWeaponTime = rifleCooldown / (slowDmg ? slowDmgSpeedDiv : 1f);
+            readyWeaponTime = readyWeaponTime * (fastDmg ? slowDmgSpeedDiv : 1f);
             fallOffDistace = rifleFallOffMax;
             fallOffStart = rifleFallOffStart;
             pistolHand.SetActive(false);
@@ -699,6 +712,7 @@ public class PlayerActions : MonoBehaviour
                     
                     }
                     mult *= slowDmg? slowDmgMult : 1;
+                    mult /= fastDmg ? (slowDmgMult / 2f) : 1;
                     damage = (int)(((dist > fallOffStart * rangeMult) ? Mathf.RoundToInt(dmgPerPellet * (fallOffDistace * rangeMult - dist) / (fallOffDistace * rangeMult)) : dmgPerPellet) * mult * overloadMult);
                     if (!enemy.shielded)
                     {
@@ -857,10 +871,10 @@ public class PlayerActions : MonoBehaviour
             if (eb != null)
             {
                 if (eb.ignoreColliders.Contains(other)) return;
+                if (eb.invincible) return;
 
                 if (!eb.shielded)
                 {
-                    if (eb.invincible) return;
                     eb.takeDamage(slamDamage, damageType.None);
                     Vector3 d = other.transform.position - transform.position;
                     d.y = 0;
@@ -877,10 +891,15 @@ public class PlayerActions : MonoBehaviour
             if (eb != null)
             {
                 if (eb.ignoreColliders.Contains(other)) return;
+                if (eb.invincible) return;
 
+                float mult = 1f;
+                mult *= slowDmg ? slowDmgMult : 1;
+                mult /= fastDmg ? (slowDmgMult / 2f) : 1;
                 if (!eb.shielded)
                 {
-                    eb.takeDamage(meleeDamage, damageType.None);
+
+                    eb.takeDamage((int)(meleeDamage * mult), damageType.None);
                     float mul = knockerBacker ? 2 : 1;
                     eb.GetComponent<Rigidbody>().AddForce(mul * facingRay.direction.normalized, ForceMode.Impulse);
                     if (canParry)
@@ -890,8 +909,8 @@ public class PlayerActions : MonoBehaviour
                             canGetHit = false;
                             Invoke("DamageAgain", 0.2f);
                             currentHP += (currentHP + parryHealing) > maxHP ? (maxHP - currentHP) : parryHealing;
-                            camContoller.Shake(0.15f, 0.1f);
-                            StartCoroutine(QuickPause(0.1f));
+                            camContoller.Shake(0.25f, 0.2f);
+                            StartCoroutine(QuickPause(0.2f));
                         }
                     }
                 }
@@ -902,9 +921,11 @@ public class PlayerActions : MonoBehaviour
 
     private IEnumerator QuickPause(float t)
     {
+        parryScreen.SetActive(true);
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(t);
         Time.timeScale = 1;
+        parryScreen.SetActive(false);
     }
 
     public void takeDamage(int dmg) //Recibir damage
@@ -1011,7 +1032,7 @@ public class PlayerActions : MonoBehaviour
                         readyWeaponTime = shotgunCooldown / slowDmgSpeedDiv;
                         break;
                     case 3:
-                        readyWeaponTime = 3 / slowDmgSpeedDiv;
+                        readyWeaponTime = 1.5f / slowDmgSpeedDiv;
                         break;
                     case 4:
                         readyWeaponTime = meleeCooldown / slowDmgSpeedDiv;
@@ -1026,6 +1047,30 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 13:
                 knockerBacker = true;
+                break;
+            case 14:
+                fastDmg = true;
+                gunAnimator.speed = 1.5f;
+                switch (selectedWeapon)
+                {
+                    case 0:
+                        readyWeaponTime = pistolCooldown * slowDmgSpeedDiv;
+                        break;
+                    case 1:
+                        readyWeaponTime = shotgunCooldown * slowDmgSpeedDiv;
+                        break;
+                    case 3:
+                        readyWeaponTime = 1.5f * slowDmgSpeedDiv;
+                        break;
+                    case 4:
+                        readyWeaponTime = meleeCooldown * slowDmgSpeedDiv;
+                        break;
+                    case 5:
+                        readyWeaponTime = rifleCooldown * slowDmgSpeedDiv;
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
@@ -1123,7 +1168,7 @@ public class PlayerActions : MonoBehaviour
                         readyWeaponTime = shotgunCooldown;
                         break;
                     case 3:
-                        readyWeaponTime = 3;
+                        readyWeaponTime = 1.5f;
                         break;
                     case 4:
                         readyWeaponTime = meleeCooldown;
@@ -1137,6 +1182,30 @@ public class PlayerActions : MonoBehaviour
                 break;
             case 13:
                 knockerBacker = false;
+                break;
+            case 14:
+                fastDmg = false;
+                gunAnimator.speed = 1;
+                switch (selectedWeapon)
+                {
+                    case 0:
+                        readyWeaponTime = pistolCooldown;
+                        break;
+                    case 1:
+                        readyWeaponTime = shotgunCooldown;
+                        break;
+                    case 3:
+                        readyWeaponTime = 1.5f;
+                        break;
+                    case 4:
+                        readyWeaponTime = meleeCooldown;
+                        break;
+                    case 5:
+                        readyWeaponTime = rifleCooldown;
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
